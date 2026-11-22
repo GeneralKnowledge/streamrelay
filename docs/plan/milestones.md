@@ -20,6 +20,8 @@ Later, not scheduled: Android client (same protocol, no server change), adaptive
 
 ## M1: Media pipeline proof (Linux, no phone)
 
+**Status: passed 2026-11-22** ([run report](../../tests/results/m1/2026-11-22/RESULTS.md)). Deliberately left for later: catch-up and hold modes (M4; until then the playout plays them as skip-to-live), media probing of inits (`codec` is stored as `unprobed`, M3), Alembic (plain numbered SQL migrations until the schema first changes after release), pairing (a static token provisions one device, M3).
+
 **Goal.** Show that the server can turn independently arriving fMP4 segments into one continuous RTMP output, switching to holding media during gaps and back, without the output ever reconnecting.
 
 **Starts with** [spike S1](spike-s1-playout.md) (the riskiest assumption). If S1 fails its gate, the playout engine choice (ADR 0005) is revisited before anything else is built.

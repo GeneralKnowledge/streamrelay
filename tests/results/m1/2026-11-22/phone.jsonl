@@ -1,0 +1,1265 @@
+{"wall": 1795367126.132, "event": "start", "broadcast_id": "01a20438-4470-71b4-94de-eb3c990342f4", "t0": 1795367126.1322348, "segments": 600, "mode": "skip_to_live", "offline": [[120.0, 130.0], [300.0, 360.0], [600.0, 900.0]], "duration_s": 1200.0}
+{"wall": 1795367126.14, "event": "init", "status": 201}
+{"wall": 1795367128.138, "event": "captured", "seq": 0}
+{"wall": 1795367128.151, "event": "put", "seq": 0, "kind": "live", "status": 201, "ms": 12, "bytes": 101042}
+{"wall": 1795367130.152, "event": "captured", "seq": 1}
+{"wall": 1795367130.166, "event": "put", "seq": 1, "kind": "live", "status": 201, "ms": 14, "bytes": 99085}
+{"wall": 1795367132.145, "event": "captured", "seq": 2}
+{"wall": 1795367132.153, "event": "put", "seq": 2, "kind": "live", "status": 201, "ms": 8, "bytes": 100883}
+{"wall": 1795367132.171, "event": "put", "seq": 2, "kind": "duplicate", "status": 200, "ms": 6, "bytes": 100883}
+{"wall": 1795367134.137, "event": "captured", "seq": 3}
+{"wall": 1795367134.144, "event": "put", "seq": 3, "kind": "live", "status": 201, "ms": 6, "bytes": 99429}
+{"wall": 1795367136.149, "event": "captured", "seq": 4}
+{"wall": 1795367136.156, "event": "put", "seq": 4, "kind": "live", "status": 201, "ms": 7, "bytes": 100953}
+{"wall": 1795367138.139, "event": "captured", "seq": 5}
+{"wall": 1795367138.146, "event": "put", "seq": 5, "kind": "live", "status": 201, "ms": 6, "bytes": 98354}
+{"wall": 1795367140.152, "event": "captured", "seq": 6}
+{"wall": 1795367140.159, "event": "put", "seq": 6, "kind": "live", "status": 201, "ms": 6, "bytes": 99699}
+{"wall": 1795367142.148, "event": "captured", "seq": 7}
+{"wall": 1795367144.141, "event": "captured", "seq": 8}
+{"wall": 1795367144.153, "event": "put", "seq": 7, "kind": "live", "status": 201, "ms": 11, "bytes": 100459}
+{"wall": 1795367144.153, "event": "put", "seq": 8, "kind": "live", "status": 201, "ms": 12, "bytes": 100063}
+{"wall": 1795367146.135, "event": "captured", "seq": 9}
+{"wall": 1795367146.144, "event": "put", "seq": 9, "kind": "live", "status": 201, "ms": 9, "bytes": 100817}
+{"wall": 1795367148.148, "event": "captured", "seq": 10}
+{"wall": 1795367148.158, "event": "put", "seq": 10, "kind": "live", "status": 201, "ms": 9, "bytes": 98572}
+{"wall": 1795367150.145, "event": "captured", "seq": 11}
+{"wall": 1795367150.153, "event": "put", "seq": 11, "kind": "live", "status": 201, "ms": 8, "bytes": 99203}
+{"wall": 1795367152.139, "event": "captured", "seq": 12}
+{"wall": 1795367152.147, "event": "put", "seq": 12, "kind": "live", "status": 201, "ms": 8, "bytes": 101329}
+{"wall": 1795367154.152, "event": "captured", "seq": 13}
+{"wall": 1795367154.16, "event": "put", "seq": 13, "kind": "live", "status": 201, "ms": 8, "bytes": 99961}
+{"wall": 1795367156.147, "event": "captured", "seq": 14}
+{"wall": 1795367156.156, "event": "put", "seq": 14, "kind": "live", "status": 201, "ms": 8, "bytes": 100828}
+{"wall": 1795367158.14, "event": "captured", "seq": 15}
+{"wall": 1795367158.146, "event": "put", "seq": 15, "kind": "live", "status": 201, "ms": 6, "bytes": 98404}
+{"wall": 1795367160.134, "event": "captured", "seq": 16}
+{"wall": 1795367160.14, "event": "put", "seq": 16, "kind": "live", "status": 201, "ms": 6, "bytes": 100388}
+{"wall": 1795367162.145, "event": "captured", "seq": 17}
+{"wall": 1795367162.165, "event": "put", "seq": 17, "kind": "live", "status": 201, "ms": 19, "bytes": 101034}
+{"wall": 1795367164.143, "event": "captured", "seq": 18}
+{"wall": 1795367164.15, "event": "put", "seq": 18, "kind": "live", "status": 201, "ms": 7, "bytes": 100444}
+{"wall": 1795367166.136, "event": "captured", "seq": 19}
+{"wall": 1795367168.151, "event": "captured", "seq": 20}
+{"wall": 1795367168.162, "event": "put", "seq": 19, "kind": "live", "status": 201, "ms": 10, "bytes": 100881}
+{"wall": 1795367168.162, "event": "put", "seq": 20, "kind": "live", "status": 201, "ms": 10, "bytes": 98818}
+{"wall": 1795367170.146, "event": "captured", "seq": 21}
+{"wall": 1795367170.154, "event": "put", "seq": 21, "kind": "live", "status": 201, "ms": 7, "bytes": 100030}
+{"wall": 1795367172.139, "event": "captured", "seq": 22}
+{"wall": 1795367172.147, "event": "put", "seq": 22, "kind": "live", "status": 201, "ms": 8, "bytes": 101111}
+{"wall": 1795367174.132, "event": "captured", "seq": 23}
+{"wall": 1795367174.142, "event": "put", "seq": 23, "kind": "live", "status": 201, "ms": 9, "bytes": 100247}
+{"wall": 1795367176.146, "event": "captured", "seq": 24}
+{"wall": 1795367176.158, "event": "put", "seq": 24, "kind": "live", "status": 201, "ms": 11, "bytes": 101070}
+{"wall": 1795367178.14, "event": "captured", "seq": 25}
+{"wall": 1795367178.146, "event": "put", "seq": 25, "kind": "live", "status": 201, "ms": 6, "bytes": 98827}
+{"wall": 1795367180.136, "event": "captured", "seq": 26}
+{"wall": 1795367180.144, "event": "put", "seq": 26, "kind": "live", "status": 201, "ms": 7, "bytes": 99781}
+{"wall": 1795367180.162, "event": "put", "seq": 26, "kind": "duplicate", "status": 200, "ms": 5, "bytes": 99781}
+{"wall": 1795367182.15, "event": "captured", "seq": 27}
+{"wall": 1795367182.157, "event": "put", "seq": 27, "kind": "live", "status": 201, "ms": 7, "bytes": 100945}
+{"wall": 1795367184.142, "event": "captured", "seq": 28}
+{"wall": 1795367184.15, "event": "put", "seq": 28, "kind": "live", "status": 201, "ms": 6, "bytes": 100401}
+{"wall": 1795367186.134, "event": "captured", "seq": 29}
+{"wall": 1795367186.141, "event": "put", "seq": 29, "kind": "live", "status": 201, "ms": 7, "bytes": 101045}
+{"wall": 1795367188.149, "event": "captured", "seq": 30}
+{"wall": 1795367188.158, "event": "put", "seq": 30, "kind": "live", "status": 201, "ms": 8, "bytes": 98713}
+{"wall": 1795367190.144, "event": "captured", "seq": 31}
+{"wall": 1795367190.152, "event": "put", "seq": 31, "kind": "live", "status": 201, "ms": 7, "bytes": 99392}
+{"wall": 1795367192.139, "event": "captured", "seq": 32}
+{"wall": 1795367192.145, "event": "put", "seq": 32, "kind": "live", "status": 201, "ms": 6, "bytes": 101136}
+{"wall": 1795367194.151, "event": "captured", "seq": 33}
+{"wall": 1795367194.159, "event": "put", "seq": 33, "kind": "live", "status": 201, "ms": 7, "bytes": 100307}
+{"wall": 1795367196.152, "event": "captured", "seq": 34}
+{"wall": 1795367196.16, "event": "put", "seq": 34, "kind": "live", "status": 201, "ms": 6, "bytes": 101259}
+{"wall": 1795367198.143, "event": "captured", "seq": 35}
+{"wall": 1795367198.15, "event": "put", "seq": 35, "kind": "live", "status": 201, "ms": 6, "bytes": 98045}
+{"wall": 1795367200.138, "event": "captured", "seq": 36}
+{"wall": 1795367202.152, "event": "captured", "seq": 37}
+{"wall": 1795367202.163, "event": "put", "seq": 36, "kind": "live", "status": 201, "ms": 10, "bytes": 99896}
+{"wall": 1795367202.164, "event": "put", "seq": 37, "kind": "live", "status": 201, "ms": 11, "bytes": 100654}
+{"wall": 1795367204.148, "event": "captured", "seq": 38}
+{"wall": 1795367204.157, "event": "put", "seq": 38, "kind": "live", "status": 201, "ms": 8, "bytes": 100059}
+{"wall": 1795367206.141, "event": "captured", "seq": 39}
+{"wall": 1795367206.149, "event": "put", "seq": 39, "kind": "live", "status": 201, "ms": 8, "bytes": 100611}
+{"wall": 1795367208.137, "event": "captured", "seq": 40}
+{"wall": 1795367208.143, "event": "put", "seq": 40, "kind": "live", "status": 201, "ms": 6, "bytes": 98789}
+{"wall": 1795367210.15, "event": "captured", "seq": 41}
+{"wall": 1795367210.157, "event": "put", "seq": 41, "kind": "live", "status": 201, "ms": 7, "bytes": 99765}
+{"wall": 1795367212.142, "event": "captured", "seq": 42}
+{"wall": 1795367212.151, "event": "put", "seq": 42, "kind": "live", "status": 201, "ms": 8, "bytes": 101351}
+{"wall": 1795367214.138, "event": "captured", "seq": 43}
+{"wall": 1795367214.144, "event": "put", "seq": 43, "kind": "live", "status": 201, "ms": 6, "bytes": 99866}
+{"wall": 1795367216.152, "event": "captured", "seq": 44}
+{"wall": 1795367216.162, "event": "put", "seq": 44, "kind": "live", "status": 422, "ms": 10, "bytes": 100945, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795367216.168, "event": "put", "seq": 44, "kind": "live", "status": 201, "ms": 6, "bytes": 100945}
+{"wall": 1795367218.144, "event": "captured", "seq": 45}
+{"wall": 1795367218.155, "event": "put", "seq": 45, "kind": "live", "status": 201, "ms": 11, "bytes": 98743}
+{"wall": 1795367218.169, "event": "put", "seq": 45, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 98743}
+{"wall": 1795367220.14, "event": "captured", "seq": 46}
+{"wall": 1795367220.149, "event": "put", "seq": 46, "kind": "live", "status": 201, "ms": 8, "bytes": 100275}
+{"wall": 1795367222.152, "event": "captured", "seq": 47}
+{"wall": 1795367222.159, "event": "put", "seq": 47, "kind": "live", "status": 201, "ms": 7, "bytes": 100861}
+{"wall": 1795367224.146, "event": "captured", "seq": 48}
+{"wall": 1795367224.165, "event": "put", "seq": 48, "kind": "live", "status": 201, "ms": 19, "bytes": 100222}
+{"wall": 1795367226.14, "event": "captured", "seq": 49}
+{"wall": 1795367226.147, "event": "put", "seq": 49, "kind": "live", "status": 201, "ms": 6, "bytes": 101053}
+{"wall": 1795367228.134, "event": "captured", "seq": 50}
+{"wall": 1795367228.142, "event": "put", "seq": 50, "kind": "live", "status": 201, "ms": 8, "bytes": 98894}
+{"wall": 1795367230.147, "event": "captured", "seq": 51}
+{"wall": 1795367230.157, "event": "put", "seq": 51, "kind": "live", "status": 201, "ms": 9, "bytes": 99543}
+{"wall": 1795367230.174, "event": "put", "seq": 51, "kind": "duplicate", "status": 200, "ms": 6, "bytes": 99543}
+{"wall": 1795367232.14, "event": "captured", "seq": 52}
+{"wall": 1795367232.147, "event": "put", "seq": 52, "kind": "live", "status": 201, "ms": 7, "bytes": 100907}
+{"wall": 1795367234.133, "event": "captured", "seq": 53}
+{"wall": 1795367234.141, "event": "put", "seq": 53, "kind": "live", "status": 201, "ms": 8, "bytes": 100091}
+{"wall": 1795367236.149, "event": "captured", "seq": 54}
+{"wall": 1795367236.159, "event": "put", "seq": 54, "kind": "live", "status": 201, "ms": 9, "bytes": 100987}
+{"wall": 1795367238.142, "event": "captured", "seq": 55}
+{"wall": 1795367238.149, "event": "put", "seq": 55, "kind": "live", "status": 201, "ms": 7, "bytes": 98534}
+{"wall": 1795367240.135, "event": "captured", "seq": 56}
+{"wall": 1795367240.142, "event": "put", "seq": 56, "kind": "live", "status": 201, "ms": 7, "bytes": 100595}
+{"wall": 1795367242.149, "event": "captured", "seq": 57}
+{"wall": 1795367242.157, "event": "put", "seq": 57, "kind": "live", "status": 201, "ms": 8, "bytes": 100754}
+{"wall": 1795367244.141, "event": "captured", "seq": 58}
+{"wall": 1795367244.148, "event": "put", "seq": 58, "kind": "live", "status": 201, "ms": 6, "bytes": 100202}
+{"wall": 1795367246.133, "event": "captured", "seq": 59}
+{"wall": 1795367246.133, "event": "offline_start", "rel": 120.0}
+{"wall": 1795367248.145, "event": "captured", "seq": 60}
+{"wall": 1795367250.137, "event": "captured", "seq": 61}
+{"wall": 1795367252.148, "event": "captured", "seq": 62}
+{"wall": 1795367254.14, "event": "captured", "seq": 63}
+{"wall": 1795367256.15, "event": "captured", "seq": 64}
+{"wall": 1795367256.151, "event": "offline_end", "rel": 130.018}
+{"wall": 1795367256.165, "event": "put", "seq": 60, "kind": "backfill", "status": 201, "ms": 13, "bytes": 98981}
+{"wall": 1795367256.167, "event": "put", "seq": 63, "kind": "live", "status": 201, "ms": 14, "bytes": 100291}
+{"wall": 1795367256.17, "event": "put", "seq": 59, "kind": "backfill", "status": 201, "ms": 17, "bytes": 100639}
+{"wall": 1795367257.168, "event": "put", "seq": 61, "kind": "backfill", "status": 201, "ms": 8, "bytes": 99966}
+{"wall": 1795367258.147, "event": "captured", "seq": 65}
+{"wall": 1795367258.157, "event": "put", "seq": 64, "kind": "live", "status": 201, "ms": 10, "bytes": 101455}
+{"wall": 1795367258.158, "event": "put", "seq": 65, "kind": "live", "status": 201, "ms": 10, "bytes": 98465}
+{"wall": 1795367258.173, "event": "put", "seq": 62, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101947}
+{"wall": 1795367260.139, "event": "captured", "seq": 66}
+{"wall": 1795367260.146, "event": "put", "seq": 66, "kind": "live", "status": 201, "ms": 7, "bytes": 100680}
+{"wall": 1795367262.151, "event": "captured", "seq": 67}
+{"wall": 1795367262.16, "event": "put", "seq": 67, "kind": "live", "status": 201, "ms": 8, "bytes": 100865}
+{"wall": 1795367264.142, "event": "captured", "seq": 68}
+{"wall": 1795367264.15, "event": "put", "seq": 68, "kind": "live", "status": 201, "ms": 7, "bytes": 100097}
+{"wall": 1795367266.137, "event": "captured", "seq": 69}
+{"wall": 1795367266.143, "event": "put", "seq": 69, "kind": "live", "status": 201, "ms": 6, "bytes": 100791}
+{"wall": 1795367268.148, "event": "captured", "seq": 70}
+{"wall": 1795367268.155, "event": "put", "seq": 70, "kind": "live", "status": 201, "ms": 7, "bytes": 98990}
+{"wall": 1795367270.139, "event": "captured", "seq": 71}
+{"wall": 1795367270.146, "event": "put", "seq": 71, "kind": "live", "status": 201, "ms": 6, "bytes": 99707}
+{"wall": 1795367272.132, "event": "captured", "seq": 72}
+{"wall": 1795367272.139, "event": "put", "seq": 72, "kind": "live", "status": 201, "ms": 6, "bytes": 101163}
+{"wall": 1795367274.144, "event": "captured", "seq": 73}
+{"wall": 1795367274.152, "event": "put", "seq": 73, "kind": "live", "status": 201, "ms": 7, "bytes": 100561}
+{"wall": 1795367276.136, "event": "captured", "seq": 74}
+{"wall": 1795367276.144, "event": "put", "seq": 74, "kind": "live", "status": 201, "ms": 6, "bytes": 101064}
+{"wall": 1795367278.149, "event": "captured", "seq": 75}
+{"wall": 1795367278.156, "event": "put", "seq": 75, "kind": "live", "status": 201, "ms": 7, "bytes": 98544}
+{"wall": 1795367280.142, "event": "captured", "seq": 76}
+{"wall": 1795367280.15, "event": "put", "seq": 76, "kind": "live", "status": 201, "ms": 7, "bytes": 100378}
+{"wall": 1795367282.133, "event": "captured", "seq": 77}
+{"wall": 1795367284.149, "event": "captured", "seq": 78}
+{"wall": 1795367284.158, "event": "put", "seq": 77, "kind": "live", "status": 201, "ms": 8, "bytes": 101318}
+{"wall": 1795367284.159, "event": "put", "seq": 78, "kind": "live", "status": 201, "ms": 8, "bytes": 100659}
+{"wall": 1795367286.143, "event": "captured", "seq": 79}
+{"wall": 1795367286.149, "event": "put", "seq": 79, "kind": "live", "status": 201, "ms": 6, "bytes": 100791}
+{"wall": 1795367288.135, "event": "captured", "seq": 80}
+{"wall": 1795367288.141, "event": "put", "seq": 80, "kind": "live", "status": 201, "ms": 6, "bytes": 98898}
+{"wall": 1795367290.146, "event": "captured", "seq": 81}
+{"wall": 1795367290.153, "event": "put", "seq": 81, "kind": "live", "status": 201, "ms": 7, "bytes": 99868}
+{"wall": 1795367292.139, "event": "captured", "seq": 82}
+{"wall": 1795367292.146, "event": "put", "seq": 82, "kind": "live", "status": 201, "ms": 6, "bytes": 101325}
+{"wall": 1795367294.151, "event": "captured", "seq": 83}
+{"wall": 1795367294.158, "event": "put", "seq": 83, "kind": "live", "status": 201, "ms": 5, "bytes": 100221}
+{"wall": 1795367296.143, "event": "captured", "seq": 84}
+{"wall": 1795367296.15, "event": "put", "seq": 84, "kind": "live", "status": 201, "ms": 6, "bytes": 100964}
+{"wall": 1795367298.136, "event": "captured", "seq": 85}
+{"wall": 1795367298.144, "event": "put", "seq": 85, "kind": "live", "status": 201, "ms": 7, "bytes": 98470}
+{"wall": 1795367300.149, "event": "captured", "seq": 86}
+{"wall": 1795367302.143, "event": "captured", "seq": 87}
+{"wall": 1795367302.15, "event": "put", "seq": 87, "kind": "live", "status": 201, "ms": 7, "bytes": 100783}
+{"wall": 1795367302.151, "event": "put", "seq": 86, "kind": "live", "status": 201, "ms": 8, "bytes": 99561}
+{"wall": 1795367302.168, "event": "put", "seq": 87, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 100783}
+{"wall": 1795367304.137, "event": "captured", "seq": 88}
+{"wall": 1795367304.143, "event": "put", "seq": 88, "kind": "live", "status": 201, "ms": 6, "bytes": 100283}
+{"wall": 1795367306.149, "event": "captured", "seq": 89}
+{"wall": 1795367306.157, "event": "put", "seq": 89, "kind": "live", "status": 201, "ms": 8, "bytes": 101023}
+{"wall": 1795367308.143, "event": "captured", "seq": 90}
+{"wall": 1795367308.152, "event": "put", "seq": 90, "kind": "live", "status": 201, "ms": 9, "bytes": 99010}
+{"wall": 1795367310.139, "event": "captured", "seq": 91}
+{"wall": 1795367310.147, "event": "put", "seq": 91, "kind": "live", "status": 201, "ms": 7, "bytes": 99777}
+{"wall": 1795367312.133, "event": "captured", "seq": 92}
+{"wall": 1795367312.139, "event": "put", "seq": 92, "kind": "live", "status": 201, "ms": 6, "bytes": 101451}
+{"wall": 1795367314.144, "event": "captured", "seq": 93}
+{"wall": 1795367314.151, "event": "put", "seq": 93, "kind": "live", "status": 201, "ms": 6, "bytes": 100395}
+{"wall": 1795367316.137, "event": "captured", "seq": 94}
+{"wall": 1795367316.155, "event": "put", "seq": 94, "kind": "live", "status": 201, "ms": 18, "bytes": 101623}
+{"wall": 1795367318.149, "event": "captured", "seq": 95}
+{"wall": 1795367318.156, "event": "put", "seq": 95, "kind": "live", "status": 201, "ms": 7, "bytes": 98269}
+{"wall": 1795367320.141, "event": "captured", "seq": 96}
+{"wall": 1795367320.148, "event": "put", "seq": 96, "kind": "live", "status": 201, "ms": 6, "bytes": 100310}
+{"wall": 1795367322.133, "event": "captured", "seq": 97}
+{"wall": 1795367322.139, "event": "put", "seq": 97, "kind": "live", "status": 201, "ms": 6, "bytes": 101224}
+{"wall": 1795367324.144, "event": "captured", "seq": 98}
+{"wall": 1795367324.15, "event": "put", "seq": 98, "kind": "live", "status": 201, "ms": 6, "bytes": 100360}
+{"wall": 1795367326.136, "event": "captured", "seq": 99}
+{"wall": 1795367326.142, "event": "put", "seq": 99, "kind": "live", "status": 201, "ms": 5, "bytes": 100902}
+{"wall": 1795367328.148, "event": "captured", "seq": 100}
+{"wall": 1795367328.157, "event": "put", "seq": 100, "kind": "live", "status": 201, "ms": 8, "bytes": 99000}
+{"wall": 1795367330.141, "event": "captured", "seq": 101}
+{"wall": 1795367330.148, "event": "put", "seq": 101, "kind": "live", "status": 201, "ms": 6, "bytes": 99691}
+{"wall": 1795367332.136, "event": "captured", "seq": 102}
+{"wall": 1795367332.145, "event": "put", "seq": 102, "kind": "live", "status": 201, "ms": 8, "bytes": 101221}
+{"wall": 1795367334.152, "event": "captured", "seq": 103}
+{"wall": 1795367334.158, "event": "put", "seq": 103, "kind": "live", "status": 201, "ms": 6, "bytes": 99978}
+{"wall": 1795367336.147, "event": "captured", "seq": 104}
+{"wall": 1795367336.155, "event": "put", "seq": 104, "kind": "live", "status": 201, "ms": 8, "bytes": 101185}
+{"wall": 1795367338.139, "event": "captured", "seq": 105}
+{"wall": 1795367338.146, "event": "put", "seq": 105, "kind": "live", "status": 201, "ms": 6, "bytes": 98929}
+{"wall": 1795367340.132, "event": "captured", "seq": 106}
+{"wall": 1795367340.138, "event": "put", "seq": 106, "kind": "live", "status": 201, "ms": 6, "bytes": 100071}
+{"wall": 1795367342.144, "event": "captured", "seq": 107}
+{"wall": 1795367342.151, "event": "put", "seq": 107, "kind": "live", "status": 201, "ms": 6, "bytes": 100986}
+{"wall": 1795367344.136, "event": "captured", "seq": 108}
+{"wall": 1795367344.141, "event": "put", "seq": 108, "kind": "live", "status": 422, "ms": 5, "bytes": 100300, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795367344.145, "event": "put", "seq": 108, "kind": "live", "status": 201, "ms": 4, "bytes": 100300}
+{"wall": 1795367346.148, "event": "captured", "seq": 109}
+{"wall": 1795367346.153, "event": "put", "seq": 109, "kind": "live", "status": 422, "ms": 5, "bytes": 101300, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795367346.159, "event": "put", "seq": 109, "kind": "live", "status": 201, "ms": 5, "bytes": 101300}
+{"wall": 1795367348.14, "event": "captured", "seq": 110}
+{"wall": 1795367348.145, "event": "put", "seq": 110, "kind": "live", "status": 201, "ms": 5, "bytes": 98803}
+{"wall": 1795367350.151, "event": "captured", "seq": 111}
+{"wall": 1795367350.157, "event": "put", "seq": 111, "kind": "live", "status": 201, "ms": 6, "bytes": 99859}
+{"wall": 1795367352.143, "event": "captured", "seq": 112}
+{"wall": 1795367352.15, "event": "put", "seq": 112, "kind": "live", "status": 201, "ms": 6, "bytes": 102117}
+{"wall": 1795367352.167, "event": "put", "seq": 112, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 102117}
+{"wall": 1795367354.134, "event": "captured", "seq": 113}
+{"wall": 1795367354.139, "event": "put", "seq": 113, "kind": "live", "status": 201, "ms": 5, "bytes": 100329}
+{"wall": 1795367356.147, "event": "captured", "seq": 114}
+{"wall": 1795367356.154, "event": "put", "seq": 114, "kind": "live", "status": 201, "ms": 7, "bytes": 101318}
+{"wall": 1795367358.139, "event": "captured", "seq": 115}
+{"wall": 1795367358.145, "event": "put", "seq": 115, "kind": "live", "status": 201, "ms": 6, "bytes": 98648}
+{"wall": 1795367360.152, "event": "captured", "seq": 116}
+{"wall": 1795367360.16, "event": "put", "seq": 116, "kind": "live", "status": 201, "ms": 8, "bytes": 100724}
+{"wall": 1795367362.144, "event": "captured", "seq": 117}
+{"wall": 1795367362.151, "event": "put", "seq": 117, "kind": "live", "status": 201, "ms": 6, "bytes": 101243}
+{"wall": 1795367364.136, "event": "captured", "seq": 118}
+{"wall": 1795367364.142, "event": "put", "seq": 118, "kind": "live", "status": 201, "ms": 6, "bytes": 100232}
+{"wall": 1795367366.149, "event": "captured", "seq": 119}
+{"wall": 1795367366.156, "event": "put", "seq": 119, "kind": "live", "status": 201, "ms": 7, "bytes": 100746}
+{"wall": 1795367368.141, "event": "captured", "seq": 120}
+{"wall": 1795367368.148, "event": "put", "seq": 120, "kind": "live", "status": 201, "ms": 7, "bytes": 98771}
+{"wall": 1795367370.134, "event": "captured", "seq": 121}
+{"wall": 1795367370.143, "event": "put", "seq": 121, "kind": "live", "status": 201, "ms": 9, "bytes": 100074}
+{"wall": 1795367372.147, "event": "captured", "seq": 122}
+{"wall": 1795367372.156, "event": "put", "seq": 122, "kind": "live", "status": 201, "ms": 9, "bytes": 101143}
+{"wall": 1795367374.139, "event": "captured", "seq": 123}
+{"wall": 1795367374.149, "event": "put", "seq": 123, "kind": "live", "status": 201, "ms": 10, "bytes": 99994}
+{"wall": 1795367376.152, "event": "captured", "seq": 124}
+{"wall": 1795367376.158, "event": "put", "seq": 124, "kind": "live", "status": 201, "ms": 6, "bytes": 101175}
+{"wall": 1795367378.144, "event": "captured", "seq": 125}
+{"wall": 1795367378.154, "event": "put", "seq": 125, "kind": "live", "status": 201, "ms": 10, "bytes": 98359}
+{"wall": 1795367380.135, "event": "captured", "seq": 126}
+{"wall": 1795367380.143, "event": "put", "seq": 126, "kind": "live", "status": 201, "ms": 7, "bytes": 99531}
+{"wall": 1795367382.147, "event": "captured", "seq": 127}
+{"wall": 1795367384.139, "event": "captured", "seq": 128}
+{"wall": 1795367384.146, "event": "put", "seq": 127, "kind": "live", "status": 422, "ms": 5, "bytes": 100437, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795367384.148, "event": "put", "seq": 128, "kind": "live", "status": 201, "ms": 8, "bytes": 99836}
+{"wall": 1795367384.152, "event": "put", "seq": 127, "kind": "live", "status": 201, "ms": 6, "bytes": 100437}
+{"wall": 1795367386.15, "event": "captured", "seq": 129}
+{"wall": 1795367386.157, "event": "put", "seq": 129, "kind": "live", "status": 201, "ms": 7, "bytes": 100657}
+{"wall": 1795367388.141, "event": "captured", "seq": 130}
+{"wall": 1795367388.147, "event": "put", "seq": 130, "kind": "live", "status": 201, "ms": 6, "bytes": 98898}
+{"wall": 1795367390.152, "event": "captured", "seq": 131}
+{"wall": 1795367390.158, "event": "put", "seq": 131, "kind": "live", "status": 201, "ms": 6, "bytes": 99291}
+{"wall": 1795367392.144, "event": "captured", "seq": 132}
+{"wall": 1795367392.152, "event": "put", "seq": 132, "kind": "live", "status": 201, "ms": 7, "bytes": 100866}
+{"wall": 1795367394.135, "event": "captured", "seq": 133}
+{"wall": 1795367394.142, "event": "put", "seq": 133, "kind": "live", "status": 201, "ms": 6, "bytes": 100338}
+{"wall": 1795367396.146, "event": "captured", "seq": 134}
+{"wall": 1795367396.155, "event": "put", "seq": 134, "kind": "live", "status": 201, "ms": 9, "bytes": 101241}
+{"wall": 1795367398.137, "event": "captured", "seq": 135}
+{"wall": 1795367398.144, "event": "put", "seq": 135, "kind": "live", "status": 201, "ms": 7, "bytes": 98414}
+{"wall": 1795367400.148, "event": "captured", "seq": 136}
+{"wall": 1795367400.155, "event": "put", "seq": 136, "kind": "live", "status": 201, "ms": 7, "bytes": 100480}
+{"wall": 1795367402.139, "event": "captured", "seq": 137}
+{"wall": 1795367402.146, "event": "put", "seq": 137, "kind": "live", "status": 201, "ms": 6, "bytes": 101527}
+{"wall": 1795367404.15, "event": "captured", "seq": 138}
+{"wall": 1795367404.158, "event": "put", "seq": 138, "kind": "live", "status": 201, "ms": 8, "bytes": 100626}
+{"wall": 1795367406.141, "event": "captured", "seq": 139}
+{"wall": 1795367406.146, "event": "put", "seq": 139, "kind": "live", "status": 201, "ms": 5, "bytes": 100969}
+{"wall": 1795367408.152, "event": "captured", "seq": 140}
+{"wall": 1795367408.166, "event": "put", "seq": 140, "kind": "live", "status": 201, "ms": 14, "bytes": 98790}
+{"wall": 1795367410.142, "event": "captured", "seq": 141}
+{"wall": 1795367410.149, "event": "put", "seq": 141, "kind": "live", "status": 201, "ms": 7, "bytes": 99731}
+{"wall": 1795367412.134, "event": "captured", "seq": 142}
+{"wall": 1795367412.14, "event": "put", "seq": 142, "kind": "live", "status": 201, "ms": 6, "bytes": 101006}
+{"wall": 1795367414.146, "event": "captured", "seq": 143}
+{"wall": 1795367416.137, "event": "captured", "seq": 144}
+{"wall": 1795367416.146, "event": "put", "seq": 144, "kind": "live", "status": 201, "ms": 8, "bytes": 101141}
+{"wall": 1795367416.147, "event": "put", "seq": 143, "kind": "live", "status": 201, "ms": 9, "bytes": 100116}
+{"wall": 1795367418.15, "event": "captured", "seq": 145}
+{"wall": 1795367418.156, "event": "put", "seq": 145, "kind": "live", "status": 422, "ms": 5, "bytes": 98906, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795367418.161, "event": "put", "seq": 145, "kind": "live", "status": 201, "ms": 5, "bytes": 98906}
+{"wall": 1795367420.143, "event": "captured", "seq": 146}
+{"wall": 1795367420.151, "event": "put", "seq": 146, "kind": "live", "status": 201, "ms": 8, "bytes": 100433}
+{"wall": 1795367420.168, "event": "put", "seq": 146, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 100433}
+{"wall": 1795367422.136, "event": "captured", "seq": 147}
+{"wall": 1795367424.146, "event": "captured", "seq": 148}
+{"wall": 1795367424.154, "event": "put", "seq": 148, "kind": "live", "status": 201, "ms": 8, "bytes": 100550}
+{"wall": 1795367424.155, "event": "put", "seq": 147, "kind": "live", "status": 201, "ms": 9, "bytes": 101141}
+{"wall": 1795367426.137, "event": "captured", "seq": 149}
+{"wall": 1795367426.137, "event": "offline_start", "rel": 300.004}
+{"wall": 1795367428.133, "event": "captured", "seq": 150}
+{"wall": 1795367430.147, "event": "captured", "seq": 151}
+{"wall": 1795367432.137, "event": "captured", "seq": 152}
+{"wall": 1795367434.148, "event": "captured", "seq": 153}
+{"wall": 1795367436.142, "event": "captured", "seq": 154}
+{"wall": 1795367438.134, "event": "captured", "seq": 155}
+{"wall": 1795367440.146, "event": "captured", "seq": 156}
+{"wall": 1795367442.137, "event": "captured", "seq": 157}
+{"wall": 1795367444.148, "event": "captured", "seq": 158}
+{"wall": 1795367446.139, "event": "captured", "seq": 159}
+{"wall": 1795367448.15, "event": "captured", "seq": 160}
+{"wall": 1795367450.142, "event": "captured", "seq": 161}
+{"wall": 1795367452.134, "event": "captured", "seq": 162}
+{"wall": 1795367454.145, "event": "captured", "seq": 163}
+{"wall": 1795367456.136, "event": "captured", "seq": 164}
+{"wall": 1795367458.147, "event": "captured", "seq": 165}
+{"wall": 1795367460.139, "event": "captured", "seq": 166}
+{"wall": 1795367462.134, "event": "captured", "seq": 167}
+{"wall": 1795367464.146, "event": "captured", "seq": 168}
+{"wall": 1795367466.138, "event": "captured", "seq": 169}
+{"wall": 1795367468.149, "event": "captured", "seq": 170}
+{"wall": 1795367470.14, "event": "captured", "seq": 171}
+{"wall": 1795367472.151, "event": "captured", "seq": 172}
+{"wall": 1795367474.141, "event": "captured", "seq": 173}
+{"wall": 1795367476.133, "event": "captured", "seq": 174}
+{"wall": 1795367478.143, "event": "captured", "seq": 175}
+{"wall": 1795367480.134, "event": "captured", "seq": 176}
+{"wall": 1795367482.144, "event": "captured", "seq": 177}
+{"wall": 1795367484.134, "event": "captured", "seq": 178}
+{"wall": 1795367486.143, "event": "captured", "seq": 179}
+{"wall": 1795367486.143, "event": "offline_end", "rel": 360.011}
+{"wall": 1795367486.154, "event": "put", "seq": 179, "kind": "live", "status": 201, "ms": 10, "bytes": 100928}
+{"wall": 1795367486.155, "event": "put", "seq": 149, "kind": "backfill", "status": 201, "ms": 10, "bytes": 101084}
+{"wall": 1795367486.155, "event": "put", "seq": 178, "kind": "live", "status": 201, "ms": 11, "bytes": 100918}
+{"wall": 1795367486.169, "event": "put", "seq": 150, "kind": "backfill", "status": 201, "ms": 5, "bytes": 98911}
+{"wall": 1795367487.155, "event": "put", "seq": 151, "kind": "backfill", "status": 422, "ms": 5, "bytes": 99519, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795367487.16, "event": "put", "seq": 151, "kind": "backfill", "status": 201, "ms": 5, "bytes": 99519}
+{"wall": 1795367488.134, "event": "captured", "seq": 180}
+{"wall": 1795367488.141, "event": "put", "seq": 180, "kind": "live", "status": 201, "ms": 6, "bytes": 99578}
+{"wall": 1795367488.159, "event": "put", "seq": 152, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101272}
+{"wall": 1795367489.166, "event": "put", "seq": 153, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100094}
+{"wall": 1795367490.146, "event": "captured", "seq": 181}
+{"wall": 1795367490.155, "event": "put", "seq": 154, "kind": "backfill", "status": 201, "ms": 9, "bytes": 101137}
+{"wall": 1795367490.156, "event": "put", "seq": 181, "kind": "live", "status": 201, "ms": 10, "bytes": 100631}
+{"wall": 1795367491.157, "event": "put", "seq": 155, "kind": "backfill", "status": 201, "ms": 5, "bytes": 98458}
+{"wall": 1795367492.138, "event": "captured", "seq": 182}
+{"wall": 1795367492.146, "event": "put", "seq": 182, "kind": "live", "status": 201, "ms": 7, "bytes": 101693}
+{"wall": 1795367492.166, "event": "put", "seq": 156, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100586}
+{"wall": 1795367493.155, "event": "put", "seq": 157, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100807}
+{"wall": 1795367494.135, "event": "captured", "seq": 183}
+{"wall": 1795367494.143, "event": "put", "seq": 183, "kind": "live", "status": 201, "ms": 8, "bytes": 100783}
+{"wall": 1795367494.162, "event": "put", "seq": 158, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100064}
+{"wall": 1795367495.167, "event": "put", "seq": 159, "kind": "backfill", "status": 422, "ms": 5, "bytes": 100839, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795367495.174, "event": "put", "seq": 159, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100839}
+{"wall": 1795367496.147, "event": "captured", "seq": 184}
+{"wall": 1795367496.155, "event": "put", "seq": 184, "kind": "live", "status": 201, "ms": 8, "bytes": 101725}
+{"wall": 1795367496.157, "event": "put", "seq": 160, "kind": "backfill", "status": 201, "ms": 9, "bytes": 99085}
+{"wall": 1795367497.162, "event": "put", "seq": 161, "kind": "backfill", "status": 201, "ms": 7, "bytes": 99981}
+{"wall": 1795367498.14, "event": "captured", "seq": 185}
+{"wall": 1795367498.148, "event": "put", "seq": 185, "kind": "live", "status": 201, "ms": 7, "bytes": 98483}
+{"wall": 1795367498.167, "event": "put", "seq": 162, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101966}
+{"wall": 1795367499.155, "event": "put", "seq": 163, "kind": "backfill", "status": 201, "ms": 8, "bytes": 100146}
+{"wall": 1795367499.171, "event": "put", "seq": 163, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 100146}
+{"wall": 1795367500.152, "event": "captured", "seq": 186}
+{"wall": 1795367500.17, "event": "put", "seq": 164, "kind": "backfill", "status": 201, "ms": 17, "bytes": 101482}
+{"wall": 1795367500.171, "event": "put", "seq": 186, "kind": "live", "status": 201, "ms": 18, "bytes": 99862}
+{"wall": 1795367501.167, "event": "put", "seq": 165, "kind": "backfill", "status": 201, "ms": 9, "bytes": 98857}
+{"wall": 1795367502.145, "event": "captured", "seq": 187}
+{"wall": 1795367502.156, "event": "put", "seq": 187, "kind": "live", "status": 201, "ms": 10, "bytes": 101076}
+{"wall": 1795367502.157, "event": "put", "seq": 166, "kind": "backfill", "status": 201, "ms": 11, "bytes": 100447}
+{"wall": 1795367503.16, "event": "put", "seq": 167, "kind": "backfill", "status": 201, "ms": 7, "bytes": 101284}
+{"wall": 1795367504.139, "event": "captured", "seq": 188}
+{"wall": 1795367504.148, "event": "put", "seq": 188, "kind": "live", "status": 201, "ms": 8, "bytes": 100575}
+{"wall": 1795367504.166, "event": "put", "seq": 168, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100796}
+{"wall": 1795367505.156, "event": "put", "seq": 169, "kind": "backfill", "status": 201, "ms": 10, "bytes": 101492}
+{"wall": 1795367505.172, "event": "put", "seq": 169, "kind": "duplicate", "status": 200, "ms": 7, "bytes": 101492}
+{"wall": 1795367506.151, "event": "captured", "seq": 189}
+{"wall": 1795367506.16, "event": "put", "seq": 170, "kind": "backfill", "status": 201, "ms": 8, "bytes": 99189}
+{"wall": 1795367507.163, "event": "put", "seq": 171, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99926}
+{"wall": 1795367508.142, "event": "captured", "seq": 190}
+{"wall": 1795367508.149, "event": "put", "seq": 189, "kind": "live", "status": 201, "ms": 7, "bytes": 101430}
+{"wall": 1795367508.15, "event": "put", "seq": 190, "kind": "live", "status": 201, "ms": 7, "bytes": 99061}
+{"wall": 1795367508.167, "event": "put", "seq": 189, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 101430}
+{"wall": 1795367508.169, "event": "put", "seq": 172, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101773}
+{"wall": 1795367509.155, "event": "put", "seq": 173, "kind": "backfill", "status": 201, "ms": 8, "bytes": 100535}
+{"wall": 1795367510.133, "event": "captured", "seq": 191}
+{"wall": 1795367510.139, "event": "put", "seq": 191, "kind": "live", "status": 201, "ms": 6, "bytes": 99533}
+{"wall": 1795367510.159, "event": "put", "seq": 174, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101567}
+{"wall": 1795367511.165, "event": "put", "seq": 175, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98970}
+{"wall": 1795367512.146, "event": "captured", "seq": 192}
+{"wall": 1795367512.156, "event": "put", "seq": 192, "kind": "live", "status": 201, "ms": 10, "bytes": 101460}
+{"wall": 1795367512.156, "event": "put", "seq": 176, "kind": "backfill", "status": 201, "ms": 9, "bytes": 100742}
+{"wall": 1795367512.17, "event": "put", "seq": 192, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 101460}
+{"wall": 1795367513.158, "event": "put", "seq": 177, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101423}
+{"wall": 1795367514.137, "event": "captured", "seq": 193}
+{"wall": 1795367514.143, "event": "put", "seq": 193, "kind": "live", "status": 201, "ms": 6, "bytes": 100793}
+{"wall": 1795367516.148, "event": "captured", "seq": 194}
+{"wall": 1795367516.156, "event": "put", "seq": 194, "kind": "live", "status": 201, "ms": 8, "bytes": 101492}
+{"wall": 1795367518.139, "event": "captured", "seq": 195}
+{"wall": 1795367518.146, "event": "put", "seq": 195, "kind": "live", "status": 201, "ms": 7, "bytes": 98710}
+{"wall": 1795367520.149, "event": "captured", "seq": 196}
+{"wall": 1795367520.156, "event": "put", "seq": 196, "kind": "live", "status": 201, "ms": 7, "bytes": 100883}
+{"wall": 1795367522.141, "event": "captured", "seq": 197}
+{"wall": 1795367522.151, "event": "put", "seq": 197, "kind": "live", "status": 201, "ms": 9, "bytes": 101197}
+{"wall": 1795367522.165, "event": "put", "seq": 197, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 101197}
+{"wall": 1795367524.132, "event": "captured", "seq": 198}
+{"wall": 1795367524.138, "event": "put", "seq": 198, "kind": "live", "status": 201, "ms": 5, "bytes": 100747}
+{"wall": 1795367526.142, "event": "captured", "seq": 199}
+{"wall": 1795367526.148, "event": "put", "seq": 199, "kind": "live", "status": 201, "ms": 6, "bytes": 101357}
+{"wall": 1795367526.167, "event": "put", "seq": 199, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 101357}
+{"wall": 1795367528.134, "event": "captured", "seq": 200}
+{"wall": 1795367528.139, "event": "put", "seq": 200, "kind": "live", "status": 201, "ms": 5, "bytes": 99207}
+{"wall": 1795367530.145, "event": "captured", "seq": 201}
+{"wall": 1795367530.154, "event": "put", "seq": 201, "kind": "live", "status": 201, "ms": 9, "bytes": 99872}
+{"wall": 1795367532.137, "event": "captured", "seq": 202}
+{"wall": 1795367532.144, "event": "put", "seq": 202, "kind": "live", "status": 201, "ms": 6, "bytes": 101038}
+{"wall": 1795367534.15, "event": "captured", "seq": 203}
+{"wall": 1795367534.157, "event": "put", "seq": 203, "kind": "live", "status": 201, "ms": 6, "bytes": 100311}
+{"wall": 1795367536.142, "event": "captured", "seq": 204}
+{"wall": 1795367536.149, "event": "put", "seq": 204, "kind": "live", "status": 201, "ms": 6, "bytes": 101431}
+{"wall": 1795367538.135, "event": "captured", "seq": 205}
+{"wall": 1795367538.142, "event": "put", "seq": 205, "kind": "live", "status": 201, "ms": 6, "bytes": 98869}
+{"wall": 1795367540.149, "event": "captured", "seq": 206}
+{"wall": 1795367540.155, "event": "put", "seq": 206, "kind": "live", "status": 201, "ms": 6, "bytes": 100139}
+{"wall": 1795367542.142, "event": "captured", "seq": 207}
+{"wall": 1795367542.148, "event": "put", "seq": 207, "kind": "live", "status": 201, "ms": 6, "bytes": 101259}
+{"wall": 1795367544.135, "event": "captured", "seq": 208}
+{"wall": 1795367544.142, "event": "put", "seq": 208, "kind": "live", "status": 201, "ms": 7, "bytes": 100528}
+{"wall": 1795367546.147, "event": "captured", "seq": 209}
+{"wall": 1795367546.156, "event": "put", "seq": 209, "kind": "live", "status": 201, "ms": 9, "bytes": 101678}
+{"wall": 1795367548.138, "event": "captured", "seq": 210}
+{"wall": 1795367548.146, "event": "put", "seq": 210, "kind": "live", "status": 201, "ms": 7, "bytes": 99088}
+{"wall": 1795367550.151, "event": "captured", "seq": 211}
+{"wall": 1795367550.158, "event": "put", "seq": 211, "kind": "live", "status": 201, "ms": 7, "bytes": 99911}
+{"wall": 1795367552.142, "event": "captured", "seq": 212}
+{"wall": 1795367552.149, "event": "put", "seq": 212, "kind": "live", "status": 201, "ms": 6, "bytes": 102002}
+{"wall": 1795367554.134, "event": "captured", "seq": 213}
+{"wall": 1795367554.141, "event": "put", "seq": 213, "kind": "live", "status": 201, "ms": 6, "bytes": 100690}
+{"wall": 1795367556.146, "event": "captured", "seq": 214}
+{"wall": 1795367556.154, "event": "put", "seq": 214, "kind": "live", "status": 201, "ms": 7, "bytes": 101445}
+{"wall": 1795367558.136, "event": "captured", "seq": 215}
+{"wall": 1795367558.142, "event": "put", "seq": 215, "kind": "live", "status": 201, "ms": 5, "bytes": 98569}
+{"wall": 1795367560.147, "event": "captured", "seq": 216}
+{"wall": 1795367560.154, "event": "put", "seq": 216, "kind": "live", "status": 201, "ms": 7, "bytes": 100577}
+{"wall": 1795367562.138, "event": "captured", "seq": 217}
+{"wall": 1795367564.148, "event": "captured", "seq": 218}
+{"wall": 1795367564.157, "event": "put", "seq": 217, "kind": "live", "status": 201, "ms": 8, "bytes": 101072}
+{"wall": 1795367564.158, "event": "put", "seq": 218, "kind": "live", "status": 201, "ms": 10, "bytes": 100422}
+{"wall": 1795367566.139, "event": "captured", "seq": 219}
+{"wall": 1795367566.144, "event": "put", "seq": 219, "kind": "live", "status": 422, "ms": 5, "bytes": 100526, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795367566.148, "event": "put", "seq": 219, "kind": "live", "status": 201, "ms": 4, "bytes": 100526}
+{"wall": 1795367568.151, "event": "captured", "seq": 220}
+{"wall": 1795367568.158, "event": "put", "seq": 220, "kind": "live", "status": 201, "ms": 7, "bytes": 99124}
+{"wall": 1795367570.142, "event": "captured", "seq": 221}
+{"wall": 1795367570.15, "event": "put", "seq": 221, "kind": "live", "status": 201, "ms": 8, "bytes": 99850}
+{"wall": 1795367572.133, "event": "captured", "seq": 222}
+{"wall": 1795367572.139, "event": "put", "seq": 222, "kind": "live", "status": 201, "ms": 6, "bytes": 101295}
+{"wall": 1795367574.145, "event": "captured", "seq": 223}
+{"wall": 1795367574.152, "event": "put", "seq": 223, "kind": "live", "status": 201, "ms": 6, "bytes": 100356}
+{"wall": 1795367576.14, "event": "captured", "seq": 224}
+{"wall": 1795367576.149, "event": "put", "seq": 224, "kind": "live", "status": 201, "ms": 9, "bytes": 101322}
+{"wall": 1795367578.152, "event": "captured", "seq": 225}
+{"wall": 1795367580.142, "event": "captured", "seq": 226}
+{"wall": 1795367580.149, "event": "put", "seq": 225, "kind": "live", "status": 201, "ms": 7, "bytes": 99346}
+{"wall": 1795367580.149, "event": "put", "seq": 226, "kind": "live", "status": 201, "ms": 7, "bytes": 100574}
+{"wall": 1795367582.132, "event": "captured", "seq": 227}
+{"wall": 1795367582.138, "event": "put", "seq": 227, "kind": "live", "status": 201, "ms": 6, "bytes": 101401}
+{"wall": 1795367584.144, "event": "captured", "seq": 228}
+{"wall": 1795367584.15, "event": "put", "seq": 228, "kind": "live", "status": 201, "ms": 5, "bytes": 100746}
+{"wall": 1795367586.137, "event": "captured", "seq": 229}
+{"wall": 1795367586.143, "event": "put", "seq": 229, "kind": "live", "status": 201, "ms": 5, "bytes": 101496}
+{"wall": 1795367588.15, "event": "captured", "seq": 230}
+{"wall": 1795367588.16, "event": "put", "seq": 230, "kind": "live", "status": 201, "ms": 9, "bytes": 99047}
+{"wall": 1795367590.142, "event": "captured", "seq": 231}
+{"wall": 1795367592.134, "event": "captured", "seq": 232}
+{"wall": 1795367592.155, "event": "put", "seq": 232, "kind": "live", "status": 201, "ms": 20, "bytes": 101350}
+{"wall": 1795367592.156, "event": "put", "seq": 231, "kind": "live", "status": 201, "ms": 21, "bytes": 99873}
+{"wall": 1795367594.147, "event": "captured", "seq": 233}
+{"wall": 1795367594.158, "event": "put", "seq": 233, "kind": "live", "status": 201, "ms": 11, "bytes": 101072}
+{"wall": 1795367596.14, "event": "captured", "seq": 234}
+{"wall": 1795367596.147, "event": "put", "seq": 234, "kind": "live", "status": 201, "ms": 7, "bytes": 101285}
+{"wall": 1795367598.152, "event": "captured", "seq": 235}
+{"wall": 1795367598.159, "event": "put", "seq": 235, "kind": "live", "status": 201, "ms": 6, "bytes": 98601}
+{"wall": 1795367600.144, "event": "captured", "seq": 236}
+{"wall": 1795367600.152, "event": "put", "seq": 236, "kind": "live", "status": 201, "ms": 8, "bytes": 100277}
+{"wall": 1795367602.137, "event": "captured", "seq": 237}
+{"wall": 1795367602.145, "event": "put", "seq": 237, "kind": "live", "status": 201, "ms": 8, "bytes": 101376}
+{"wall": 1795367604.149, "event": "captured", "seq": 238}
+{"wall": 1795367606.142, "event": "captured", "seq": 239}
+{"wall": 1795367606.151, "event": "put", "seq": 239, "kind": "live", "status": 201, "ms": 8, "bytes": 100805}
+{"wall": 1795367606.152, "event": "put", "seq": 238, "kind": "live", "status": 201, "ms": 9, "bytes": 100266}
+{"wall": 1795367608.133, "event": "captured", "seq": 240}
+{"wall": 1795367608.139, "event": "put", "seq": 240, "kind": "live", "status": 201, "ms": 6, "bytes": 99016}
+{"wall": 1795367610.145, "event": "captured", "seq": 241}
+{"wall": 1795367610.152, "event": "put", "seq": 241, "kind": "live", "status": 201, "ms": 7, "bytes": 100356}
+{"wall": 1795367612.136, "event": "captured", "seq": 242}
+{"wall": 1795367612.143, "event": "put", "seq": 242, "kind": "live", "status": 201, "ms": 6, "bytes": 101568}
+{"wall": 1795367614.147, "event": "captured", "seq": 243}
+{"wall": 1795367614.155, "event": "put", "seq": 243, "kind": "live", "status": 201, "ms": 8, "bytes": 100429}
+{"wall": 1795367616.141, "event": "captured", "seq": 244}
+{"wall": 1795367616.148, "event": "put", "seq": 244, "kind": "live", "status": 201, "ms": 6, "bytes": 101750}
+{"wall": 1795367618.133, "event": "captured", "seq": 245}
+{"wall": 1795367618.14, "event": "put", "seq": 245, "kind": "live", "status": 201, "ms": 7, "bytes": 98893}
+{"wall": 1795367620.144, "event": "captured", "seq": 246}
+{"wall": 1795367620.15, "event": "put", "seq": 246, "kind": "live", "status": 201, "ms": 6, "bytes": 100697}
+{"wall": 1795367622.136, "event": "captured", "seq": 247}
+{"wall": 1795367622.141, "event": "put", "seq": 247, "kind": "live", "status": 201, "ms": 6, "bytes": 101270}
+{"wall": 1795367624.147, "event": "captured", "seq": 248}
+{"wall": 1795367624.156, "event": "put", "seq": 248, "kind": "live", "status": 201, "ms": 8, "bytes": 100840}
+{"wall": 1795367626.139, "event": "captured", "seq": 249}
+{"wall": 1795367626.145, "event": "put", "seq": 249, "kind": "live", "status": 201, "ms": 6, "bytes": 101441}
+{"wall": 1795367628.151, "event": "captured", "seq": 250}
+{"wall": 1795367628.159, "event": "put", "seq": 250, "kind": "live", "status": 201, "ms": 7, "bytes": 99390}
+{"wall": 1795367630.141, "event": "captured", "seq": 251}
+{"wall": 1795367630.147, "event": "put", "seq": 251, "kind": "live", "status": 201, "ms": 6, "bytes": 99941}
+{"wall": 1795367630.165, "event": "put", "seq": 251, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 99941}
+{"wall": 1795367632.133, "event": "captured", "seq": 252}
+{"wall": 1795367632.139, "event": "put", "seq": 252, "kind": "live", "status": 201, "ms": 6, "bytes": 101471}
+{"wall": 1795367634.145, "event": "captured", "seq": 253}
+{"wall": 1795367634.152, "event": "put", "seq": 253, "kind": "live", "status": 201, "ms": 6, "bytes": 100403}
+{"wall": 1795367634.17, "event": "put", "seq": 253, "kind": "duplicate", "status": 200, "ms": 5, "bytes": 100403}
+{"wall": 1795367636.137, "event": "captured", "seq": 254}
+{"wall": 1795367636.144, "event": "put", "seq": 254, "kind": "live", "status": 201, "ms": 6, "bytes": 101566}
+{"wall": 1795367638.148, "event": "captured", "seq": 255}
+{"wall": 1795367638.155, "event": "put", "seq": 255, "kind": "live", "status": 201, "ms": 7, "bytes": 98979}
+{"wall": 1795367640.14, "event": "captured", "seq": 256}
+{"wall": 1795367640.147, "event": "put", "seq": 256, "kind": "live", "status": 201, "ms": 6, "bytes": 100923}
+{"wall": 1795367642.152, "event": "captured", "seq": 257}
+{"wall": 1795367642.158, "event": "put", "seq": 257, "kind": "live", "status": 201, "ms": 6, "bytes": 101542}
+{"wall": 1795367644.143, "event": "captured", "seq": 258}
+{"wall": 1795367644.151, "event": "put", "seq": 258, "kind": "live", "status": 201, "ms": 8, "bytes": 100677}
+{"wall": 1795367646.133, "event": "captured", "seq": 259}
+{"wall": 1795367646.139, "event": "put", "seq": 259, "kind": "live", "status": 201, "ms": 6, "bytes": 101327}
+{"wall": 1795367646.157, "event": "put", "seq": 259, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 101327}
+{"wall": 1795367648.143, "event": "captured", "seq": 260}
+{"wall": 1795367648.15, "event": "put", "seq": 260, "kind": "live", "status": 201, "ms": 7, "bytes": 99091}
+{"wall": 1795367650.134, "event": "captured", "seq": 261}
+{"wall": 1795367652.145, "event": "captured", "seq": 262}
+{"wall": 1795367652.154, "event": "put", "seq": 261, "kind": "live", "status": 201, "ms": 9, "bytes": 100453}
+{"wall": 1795367652.156, "event": "put", "seq": 262, "kind": "live", "status": 201, "ms": 11, "bytes": 102155}
+{"wall": 1795367654.136, "event": "captured", "seq": 263}
+{"wall": 1795367654.154, "event": "put", "seq": 263, "kind": "live", "status": 201, "ms": 18, "bytes": 100558}
+{"wall": 1795367656.149, "event": "captured", "seq": 264}
+{"wall": 1795367656.157, "event": "put", "seq": 264, "kind": "live", "status": 201, "ms": 7, "bytes": 101704}
+{"wall": 1795367658.141, "event": "captured", "seq": 265}
+{"wall": 1795367658.147, "event": "put", "seq": 265, "kind": "live", "status": 201, "ms": 5, "bytes": 98857}
+{"wall": 1795367660.132, "event": "captured", "seq": 266}
+{"wall": 1795367660.137, "event": "put", "seq": 266, "kind": "live", "status": 422, "ms": 5, "bytes": 100896, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795367660.142, "event": "put", "seq": 266, "kind": "live", "status": 201, "ms": 5, "bytes": 100896}
+{"wall": 1795367662.145, "event": "captured", "seq": 267}
+{"wall": 1795367662.151, "event": "put", "seq": 267, "kind": "live", "status": 201, "ms": 6, "bytes": 101425}
+{"wall": 1795367664.136, "event": "captured", "seq": 268}
+{"wall": 1795367666.148, "event": "captured", "seq": 269}
+{"wall": 1795367666.16, "event": "put", "seq": 269, "kind": "live", "status": 201, "ms": 10, "bytes": 101298}
+{"wall": 1795367666.16, "event": "put", "seq": 268, "kind": "live", "status": 201, "ms": 11, "bytes": 100590}
+{"wall": 1795367668.14, "event": "captured", "seq": 270}
+{"wall": 1795367668.146, "event": "put", "seq": 270, "kind": "live", "status": 201, "ms": 6, "bytes": 99237}
+{"wall": 1795367670.134, "event": "captured", "seq": 271}
+{"wall": 1795367670.141, "event": "put", "seq": 271, "kind": "live", "status": 201, "ms": 7, "bytes": 100249}
+{"wall": 1795367672.146, "event": "captured", "seq": 272}
+{"wall": 1795367672.155, "event": "put", "seq": 272, "kind": "live", "status": 201, "ms": 9, "bytes": 101702}
+{"wall": 1795367674.138, "event": "captured", "seq": 273}
+{"wall": 1795367674.143, "event": "put", "seq": 273, "kind": "live", "status": 201, "ms": 5, "bytes": 101239}
+{"wall": 1795367676.149, "event": "captured", "seq": 274}
+{"wall": 1795367676.156, "event": "put", "seq": 274, "kind": "live", "status": 201, "ms": 7, "bytes": 101465}
+{"wall": 1795367678.14, "event": "captured", "seq": 275}
+{"wall": 1795367678.146, "event": "put", "seq": 275, "kind": "live", "status": 201, "ms": 6, "bytes": 99014}
+{"wall": 1795367680.151, "event": "captured", "seq": 276}
+{"wall": 1795367680.157, "event": "put", "seq": 276, "kind": "live", "status": 201, "ms": 5, "bytes": 100665}
+{"wall": 1795367680.175, "event": "put", "seq": 276, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 100665}
+{"wall": 1795367682.142, "event": "captured", "seq": 277}
+{"wall": 1795367682.149, "event": "put", "seq": 277, "kind": "live", "status": 201, "ms": 6, "bytes": 101545}
+{"wall": 1795367684.133, "event": "captured", "seq": 278}
+{"wall": 1795367684.138, "event": "put", "seq": 278, "kind": "live", "status": 201, "ms": 5, "bytes": 100742}
+{"wall": 1795367686.144, "event": "captured", "seq": 279}
+{"wall": 1795367686.15, "event": "put", "seq": 279, "kind": "live", "status": 201, "ms": 5, "bytes": 101042}
+{"wall": 1795367688.139, "event": "captured", "seq": 280}
+{"wall": 1795367688.145, "event": "put", "seq": 280, "kind": "live", "status": 201, "ms": 6, "bytes": 99582}
+{"wall": 1795367690.15, "event": "captured", "seq": 281}
+{"wall": 1795367690.157, "event": "put", "seq": 281, "kind": "live", "status": 201, "ms": 7, "bytes": 100291}
+{"wall": 1795367692.14, "event": "captured", "seq": 282}
+{"wall": 1795367692.146, "event": "put", "seq": 282, "kind": "live", "status": 201, "ms": 5, "bytes": 101607}
+{"wall": 1795367694.152, "event": "captured", "seq": 283}
+{"wall": 1795367694.159, "event": "put", "seq": 283, "kind": "live", "status": 201, "ms": 6, "bytes": 100541}
+{"wall": 1795367696.143, "event": "captured", "seq": 284}
+{"wall": 1795367696.149, "event": "put", "seq": 284, "kind": "live", "status": 201, "ms": 5, "bytes": 101511}
+{"wall": 1795367698.135, "event": "captured", "seq": 285}
+{"wall": 1795367698.141, "event": "put", "seq": 285, "kind": "live", "status": 201, "ms": 5, "bytes": 99077}
+{"wall": 1795367700.146, "event": "captured", "seq": 286}
+{"wall": 1795367700.154, "event": "put", "seq": 286, "kind": "live", "status": 201, "ms": 8, "bytes": 100218}
+{"wall": 1795367702.138, "event": "captured", "seq": 287}
+{"wall": 1795367702.145, "event": "put", "seq": 287, "kind": "live", "status": 201, "ms": 6, "bytes": 101156}
+{"wall": 1795367704.151, "event": "captured", "seq": 288}
+{"wall": 1795367704.159, "event": "put", "seq": 288, "kind": "live", "status": 201, "ms": 8, "bytes": 100925}
+{"wall": 1795367706.145, "event": "captured", "seq": 289}
+{"wall": 1795367706.153, "event": "put", "seq": 289, "kind": "live", "status": 201, "ms": 8, "bytes": 101330}
+{"wall": 1795367708.138, "event": "captured", "seq": 290}
+{"wall": 1795367708.144, "event": "put", "seq": 290, "kind": "live", "status": 201, "ms": 6, "bytes": 99088}
+{"wall": 1795367710.148, "event": "captured", "seq": 291}
+{"wall": 1795367710.155, "event": "put", "seq": 291, "kind": "live", "status": 201, "ms": 6, "bytes": 99667}
+{"wall": 1795367712.139, "event": "captured", "seq": 292}
+{"wall": 1795367712.146, "event": "put", "seq": 292, "kind": "live", "status": 201, "ms": 7, "bytes": 101207}
+{"wall": 1795367714.151, "event": "captured", "seq": 293}
+{"wall": 1795367714.157, "event": "put", "seq": 293, "kind": "live", "status": 201, "ms": 6, "bytes": 100263}
+{"wall": 1795367716.142, "event": "captured", "seq": 294}
+{"wall": 1795367716.148, "event": "put", "seq": 294, "kind": "live", "status": 201, "ms": 6, "bytes": 101541}
+{"wall": 1795367718.133, "event": "captured", "seq": 295}
+{"wall": 1795367718.14, "event": "put", "seq": 295, "kind": "live", "status": 201, "ms": 6, "bytes": 98820}
+{"wall": 1795367720.146, "event": "captured", "seq": 296}
+{"wall": 1795367720.154, "event": "put", "seq": 296, "kind": "live", "status": 201, "ms": 7, "bytes": 100783}
+{"wall": 1795367722.137, "event": "captured", "seq": 297}
+{"wall": 1795367722.143, "event": "put", "seq": 297, "kind": "live", "status": 201, "ms": 6, "bytes": 101548}
+{"wall": 1795367724.148, "event": "captured", "seq": 298}
+{"wall": 1795367724.154, "event": "put", "seq": 298, "kind": "live", "status": 201, "ms": 6, "bytes": 100638}
+{"wall": 1795367726.139, "event": "captured", "seq": 299}
+{"wall": 1795367726.139, "event": "offline_start", "rel": 600.006}
+{"wall": 1795367728.151, "event": "captured", "seq": 300}
+{"wall": 1795367730.143, "event": "captured", "seq": 301}
+{"wall": 1795367732.134, "event": "captured", "seq": 302}
+{"wall": 1795367734.146, "event": "captured", "seq": 303}
+{"wall": 1795367736.139, "event": "captured", "seq": 304}
+{"wall": 1795367738.135, "event": "captured", "seq": 305}
+{"wall": 1795367740.149, "event": "captured", "seq": 306}
+{"wall": 1795367742.141, "event": "captured", "seq": 307}
+{"wall": 1795367744.152, "event": "captured", "seq": 308}
+{"wall": 1795367746.144, "event": "captured", "seq": 309}
+{"wall": 1795367748.139, "event": "captured", "seq": 310}
+{"wall": 1795367750.151, "event": "captured", "seq": 311}
+{"wall": 1795367752.147, "event": "captured", "seq": 312}
+{"wall": 1795367754.138, "event": "captured", "seq": 313}
+{"wall": 1795367756.137, "event": "captured", "seq": 314}
+{"wall": 1795367758.149, "event": "captured", "seq": 315}
+{"wall": 1795367760.141, "event": "captured", "seq": 316}
+{"wall": 1795367762.133, "event": "captured", "seq": 317}
+{"wall": 1795367764.144, "event": "captured", "seq": 318}
+{"wall": 1795367766.136, "event": "captured", "seq": 319}
+{"wall": 1795367768.15, "event": "captured", "seq": 320}
+{"wall": 1795367770.142, "event": "captured", "seq": 321}
+{"wall": 1795367772.134, "event": "captured", "seq": 322}
+{"wall": 1795367774.144, "event": "captured", "seq": 323}
+{"wall": 1795367776.135, "event": "captured", "seq": 324}
+{"wall": 1795367778.145, "event": "captured", "seq": 325}
+{"wall": 1795367780.137, "event": "captured", "seq": 326}
+{"wall": 1795367782.149, "event": "captured", "seq": 327}
+{"wall": 1795367784.139, "event": "captured", "seq": 328}
+{"wall": 1795367786.151, "event": "captured", "seq": 329}
+{"wall": 1795367788.141, "event": "captured", "seq": 330}
+{"wall": 1795367790.152, "event": "captured", "seq": 331}
+{"wall": 1795367792.145, "event": "captured", "seq": 332}
+{"wall": 1795367794.137, "event": "captured", "seq": 333}
+{"wall": 1795367796.15, "event": "captured", "seq": 334}
+{"wall": 1795367798.142, "event": "captured", "seq": 335}
+{"wall": 1795367800.136, "event": "captured", "seq": 336}
+{"wall": 1795367802.15, "event": "captured", "seq": 337}
+{"wall": 1795367804.142, "event": "captured", "seq": 338}
+{"wall": 1795367806.133, "event": "captured", "seq": 339}
+{"wall": 1795367808.146, "event": "captured", "seq": 340}
+{"wall": 1795367810.136, "event": "captured", "seq": 341}
+{"wall": 1795367812.149, "event": "captured", "seq": 342}
+{"wall": 1795367814.141, "event": "captured", "seq": 343}
+{"wall": 1795367816.133, "event": "captured", "seq": 344}
+{"wall": 1795367818.145, "event": "captured", "seq": 345}
+{"wall": 1795367820.137, "event": "captured", "seq": 346}
+{"wall": 1795367822.15, "event": "captured", "seq": 347}
+{"wall": 1795367824.143, "event": "captured", "seq": 348}
+{"wall": 1795367826.137, "event": "captured", "seq": 349}
+{"wall": 1795367828.149, "event": "captured", "seq": 350}
+{"wall": 1795367830.141, "event": "captured", "seq": 351}
+{"wall": 1795367832.133, "event": "captured", "seq": 352}
+{"wall": 1795367834.146, "event": "captured", "seq": 353}
+{"wall": 1795367836.138, "event": "captured", "seq": 354}
+{"wall": 1795367838.152, "event": "captured", "seq": 355}
+{"wall": 1795367840.147, "event": "captured", "seq": 356}
+{"wall": 1795367842.138, "event": "captured", "seq": 357}
+{"wall": 1795367844.15, "event": "captured", "seq": 358}
+{"wall": 1795367846.142, "event": "captured", "seq": 359}
+{"wall": 1795367848.137, "event": "captured", "seq": 360}
+{"wall": 1795367850.148, "event": "captured", "seq": 361}
+{"wall": 1795367852.141, "event": "captured", "seq": 362}
+{"wall": 1795367854.132, "event": "captured", "seq": 363}
+{"wall": 1795367856.143, "event": "captured", "seq": 364}
+{"wall": 1795367858.138, "event": "captured", "seq": 365}
+{"wall": 1795367860.149, "event": "captured", "seq": 366}
+{"wall": 1795367862.14, "event": "captured", "seq": 367}
+{"wall": 1795367864.132, "event": "captured", "seq": 368}
+{"wall": 1795367866.144, "event": "captured", "seq": 369}
+{"wall": 1795367868.135, "event": "captured", "seq": 370}
+{"wall": 1795367870.147, "event": "captured", "seq": 371}
+{"wall": 1795367872.139, "event": "captured", "seq": 372}
+{"wall": 1795367874.151, "event": "captured", "seq": 373}
+{"wall": 1795367876.142, "event": "captured", "seq": 374}
+{"wall": 1795367878.133, "event": "captured", "seq": 375}
+{"wall": 1795367880.145, "event": "captured", "seq": 376}
+{"wall": 1795367882.137, "event": "captured", "seq": 377}
+{"wall": 1795367884.148, "event": "captured", "seq": 378}
+{"wall": 1795367886.141, "event": "captured", "seq": 379}
+{"wall": 1795367888.144, "event": "captured", "seq": 380}
+{"wall": 1795367890.139, "event": "captured", "seq": 381}
+{"wall": 1795367892.151, "event": "captured", "seq": 382}
+{"wall": 1795367894.142, "event": "captured", "seq": 383}
+{"wall": 1795367896.134, "event": "captured", "seq": 384}
+{"wall": 1795367898.147, "event": "captured", "seq": 385}
+{"wall": 1795367900.142, "event": "captured", "seq": 386}
+{"wall": 1795367902.135, "event": "captured", "seq": 387}
+{"wall": 1795367904.15, "event": "captured", "seq": 388}
+{"wall": 1795367906.143, "event": "captured", "seq": 389}
+{"wall": 1795367908.137, "event": "captured", "seq": 390}
+{"wall": 1795367910.151, "event": "captured", "seq": 391}
+{"wall": 1795367912.144, "event": "captured", "seq": 392}
+{"wall": 1795367914.136, "event": "captured", "seq": 393}
+{"wall": 1795367916.149, "event": "captured", "seq": 394}
+{"wall": 1795367918.142, "event": "captured", "seq": 395}
+{"wall": 1795367920.135, "event": "captured", "seq": 396}
+{"wall": 1795367922.149, "event": "captured", "seq": 397}
+{"wall": 1795367924.14, "event": "captured", "seq": 398}
+{"wall": 1795367926.152, "event": "captured", "seq": 399}
+{"wall": 1795367928.145, "event": "captured", "seq": 400}
+{"wall": 1795367930.138, "event": "captured", "seq": 401}
+{"wall": 1795367932.151, "event": "captured", "seq": 402}
+{"wall": 1795367934.145, "event": "captured", "seq": 403}
+{"wall": 1795367936.142, "event": "captured", "seq": 404}
+{"wall": 1795367938.134, "event": "captured", "seq": 405}
+{"wall": 1795367940.149, "event": "captured", "seq": 406}
+{"wall": 1795367942.141, "event": "captured", "seq": 407}
+{"wall": 1795367944.135, "event": "captured", "seq": 408}
+{"wall": 1795367946.151, "event": "captured", "seq": 409}
+{"wall": 1795367948.144, "event": "captured", "seq": 410}
+{"wall": 1795367950.137, "event": "captured", "seq": 411}
+{"wall": 1795367952.15, "event": "captured", "seq": 412}
+{"wall": 1795367954.144, "event": "captured", "seq": 413}
+{"wall": 1795367956.135, "event": "captured", "seq": 414}
+{"wall": 1795367958.149, "event": "captured", "seq": 415}
+{"wall": 1795367960.143, "event": "captured", "seq": 416}
+{"wall": 1795367962.135, "event": "captured", "seq": 417}
+{"wall": 1795367964.147, "event": "captured", "seq": 418}
+{"wall": 1795367966.139, "event": "captured", "seq": 419}
+{"wall": 1795367968.152, "event": "captured", "seq": 420}
+{"wall": 1795367970.145, "event": "captured", "seq": 421}
+{"wall": 1795367972.137, "event": "captured", "seq": 422}
+{"wall": 1795367974.148, "event": "captured", "seq": 423}
+{"wall": 1795367976.139, "event": "captured", "seq": 424}
+{"wall": 1795367978.15, "event": "captured", "seq": 425}
+{"wall": 1795367980.142, "event": "captured", "seq": 426}
+{"wall": 1795367982.133, "event": "captured", "seq": 427}
+{"wall": 1795367984.145, "event": "captured", "seq": 428}
+{"wall": 1795367986.136, "event": "captured", "seq": 429}
+{"wall": 1795367988.15, "event": "captured", "seq": 430}
+{"wall": 1795367990.142, "event": "captured", "seq": 431}
+{"wall": 1795367992.134, "event": "captured", "seq": 432}
+{"wall": 1795367994.147, "event": "captured", "seq": 433}
+{"wall": 1795367996.14, "event": "captured", "seq": 434}
+{"wall": 1795367998.15, "event": "captured", "seq": 435}
+{"wall": 1795368000.143, "event": "captured", "seq": 436}
+{"wall": 1795368002.134, "event": "captured", "seq": 437}
+{"wall": 1795368004.148, "event": "captured", "seq": 438}
+{"wall": 1795368006.139, "event": "captured", "seq": 439}
+{"wall": 1795368008.15, "event": "captured", "seq": 440}
+{"wall": 1795368010.142, "event": "captured", "seq": 441}
+{"wall": 1795368012.133, "event": "captured", "seq": 442}
+{"wall": 1795368014.144, "event": "captured", "seq": 443}
+{"wall": 1795368016.136, "event": "captured", "seq": 444}
+{"wall": 1795368018.147, "event": "captured", "seq": 445}
+{"wall": 1795368020.137, "event": "captured", "seq": 446}
+{"wall": 1795368022.148, "event": "captured", "seq": 447}
+{"wall": 1795368024.139, "event": "captured", "seq": 448}
+{"wall": 1795368026.149, "event": "captured", "seq": 449}
+{"wall": 1795368026.149, "event": "offline_end", "rel": 900.017}
+{"wall": 1795368026.159, "event": "put", "seq": 448, "kind": "live", "status": 201, "ms": 8, "bytes": 100479}
+{"wall": 1795368026.16, "event": "put", "seq": 449, "kind": "live", "status": 201, "ms": 9, "bytes": 101243}
+{"wall": 1795368026.16, "event": "put", "seq": 299, "kind": "backfill", "status": 201, "ms": 10, "bytes": 101239}
+{"wall": 1795368026.174, "event": "put", "seq": 299, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 101239}
+{"wall": 1795368026.176, "event": "put", "seq": 300, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99117}
+{"wall": 1795368027.162, "event": "put", "seq": 301, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100346}
+{"wall": 1795368028.142, "event": "captured", "seq": 450}
+{"wall": 1795368028.147, "event": "put", "seq": 450, "kind": "live", "status": 201, "ms": 5, "bytes": 98790}
+{"wall": 1795368028.167, "event": "put", "seq": 302, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101230}
+{"wall": 1795368029.175, "event": "put", "seq": 303, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100175}
+{"wall": 1795368030.135, "event": "captured", "seq": 451}
+{"wall": 1795368030.141, "event": "put", "seq": 451, "kind": "live", "status": 201, "ms": 6, "bytes": 99687}
+{"wall": 1795368030.161, "event": "put", "seq": 304, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101515}
+{"wall": 1795368031.168, "event": "put", "seq": 305, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98605}
+{"wall": 1795368032.148, "event": "captured", "seq": 452}
+{"wall": 1795368032.156, "event": "put", "seq": 452, "kind": "live", "status": 201, "ms": 8, "bytes": 101298}
+{"wall": 1795368032.174, "event": "put", "seq": 306, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100640}
+{"wall": 1795368033.162, "event": "put", "seq": 307, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100876}
+{"wall": 1795368034.141, "event": "captured", "seq": 453}
+{"wall": 1795368034.149, "event": "put", "seq": 453, "kind": "live", "status": 201, "ms": 8, "bytes": 100012}
+{"wall": 1795368034.166, "event": "put", "seq": 308, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100052}
+{"wall": 1795368035.175, "event": "put", "seq": 309, "kind": "backfill", "status": 201, "ms": 7, "bytes": 101063}
+{"wall": 1795368036.135, "event": "captured", "seq": 454}
+{"wall": 1795368036.143, "event": "put", "seq": 454, "kind": "live", "status": 201, "ms": 7, "bytes": 101421}
+{"wall": 1795368036.162, "event": "put", "seq": 310, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98968}
+{"wall": 1795368036.181, "event": "put", "seq": 310, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 98968}
+{"wall": 1795368037.169, "event": "put", "seq": 311, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99947}
+{"wall": 1795368038.149, "event": "captured", "seq": 455}
+{"wall": 1795368038.157, "event": "put", "seq": 455, "kind": "live", "status": 201, "ms": 7, "bytes": 98523}
+{"wall": 1795368038.176, "event": "put", "seq": 312, "kind": "backfill", "status": 201, "ms": 6, "bytes": 102104}
+{"wall": 1795368039.166, "event": "put", "seq": 313, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100425}
+{"wall": 1795368040.146, "event": "captured", "seq": 456}
+{"wall": 1795368040.172, "event": "put", "seq": 314, "kind": "backfill", "status": 422, "ms": 5, "bytes": 101568, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368040.176, "event": "put", "seq": 314, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101568}
+{"wall": 1795368041.16, "event": "put", "seq": 315, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98783}
+{"wall": 1795368042.14, "event": "captured", "seq": 457}
+{"wall": 1795368042.148, "event": "put", "seq": 456, "kind": "live", "status": 201, "ms": 7, "bytes": 100749}
+{"wall": 1795368042.149, "event": "put", "seq": 457, "kind": "live", "status": 201, "ms": 8, "bytes": 100726}
+{"wall": 1795368042.165, "event": "put", "seq": 316, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101058}
+{"wall": 1795368043.186, "event": "put", "seq": 317, "kind": "backfill", "status": 201, "ms": 19, "bytes": 101629}
+{"wall": 1795368044.133, "event": "captured", "seq": 458}
+{"wall": 1795368044.139, "event": "put", "seq": 458, "kind": "live", "status": 201, "ms": 6, "bytes": 100006}
+{"wall": 1795368044.158, "event": "put", "seq": 318, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100498}
+{"wall": 1795368045.166, "event": "put", "seq": 319, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100882}
+{"wall": 1795368046.146, "event": "captured", "seq": 459}
+{"wall": 1795368046.152, "event": "put", "seq": 459, "kind": "live", "status": 422, "ms": 6, "bytes": 100562, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368046.158, "event": "put", "seq": 459, "kind": "live", "status": 201, "ms": 6, "bytes": 100562}
+{"wall": 1795368046.172, "event": "put", "seq": 320, "kind": "backfill", "status": 201, "ms": 5, "bytes": 98898}
+{"wall": 1795368047.159, "event": "put", "seq": 321, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100127}
+{"wall": 1795368048.139, "event": "captured", "seq": 460}
+{"wall": 1795368048.145, "event": "put", "seq": 460, "kind": "live", "status": 201, "ms": 6, "bytes": 98864}
+{"wall": 1795368048.165, "event": "put", "seq": 322, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101457}
+{"wall": 1795368048.184, "event": "put", "seq": 322, "kind": "duplicate", "status": 200, "ms": 5, "bytes": 101457}
+{"wall": 1795368049.171, "event": "put", "seq": 323, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100338}
+{"wall": 1795368050.15, "event": "captured", "seq": 461}
+{"wall": 1795368050.16, "event": "put", "seq": 461, "kind": "live", "status": 201, "ms": 9, "bytes": 99868}
+{"wall": 1795368050.161, "event": "put", "seq": 324, "kind": "backfill", "status": 201, "ms": 10, "bytes": 101321}
+{"wall": 1795368050.175, "event": "put", "seq": 461, "kind": "duplicate", "status": 200, "ms": 5, "bytes": 99868}
+{"wall": 1795368051.162, "event": "put", "seq": 325, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99082}
+{"wall": 1795368052.145, "event": "captured", "seq": 462}
+{"wall": 1795368052.155, "event": "put", "seq": 462, "kind": "live", "status": 201, "ms": 10, "bytes": 102059}
+{"wall": 1795368052.171, "event": "put", "seq": 326, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99975}
+{"wall": 1795368053.17, "event": "put", "seq": 327, "kind": "backfill", "status": 201, "ms": 16, "bytes": 101141}
+{"wall": 1795368054.141, "event": "captured", "seq": 463}
+{"wall": 1795368054.149, "event": "put", "seq": 463, "kind": "live", "status": 201, "ms": 8, "bytes": 100061}
+{"wall": 1795368054.168, "event": "put", "seq": 328, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100548}
+{"wall": 1795368055.173, "event": "put", "seq": 329, "kind": "backfill", "status": 422, "ms": 5, "bytes": 101391, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368055.18, "event": "put", "seq": 329, "kind": "backfill", "status": 201, "ms": 7, "bytes": 101391}
+{"wall": 1795368056.136, "event": "captured", "seq": 464}
+{"wall": 1795368056.143, "event": "put", "seq": 464, "kind": "live", "status": 201, "ms": 7, "bytes": 101309}
+{"wall": 1795368056.163, "event": "put", "seq": 330, "kind": "backfill", "status": 201, "ms": 7, "bytes": 98814}
+{"wall": 1795368057.169, "event": "put", "seq": 331, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99691}
+{"wall": 1795368058.148, "event": "captured", "seq": 465}
+{"wall": 1795368058.175, "event": "put", "seq": 332, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101167}
+{"wall": 1795368059.162, "event": "put", "seq": 333, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100611}
+{"wall": 1795368060.141, "event": "captured", "seq": 466}
+{"wall": 1795368060.149, "event": "put", "seq": 466, "kind": "live", "status": 201, "ms": 7, "bytes": 100844}
+{"wall": 1795368060.15, "event": "put", "seq": 465, "kind": "live", "status": 201, "ms": 8, "bytes": 99011}
+{"wall": 1795368060.166, "event": "put", "seq": 334, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101422}
+{"wall": 1795368061.173, "event": "put", "seq": 335, "kind": "backfill", "status": 201, "ms": 5, "bytes": 98196}
+{"wall": 1795368062.133, "event": "captured", "seq": 467}
+{"wall": 1795368062.139, "event": "put", "seq": 467, "kind": "live", "status": 201, "ms": 5, "bytes": 101355}
+{"wall": 1795368062.157, "event": "put", "seq": 336, "kind": "backfill", "status": 422, "ms": 3, "bytes": 100034, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368062.16, "event": "put", "seq": 336, "kind": "backfill", "status": 201, "ms": 4, "bytes": 100034}
+{"wall": 1795368063.166, "event": "put", "seq": 337, "kind": "backfill", "status": 201, "ms": 7, "bytes": 101282}
+{"wall": 1795368064.146, "event": "captured", "seq": 468}
+{"wall": 1795368064.153, "event": "put", "seq": 468, "kind": "live", "status": 201, "ms": 7, "bytes": 100488}
+{"wall": 1795368064.171, "event": "put", "seq": 338, "kind": "backfill", "status": 201, "ms": 4, "bytes": 100256}
+{"wall": 1795368065.159, "event": "put", "seq": 339, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100873}
+{"wall": 1795368066.139, "event": "captured", "seq": 469}
+{"wall": 1795368066.145, "event": "put", "seq": 469, "kind": "live", "status": 201, "ms": 6, "bytes": 101185}
+{"wall": 1795368066.165, "event": "put", "seq": 340, "kind": "backfill", "status": 201, "ms": 5, "bytes": 98946}
+{"wall": 1795368067.173, "event": "put", "seq": 341, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99827}
+{"wall": 1795368068.132, "event": "captured", "seq": 470}
+{"wall": 1795368068.139, "event": "put", "seq": 470, "kind": "live", "status": 201, "ms": 6, "bytes": 98700}
+{"wall": 1795368068.157, "event": "put", "seq": 342, "kind": "backfill", "status": 201, "ms": 4, "bytes": 101132}
+{"wall": 1795368069.165, "event": "put", "seq": 343, "kind": "backfill", "status": 201, "ms": 5, "bytes": 99969}
+{"wall": 1795368070.145, "event": "captured", "seq": 471}
+{"wall": 1795368070.152, "event": "put", "seq": 471, "kind": "live", "status": 201, "ms": 7, "bytes": 99848}
+{"wall": 1795368070.17, "event": "put", "seq": 344, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101462}
+{"wall": 1795368071.158, "event": "put", "seq": 345, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98322}
+{"wall": 1795368072.137, "event": "captured", "seq": 472}
+{"wall": 1795368072.144, "event": "put", "seq": 472, "kind": "live", "status": 201, "ms": 7, "bytes": 101480}
+{"wall": 1795368072.162, "event": "put", "seq": 472, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 101480}
+{"wall": 1795368072.163, "event": "put", "seq": 346, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101025}
+{"wall": 1795368073.169, "event": "put", "seq": 347, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101074}
+{"wall": 1795368074.15, "event": "captured", "seq": 473}
+{"wall": 1795368074.16, "event": "put", "seq": 348, "kind": "backfill", "status": 201, "ms": 9, "bytes": 100518}
+{"wall": 1795368074.16, "event": "put", "seq": 473, "kind": "live", "status": 201, "ms": 9, "bytes": 100503}
+{"wall": 1795368075.162, "event": "put", "seq": 349, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101229}
+{"wall": 1795368076.143, "event": "captured", "seq": 474}
+{"wall": 1795368076.149, "event": "put", "seq": 474, "kind": "live", "status": 201, "ms": 7, "bytes": 101591}
+{"wall": 1795368076.168, "event": "put", "seq": 350, "kind": "backfill", "status": 201, "ms": 5, "bytes": 98524}
+{"wall": 1795368077.158, "event": "put", "seq": 351, "kind": "backfill", "status": 201, "ms": 8, "bytes": 99433}
+{"wall": 1795368077.174, "event": "put", "seq": 351, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 99433}
+{"wall": 1795368078.139, "event": "captured", "seq": 475}
+{"wall": 1795368078.146, "event": "put", "seq": 475, "kind": "live", "status": 201, "ms": 6, "bytes": 98567}
+{"wall": 1795368078.167, "event": "put", "seq": 352, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100793}
+{"wall": 1795368079.174, "event": "put", "seq": 353, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100254}
+{"wall": 1795368080.133, "event": "captured", "seq": 476}
+{"wall": 1795368080.141, "event": "put", "seq": 476, "kind": "live", "status": 201, "ms": 8, "bytes": 100268}
+{"wall": 1795368080.163, "event": "put", "seq": 354, "kind": "backfill", "status": 201, "ms": 9, "bytes": 100831}
+{"wall": 1795368081.166, "event": "put", "seq": 355, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98303}
+{"wall": 1795368082.146, "event": "captured", "seq": 477}
+{"wall": 1795368082.155, "event": "put", "seq": 477, "kind": "live", "status": 201, "ms": 9, "bytes": 101269}
+{"wall": 1795368082.172, "event": "put", "seq": 356, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100428}
+{"wall": 1795368083.16, "event": "put", "seq": 357, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100963}
+{"wall": 1795368084.143, "event": "captured", "seq": 478}
+{"wall": 1795368084.148, "event": "put", "seq": 478, "kind": "live", "status": 201, "ms": 5, "bytes": 100379}
+{"wall": 1795368084.168, "event": "put", "seq": 358, "kind": "backfill", "status": 201, "ms": 5, "bytes": 99962}
+{"wall": 1795368085.174, "event": "put", "seq": 359, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100658}
+{"wall": 1795368086.134, "event": "captured", "seq": 479}
+{"wall": 1795368086.14, "event": "put", "seq": 479, "kind": "live", "status": 201, "ms": 6, "bytes": 100832}
+{"wall": 1795368086.16, "event": "put", "seq": 360, "kind": "backfill", "status": 201, "ms": 5, "bytes": 99003}
+{"wall": 1795368087.166, "event": "put", "seq": 361, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100307}
+{"wall": 1795368087.185, "event": "put", "seq": 361, "kind": "duplicate", "status": 200, "ms": 5, "bytes": 100307}
+{"wall": 1795368088.147, "event": "captured", "seq": 480}
+{"wall": 1795368088.153, "event": "put", "seq": 480, "kind": "live", "status": 201, "ms": 6, "bytes": 99407}
+{"wall": 1795368088.17, "event": "put", "seq": 362, "kind": "backfill", "status": 422, "ms": 3, "bytes": 101720, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368088.174, "event": "put", "seq": 362, "kind": "backfill", "status": 201, "ms": 4, "bytes": 101720}
+{"wall": 1795368089.159, "event": "put", "seq": 363, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100266}
+{"wall": 1795368090.139, "event": "captured", "seq": 481}
+{"wall": 1795368090.145, "event": "put", "seq": 481, "kind": "live", "status": 201, "ms": 6, "bytes": 100269}
+{"wall": 1795368090.164, "event": "put", "seq": 364, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101367}
+{"wall": 1795368091.171, "event": "put", "seq": 365, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98451}
+{"wall": 1795368092.151, "event": "captured", "seq": 482}
+{"wall": 1795368092.159, "event": "put", "seq": 366, "kind": "backfill", "status": 201, "ms": 8, "bytes": 100148}
+{"wall": 1795368092.159, "event": "put", "seq": 482, "kind": "live", "status": 201, "ms": 7, "bytes": 101734}
+{"wall": 1795368093.163, "event": "put", "seq": 367, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100892}
+{"wall": 1795368094.142, "event": "captured", "seq": 483}
+{"wall": 1795368094.149, "event": "put", "seq": 483, "kind": "live", "status": 201, "ms": 6, "bytes": 100668}
+{"wall": 1795368094.167, "event": "put", "seq": 368, "kind": "backfill", "status": 201, "ms": 4, "bytes": 100225}
+{"wall": 1795368095.173, "event": "put", "seq": 369, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101501}
+{"wall": 1795368096.135, "event": "captured", "seq": 484}
+{"wall": 1795368096.144, "event": "put", "seq": 484, "kind": "live", "status": 201, "ms": 8, "bytes": 101625}
+{"wall": 1795368096.162, "event": "put", "seq": 484, "kind": "duplicate", "status": 200, "ms": 7, "bytes": 101625}
+{"wall": 1795368096.163, "event": "put", "seq": 370, "kind": "backfill", "status": 201, "ms": 7, "bytes": 98926}
+{"wall": 1795368097.173, "event": "put", "seq": 371, "kind": "backfill", "status": 201, "ms": 8, "bytes": 99882}
+{"wall": 1795368098.137, "event": "captured", "seq": 485}
+{"wall": 1795368098.144, "event": "put", "seq": 485, "kind": "live", "status": 201, "ms": 6, "bytes": 98345}
+{"wall": 1795368098.163, "event": "put", "seq": 372, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101461}
+{"wall": 1795368099.173, "event": "put", "seq": 373, "kind": "backfill", "status": 201, "ms": 8, "bytes": 100207}
+{"wall": 1795368100.152, "event": "captured", "seq": 486}
+{"wall": 1795368100.16, "event": "put", "seq": 374, "kind": "backfill", "status": 201, "ms": 7, "bytes": 101286}
+{"wall": 1795368100.161, "event": "put", "seq": 486, "kind": "live", "status": 201, "ms": 8, "bytes": 99826}
+{"wall": 1795368101.167, "event": "put", "seq": 375, "kind": "backfill", "status": 201, "ms": 8, "bytes": 98616}
+{"wall": 1795368102.146, "event": "captured", "seq": 487}
+{"wall": 1795368102.155, "event": "put", "seq": 487, "kind": "live", "status": 201, "ms": 9, "bytes": 101047}
+{"wall": 1795368102.172, "event": "put", "seq": 376, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100593}
+{"wall": 1795368103.16, "event": "put", "seq": 377, "kind": "backfill", "status": 201, "ms": 8, "bytes": 101198}
+{"wall": 1795368104.137, "event": "captured", "seq": 488}
+{"wall": 1795368104.144, "event": "put", "seq": 488, "kind": "live", "status": 201, "ms": 6, "bytes": 100736}
+{"wall": 1795368104.163, "event": "put", "seq": 378, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100465}
+{"wall": 1795368105.17, "event": "put", "seq": 379, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100986}
+{"wall": 1795368106.149, "event": "captured", "seq": 489}
+{"wall": 1795368106.176, "event": "put", "seq": 489, "kind": "live", "status": 201, "ms": 27, "bytes": 101573}
+{"wall": 1795368106.177, "event": "put", "seq": 380, "kind": "backfill", "status": 201, "ms": 8, "bytes": 99073}
+{"wall": 1795368107.161, "event": "put", "seq": 381, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99909}
+{"wall": 1795368108.141, "event": "captured", "seq": 490}
+{"wall": 1795368108.147, "event": "put", "seq": 490, "kind": "live", "status": 201, "ms": 6, "bytes": 99024}
+{"wall": 1795368108.166, "event": "put", "seq": 382, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101224}
+{"wall": 1795368109.179, "event": "put", "seq": 383, "kind": "backfill", "status": 201, "ms": 11, "bytes": 100118}
+{"wall": 1795368110.134, "event": "captured", "seq": 491}
+{"wall": 1795368110.14, "event": "put", "seq": 491, "kind": "live", "status": 201, "ms": 6, "bytes": 99886}
+{"wall": 1795368110.16, "event": "put", "seq": 384, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101395}
+{"wall": 1795368111.167, "event": "put", "seq": 385, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98735}
+{"wall": 1795368112.147, "event": "captured", "seq": 492}
+{"wall": 1795368112.174, "event": "put", "seq": 386, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100414}
+{"wall": 1795368113.163, "event": "put", "seq": 387, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101282}
+{"wall": 1795368114.142, "event": "captured", "seq": 493}
+{"wall": 1795368114.152, "event": "put", "seq": 492, "kind": "live", "status": 201, "ms": 10, "bytes": 101493}
+{"wall": 1795368114.153, "event": "put", "seq": 493, "kind": "live", "status": 201, "ms": 10, "bytes": 100316}
+{"wall": 1795368114.168, "event": "put", "seq": 388, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100825}
+{"wall": 1795368115.174, "event": "put", "seq": 389, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101453}
+{"wall": 1795368116.134, "event": "captured", "seq": 494}
+{"wall": 1795368116.142, "event": "put", "seq": 494, "kind": "live", "status": 201, "ms": 8, "bytes": 101616}
+{"wall": 1795368116.16, "event": "put", "seq": 390, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99103}
+{"wall": 1795368117.168, "event": "put", "seq": 391, "kind": "backfill", "status": 201, "ms": 7, "bytes": 99986}
+{"wall": 1795368118.147, "event": "captured", "seq": 495}
+{"wall": 1795368118.155, "event": "put", "seq": 495, "kind": "live", "status": 201, "ms": 8, "bytes": 98785}
+{"wall": 1795368118.173, "event": "put", "seq": 392, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101610}
+{"wall": 1795368119.161, "event": "put", "seq": 393, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100239}
+{"wall": 1795368120.14, "event": "captured", "seq": 496}
+{"wall": 1795368120.147, "event": "put", "seq": 496, "kind": "live", "status": 201, "ms": 7, "bytes": 100809}
+{"wall": 1795368120.166, "event": "put", "seq": 394, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101611}
+{"wall": 1795368121.172, "event": "put", "seq": 395, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98348}
+{"wall": 1795368122.15, "event": "captured", "seq": 497}
+{"wall": 1795368122.157, "event": "put", "seq": 396, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100118}
+{"wall": 1795368122.159, "event": "put", "seq": 497, "kind": "live", "status": 201, "ms": 7, "bytes": 101834}
+{"wall": 1795368123.164, "event": "put", "seq": 397, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101208}
+{"wall": 1795368124.142, "event": "captured", "seq": 498}
+{"wall": 1795368124.149, "event": "put", "seq": 498, "kind": "live", "status": 201, "ms": 6, "bytes": 100608}
+{"wall": 1795368124.167, "event": "put", "seq": 398, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100308}
+{"wall": 1795368124.188, "event": "put", "seq": 398, "kind": "duplicate", "status": 200, "ms": 5, "bytes": 100308}
+{"wall": 1795368125.173, "event": "put", "seq": 399, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101037}
+{"wall": 1795368126.133, "event": "captured", "seq": 499}
+{"wall": 1795368126.14, "event": "put", "seq": 499, "kind": "live", "status": 201, "ms": 6, "bytes": 101311}
+{"wall": 1795368126.158, "event": "put", "seq": 400, "kind": "backfill", "status": 201, "ms": 4, "bytes": 99014}
+{"wall": 1795368127.165, "event": "put", "seq": 401, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100065}
+{"wall": 1795368128.145, "event": "captured", "seq": 500}
+{"wall": 1795368128.151, "event": "put", "seq": 500, "kind": "live", "status": 201, "ms": 6, "bytes": 99295}
+{"wall": 1795368128.17, "event": "put", "seq": 402, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101087}
+{"wall": 1795368129.157, "event": "put", "seq": 403, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100046}
+{"wall": 1795368130.137, "event": "captured", "seq": 501}
+{"wall": 1795368130.143, "event": "put", "seq": 501, "kind": "live", "status": 201, "ms": 5, "bytes": 100076}
+{"wall": 1795368130.161, "event": "put", "seq": 404, "kind": "backfill", "status": 201, "ms": 4, "bytes": 101560}
+{"wall": 1795368131.169, "event": "put", "seq": 405, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98841}
+{"wall": 1795368132.149, "event": "captured", "seq": 502}
+{"wall": 1795368132.156, "event": "put", "seq": 502, "kind": "live", "status": 201, "ms": 6, "bytes": 101327}
+{"wall": 1795368132.174, "event": "put", "seq": 502, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 101327}
+{"wall": 1795368132.176, "event": "put", "seq": 406, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100270}
+{"wall": 1795368133.16, "event": "put", "seq": 407, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101033}
+{"wall": 1795368134.14, "event": "captured", "seq": 503}
+{"wall": 1795368134.145, "event": "put", "seq": 503, "kind": "live", "status": 201, "ms": 5, "bytes": 100282}
+{"wall": 1795368134.165, "event": "put", "seq": 408, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100354}
+{"wall": 1795368135.172, "event": "put", "seq": 409, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101565}
+{"wall": 1795368136.152, "event": "captured", "seq": 504}
+{"wall": 1795368136.16, "event": "put", "seq": 410, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98862}
+{"wall": 1795368136.16, "event": "put", "seq": 504, "kind": "live", "status": 201, "ms": 8, "bytes": 101573}
+{"wall": 1795368137.165, "event": "put", "seq": 411, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99752}
+{"wall": 1795368138.145, "event": "captured", "seq": 505}
+{"wall": 1795368138.153, "event": "put", "seq": 505, "kind": "live", "status": 201, "ms": 7, "bytes": 99111}
+{"wall": 1795368138.17, "event": "put", "seq": 412, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101837}
+{"wall": 1795368139.157, "event": "put", "seq": 413, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100580}
+{"wall": 1795368140.137, "event": "captured", "seq": 506}
+{"wall": 1795368140.143, "event": "put", "seq": 506, "kind": "live", "status": 201, "ms": 6, "bytes": 100569}
+{"wall": 1795368140.162, "event": "put", "seq": 414, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101466}
+{"wall": 1795368141.17, "event": "put", "seq": 415, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98662}
+{"wall": 1795368142.149, "event": "captured", "seq": 507}
+{"wall": 1795368142.156, "event": "put", "seq": 507, "kind": "live", "status": 201, "ms": 7, "bytes": 101310}
+{"wall": 1795368142.174, "event": "put", "seq": 416, "kind": "backfill", "status": 201, "ms": 5, "bytes": 100773}
+{"wall": 1795368143.161, "event": "put", "seq": 417, "kind": "backfill", "status": 422, "ms": 4, "bytes": 101498, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368143.166, "event": "put", "seq": 417, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101498}
+{"wall": 1795368144.143, "event": "captured", "seq": 508}
+{"wall": 1795368144.149, "event": "put", "seq": 508, "kind": "live", "status": 201, "ms": 6, "bytes": 100727}
+{"wall": 1795368144.169, "event": "put", "seq": 418, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100221}
+{"wall": 1795368145.189, "event": "put", "seq": 419, "kind": "backfill", "status": 201, "ms": 19, "bytes": 100748}
+{"wall": 1795368146.135, "event": "captured", "seq": 509}
+{"wall": 1795368146.142, "event": "put", "seq": 509, "kind": "live", "status": 201, "ms": 7, "bytes": 101274}
+{"wall": 1795368146.162, "event": "put", "seq": 420, "kind": "backfill", "status": 201, "ms": 6, "bytes": 99151}
+{"wall": 1795368147.169, "event": "put", "seq": 421, "kind": "backfill", "status": 201, "ms": 8, "bytes": 99881}
+{"wall": 1795368148.146, "event": "captured", "seq": 510}
+{"wall": 1795368148.153, "event": "put", "seq": 510, "kind": "live", "status": 201, "ms": 6, "bytes": 98893}
+{"wall": 1795368148.171, "event": "put", "seq": 422, "kind": "backfill", "status": 422, "ms": 4, "bytes": 101414, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368148.175, "event": "put", "seq": 422, "kind": "backfill", "status": 201, "ms": 4, "bytes": 101414}
+{"wall": 1795368148.191, "event": "put", "seq": 422, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 101414}
+{"wall": 1795368149.159, "event": "put", "seq": 423, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100280}
+{"wall": 1795368150.138, "event": "captured", "seq": 511}
+{"wall": 1795368150.143, "event": "put", "seq": 511, "kind": "live", "status": 201, "ms": 5, "bytes": 99895}
+{"wall": 1795368150.162, "event": "put", "seq": 424, "kind": "backfill", "status": 201, "ms": 4, "bytes": 101415}
+{"wall": 1795368151.173, "event": "put", "seq": 425, "kind": "backfill", "status": 201, "ms": 8, "bytes": 98647}
+{"wall": 1795368152.152, "event": "captured", "seq": 512}
+{"wall": 1795368152.16, "event": "put", "seq": 512, "kind": "live", "status": 201, "ms": 7, "bytes": 102010}
+{"wall": 1795368152.16, "event": "put", "seq": 426, "kind": "backfill", "status": 201, "ms": 7, "bytes": 99655}
+{"wall": 1795368153.165, "event": "put", "seq": 427, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100687}
+{"wall": 1795368154.143, "event": "captured", "seq": 513}
+{"wall": 1795368154.149, "event": "put", "seq": 513, "kind": "live", "status": 201, "ms": 6, "bytes": 100433}
+{"wall": 1795368154.168, "event": "put", "seq": 428, "kind": "backfill", "status": 201, "ms": 5, "bytes": 99965}
+{"wall": 1795368155.175, "event": "put", "seq": 429, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100755}
+{"wall": 1795368156.134, "event": "captured", "seq": 514}
+{"wall": 1795368156.14, "event": "put", "seq": 514, "kind": "live", "status": 201, "ms": 6, "bytes": 101723}
+{"wall": 1795368156.16, "event": "put", "seq": 430, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98820}
+{"wall": 1795368157.169, "event": "put", "seq": 431, "kind": "backfill", "status": 201, "ms": 9, "bytes": 99756}
+{"wall": 1795368158.146, "event": "captured", "seq": 515}
+{"wall": 1795368158.155, "event": "put", "seq": 515, "kind": "live", "status": 201, "ms": 9, "bytes": 98551}
+{"wall": 1795368158.171, "event": "put", "seq": 432, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101373}
+{"wall": 1795368159.16, "event": "put", "seq": 433, "kind": "backfill", "status": 201, "ms": 7, "bytes": 100565}
+{"wall": 1795368160.138, "event": "captured", "seq": 516}
+{"wall": 1795368160.167, "event": "put", "seq": 434, "kind": "backfill", "status": 201, "ms": 8, "bytes": 101507}
+{"wall": 1795368161.17, "event": "put", "seq": 435, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98500}
+{"wall": 1795368162.151, "event": "captured", "seq": 517}
+{"wall": 1795368162.164, "event": "put", "seq": 517, "kind": "live", "status": 201, "ms": 12, "bytes": 100992}
+{"wall": 1795368162.164, "event": "put", "seq": 516, "kind": "live", "status": 201, "ms": 11, "bytes": 100619}
+{"wall": 1795368162.165, "event": "put", "seq": 436, "kind": "backfill", "status": 201, "ms": 11, "bytes": 100562}
+{"wall": 1795368163.163, "event": "put", "seq": 437, "kind": "backfill", "status": 201, "ms": 6, "bytes": 101387}
+{"wall": 1795368163.181, "event": "put", "seq": 437, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 101387}
+{"wall": 1795368164.143, "event": "captured", "seq": 518}
+{"wall": 1795368164.15, "event": "put", "seq": 518, "kind": "live", "status": 201, "ms": 6, "bytes": 100362}
+{"wall": 1795368164.17, "event": "put", "seq": 438, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100561}
+{"wall": 1795368165.157, "event": "put", "seq": 439, "kind": "backfill", "status": 201, "ms": 7, "bytes": 101074}
+{"wall": 1795368166.136, "event": "captured", "seq": 519}
+{"wall": 1795368166.142, "event": "put", "seq": 519, "kind": "live", "status": 201, "ms": 6, "bytes": 100649}
+{"wall": 1795368166.162, "event": "put", "seq": 440, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98888}
+{"wall": 1795368167.169, "event": "put", "seq": 441, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100180}
+{"wall": 1795368168.148, "event": "captured", "seq": 520}
+{"wall": 1795368168.156, "event": "put", "seq": 520, "kind": "live", "status": 201, "ms": 7, "bytes": 98917}
+{"wall": 1795368168.174, "event": "put", "seq": 442, "kind": "backfill", "status": 201, "ms": 5, "bytes": 101276}
+{"wall": 1795368169.161, "event": "put", "seq": 443, "kind": "backfill", "status": 201, "ms": 6, "bytes": 100082}
+{"wall": 1795368170.141, "event": "captured", "seq": 521}
+{"wall": 1795368170.149, "event": "put", "seq": 521, "kind": "live", "status": 201, "ms": 7, "bytes": 99897}
+{"wall": 1795368170.168, "event": "put", "seq": 444, "kind": "backfill", "status": 201, "ms": 7, "bytes": 101478}
+{"wall": 1795368171.173, "event": "put", "seq": 445, "kind": "backfill", "status": 201, "ms": 6, "bytes": 98634}
+{"wall": 1795368172.152, "event": "captured", "seq": 522}
+{"wall": 1795368172.161, "event": "put", "seq": 446, "kind": "backfill", "status": 201, "ms": 8, "bytes": 100633}
+{"wall": 1795368172.162, "event": "put", "seq": 522, "kind": "live", "status": 201, "ms": 8, "bytes": 101362}
+{"wall": 1795368173.165, "event": "put", "seq": 447, "kind": "backfill", "status": 201, "ms": 7, "bytes": 101141}
+{"wall": 1795368174.146, "event": "captured", "seq": 523}
+{"wall": 1795368174.154, "event": "put", "seq": 523, "kind": "live", "status": 201, "ms": 7, "bytes": 100338}
+{"wall": 1795368174.171, "event": "put", "seq": 523, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 100338}
+{"wall": 1795368176.138, "event": "captured", "seq": 524}
+{"wall": 1795368176.154, "event": "put", "seq": 524, "kind": "live", "status": 201, "ms": 16, "bytes": 101129}
+{"wall": 1795368178.15, "event": "captured", "seq": 525}
+{"wall": 1795368180.143, "event": "captured", "seq": 526}
+{"wall": 1795368180.149, "event": "put", "seq": 526, "kind": "live", "status": 422, "ms": 5, "bytes": 99707, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368180.153, "event": "put", "seq": 525, "kind": "live", "status": 201, "ms": 9, "bytes": 98988}
+{"wall": 1795368180.155, "event": "put", "seq": 526, "kind": "live", "status": 201, "ms": 6, "bytes": 99707}
+{"wall": 1795368182.145, "event": "captured", "seq": 527}
+{"wall": 1795368182.153, "event": "put", "seq": 527, "kind": "live", "status": 201, "ms": 8, "bytes": 100747}
+{"wall": 1795368184.138, "event": "captured", "seq": 528}
+{"wall": 1795368184.145, "event": "put", "seq": 528, "kind": "live", "status": 201, "ms": 7, "bytes": 100262}
+{"wall": 1795368186.151, "event": "captured", "seq": 529}
+{"wall": 1795368186.158, "event": "put", "seq": 529, "kind": "live", "status": 201, "ms": 6, "bytes": 101238}
+{"wall": 1795368188.145, "event": "captured", "seq": 530}
+{"wall": 1795368188.154, "event": "put", "seq": 530, "kind": "live", "status": 201, "ms": 9, "bytes": 98703}
+{"wall": 1795368190.137, "event": "captured", "seq": 531}
+{"wall": 1795368190.145, "event": "put", "seq": 531, "kind": "live", "status": 201, "ms": 7, "bytes": 99770}
+{"wall": 1795368192.15, "event": "captured", "seq": 532}
+{"wall": 1795368192.157, "event": "put", "seq": 532, "kind": "live", "status": 201, "ms": 6, "bytes": 101041}
+{"wall": 1795368194.143, "event": "captured", "seq": 533}
+{"wall": 1795368194.151, "event": "put", "seq": 533, "kind": "live", "status": 201, "ms": 8, "bytes": 100152}
+{"wall": 1795368196.142, "event": "captured", "seq": 534}
+{"wall": 1795368196.151, "event": "put", "seq": 534, "kind": "live", "status": 201, "ms": 8, "bytes": 101449}
+{"wall": 1795368198.136, "event": "captured", "seq": 535}
+{"wall": 1795368198.143, "event": "put", "seq": 535, "kind": "live", "status": 201, "ms": 7, "bytes": 98210}
+{"wall": 1795368200.147, "event": "captured", "seq": 536}
+{"wall": 1795368200.156, "event": "put", "seq": 536, "kind": "live", "status": 201, "ms": 8, "bytes": 100021}
+{"wall": 1795368202.148, "event": "captured", "seq": 537}
+{"wall": 1795368202.156, "event": "put", "seq": 537, "kind": "live", "status": 201, "ms": 8, "bytes": 101078}
+{"wall": 1795368204.14, "event": "captured", "seq": 538}
+{"wall": 1795368206.151, "event": "captured", "seq": 539}
+{"wall": 1795368206.16, "event": "put", "seq": 539, "kind": "live", "status": 201, "ms": 9, "bytes": 100648}
+{"wall": 1795368206.16, "event": "put", "seq": 538, "kind": "live", "status": 201, "ms": 8, "bytes": 100393}
+{"wall": 1795368208.144, "event": "captured", "seq": 540}
+{"wall": 1795368208.149, "event": "put", "seq": 540, "kind": "live", "status": 422, "ms": 4, "bytes": 98939, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368208.155, "event": "put", "seq": 540, "kind": "live", "status": 201, "ms": 6, "bytes": 98939}
+{"wall": 1795368210.136, "event": "captured", "seq": 541}
+{"wall": 1795368210.143, "event": "put", "seq": 541, "kind": "live", "status": 201, "ms": 6, "bytes": 99789}
+{"wall": 1795368212.146, "event": "captured", "seq": 542}
+{"wall": 1795368212.156, "event": "put", "seq": 542, "kind": "live", "status": 201, "ms": 9, "bytes": 101338}
+{"wall": 1795368214.137, "event": "captured", "seq": 543}
+{"wall": 1795368214.142, "event": "put", "seq": 543, "kind": "live", "status": 201, "ms": 5, "bytes": 100165}
+{"wall": 1795368216.151, "event": "captured", "seq": 544}
+{"wall": 1795368218.144, "event": "captured", "seq": 545}
+{"wall": 1795368218.15, "event": "put", "seq": 544, "kind": "live", "status": 422, "ms": 5, "bytes": 101775, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368218.154, "event": "put", "seq": 545, "kind": "live", "status": 201, "ms": 9, "bytes": 98578}
+{"wall": 1795368218.156, "event": "put", "seq": 544, "kind": "live", "status": 201, "ms": 6, "bytes": 101775}
+{"wall": 1795368220.137, "event": "captured", "seq": 546}
+{"wall": 1795368220.144, "event": "put", "seq": 546, "kind": "live", "status": 201, "ms": 7, "bytes": 100575}
+{"wall": 1795368222.15, "event": "captured", "seq": 547}
+{"wall": 1795368224.143, "event": "captured", "seq": 548}
+{"wall": 1795368224.153, "event": "put", "seq": 548, "kind": "live", "status": 201, "ms": 9, "bytes": 100468}
+{"wall": 1795368224.153, "event": "put", "seq": 547, "kind": "live", "status": 201, "ms": 10, "bytes": 101010}
+{"wall": 1795368226.135, "event": "captured", "seq": 549}
+{"wall": 1795368226.143, "event": "put", "seq": 549, "kind": "live", "status": 201, "ms": 7, "bytes": 101474}
+{"wall": 1795368228.148, "event": "captured", "seq": 550}
+{"wall": 1795368228.156, "event": "put", "seq": 550, "kind": "live", "status": 201, "ms": 8, "bytes": 99257}
+{"wall": 1795368230.149, "event": "captured", "seq": 551}
+{"wall": 1795368230.155, "event": "put", "seq": 551, "kind": "live", "status": 201, "ms": 6, "bytes": 100051}
+{"wall": 1795368232.144, "event": "captured", "seq": 552}
+{"wall": 1795368232.151, "event": "put", "seq": 552, "kind": "live", "status": 201, "ms": 7, "bytes": 101277}
+{"wall": 1795368234.136, "event": "captured", "seq": 553}
+{"wall": 1795368234.142, "event": "put", "seq": 553, "kind": "live", "status": 422, "ms": 6, "bytes": 100395, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368234.148, "event": "put", "seq": 553, "kind": "live", "status": 201, "ms": 6, "bytes": 100395}
+{"wall": 1795368234.161, "event": "put", "seq": 553, "kind": "duplicate", "status": 200, "ms": 4, "bytes": 100395}
+{"wall": 1795368236.148, "event": "captured", "seq": 554}
+{"wall": 1795368236.157, "event": "put", "seq": 554, "kind": "live", "status": 201, "ms": 8, "bytes": 101303}
+{"wall": 1795368238.14, "event": "captured", "seq": 555}
+{"wall": 1795368238.149, "event": "put", "seq": 555, "kind": "live", "status": 201, "ms": 8, "bytes": 99147}
+{"wall": 1795368240.133, "event": "captured", "seq": 556}
+{"wall": 1795368240.14, "event": "put", "seq": 556, "kind": "live", "status": 201, "ms": 7, "bytes": 100999}
+{"wall": 1795368242.148, "event": "captured", "seq": 557}
+{"wall": 1795368242.157, "event": "put", "seq": 557, "kind": "live", "status": 201, "ms": 9, "bytes": 101403}
+{"wall": 1795368244.142, "event": "captured", "seq": 558}
+{"wall": 1795368244.149, "event": "put", "seq": 558, "kind": "live", "status": 201, "ms": 6, "bytes": 100577}
+{"wall": 1795368246.136, "event": "captured", "seq": 559}
+{"wall": 1795368246.145, "event": "put", "seq": 559, "kind": "live", "status": 201, "ms": 9, "bytes": 101382}
+{"wall": 1795368248.149, "event": "captured", "seq": 560}
+{"wall": 1795368248.159, "event": "put", "seq": 560, "kind": "live", "status": 201, "ms": 10, "bytes": 99118}
+{"wall": 1795368250.144, "event": "captured", "seq": 561}
+{"wall": 1795368250.152, "event": "put", "seq": 561, "kind": "live", "status": 201, "ms": 8, "bytes": 100118}
+{"wall": 1795368252.137, "event": "captured", "seq": 562}
+{"wall": 1795368252.143, "event": "put", "seq": 562, "kind": "live", "status": 201, "ms": 6, "bytes": 102428}
+{"wall": 1795368254.15, "event": "captured", "seq": 563}
+{"wall": 1795368254.156, "event": "put", "seq": 563, "kind": "live", "status": 201, "ms": 6, "bytes": 100244}
+{"wall": 1795368256.14, "event": "captured", "seq": 564}
+{"wall": 1795368256.147, "event": "put", "seq": 564, "kind": "live", "status": 201, "ms": 7, "bytes": 101599}
+{"wall": 1795368258.152, "event": "captured", "seq": 565}
+{"wall": 1795368258.159, "event": "put", "seq": 565, "kind": "live", "status": 201, "ms": 7, "bytes": 99169}
+{"wall": 1795368260.145, "event": "captured", "seq": 566}
+{"wall": 1795368260.154, "event": "put", "seq": 566, "kind": "live", "status": 201, "ms": 8, "bytes": 100924}
+{"wall": 1795368262.137, "event": "captured", "seq": 567}
+{"wall": 1795368262.143, "event": "put", "seq": 567, "kind": "live", "status": 201, "ms": 6, "bytes": 101100}
+{"wall": 1795368264.15, "event": "captured", "seq": 568}
+{"wall": 1795368264.156, "event": "put", "seq": 568, "kind": "live", "status": 422, "ms": 6, "bytes": 100674, "error": "{\"error\":\"checksum mismatch\"}"}
+{"wall": 1795368264.164, "event": "put", "seq": 568, "kind": "live", "status": 201, "ms": 8, "bytes": 100674}
+{"wall": 1795368266.143, "event": "captured", "seq": 569}
+{"wall": 1795368266.149, "event": "put", "seq": 569, "kind": "live", "status": 201, "ms": 6, "bytes": 101000}
+{"wall": 1795368268.135, "event": "captured", "seq": 570}
+{"wall": 1795368268.156, "event": "put", "seq": 570, "kind": "live", "status": 201, "ms": 20, "bytes": 99017}
+{"wall": 1795368270.148, "event": "captured", "seq": 571}
+{"wall": 1795368270.158, "event": "put", "seq": 571, "kind": "live", "status": 201, "ms": 9, "bytes": 99823}
+{"wall": 1795368272.144, "event": "captured", "seq": 572}
+{"wall": 1795368272.153, "event": "put", "seq": 572, "kind": "live", "status": 201, "ms": 8, "bytes": 101407}
+{"wall": 1795368274.138, "event": "captured", "seq": 573}
+{"wall": 1795368274.147, "event": "put", "seq": 573, "kind": "live", "status": 201, "ms": 9, "bytes": 100756}
+{"wall": 1795368276.133, "event": "captured", "seq": 574}
+{"wall": 1795368276.14, "event": "put", "seq": 574, "kind": "live", "status": 201, "ms": 6, "bytes": 101772}
+{"wall": 1795368278.144, "event": "captured", "seq": 575}
+{"wall": 1795368278.152, "event": "put", "seq": 575, "kind": "live", "status": 201, "ms": 7, "bytes": 98501}
+{"wall": 1795368280.137, "event": "captured", "seq": 576}
+{"wall": 1795368280.144, "event": "put", "seq": 576, "kind": "live", "status": 201, "ms": 6, "bytes": 100467}
+{"wall": 1795368282.149, "event": "captured", "seq": 577}
+{"wall": 1795368282.158, "event": "put", "seq": 577, "kind": "live", "status": 201, "ms": 9, "bytes": 101601}
+{"wall": 1795368284.141, "event": "captured", "seq": 578}
+{"wall": 1795368284.148, "event": "put", "seq": 578, "kind": "live", "status": 201, "ms": 6, "bytes": 100410}
+{"wall": 1795368286.133, "event": "captured", "seq": 579}
+{"wall": 1795368286.141, "event": "put", "seq": 579, "kind": "live", "status": 201, "ms": 7, "bytes": 100722}
+{"wall": 1795368288.147, "event": "captured", "seq": 580}
+{"wall": 1795368288.156, "event": "put", "seq": 580, "kind": "live", "status": 201, "ms": 9, "bytes": 99235}
+{"wall": 1795368290.139, "event": "captured", "seq": 581}
+{"wall": 1795368290.145, "event": "put", "seq": 581, "kind": "live", "status": 201, "ms": 6, "bytes": 100103}
+{"wall": 1795368292.152, "event": "captured", "seq": 582}
+{"wall": 1795368292.159, "event": "put", "seq": 582, "kind": "live", "status": 201, "ms": 7, "bytes": 101458}
+{"wall": 1795368294.144, "event": "captured", "seq": 583}
+{"wall": 1795368294.154, "event": "put", "seq": 583, "kind": "live", "status": 201, "ms": 10, "bytes": 100508}
+{"wall": 1795368296.137, "event": "captured", "seq": 584}
+{"wall": 1795368296.145, "event": "put", "seq": 584, "kind": "live", "status": 201, "ms": 7, "bytes": 101548}
+{"wall": 1795368298.15, "event": "captured", "seq": 585}
+{"wall": 1795368298.159, "event": "put", "seq": 585, "kind": "live", "status": 201, "ms": 8, "bytes": 98709}
+{"wall": 1795368300.143, "event": "captured", "seq": 586}
+{"wall": 1795368300.15, "event": "put", "seq": 586, "kind": "live", "status": 201, "ms": 6, "bytes": 100672}
+{"wall": 1795368302.139, "event": "captured", "seq": 587}
+{"wall": 1795368302.146, "event": "put", "seq": 587, "kind": "live", "status": 201, "ms": 6, "bytes": 101635}
+{"wall": 1795368304.134, "event": "captured", "seq": 588}
+{"wall": 1795368304.141, "event": "put", "seq": 588, "kind": "live", "status": 201, "ms": 7, "bytes": 100767}
+{"wall": 1795368304.159, "event": "put", "seq": 588, "kind": "duplicate", "status": 200, "ms": 5, "bytes": 100767}
+{"wall": 1795368306.148, "event": "captured", "seq": 589}
+{"wall": 1795368308.141, "event": "captured", "seq": 590}
+{"wall": 1795368308.149, "event": "put", "seq": 589, "kind": "live", "status": 201, "ms": 7, "bytes": 101873}
+{"wall": 1795368308.15, "event": "put", "seq": 590, "kind": "live", "status": 201, "ms": 8, "bytes": 98985}
+{"wall": 1795368310.133, "event": "captured", "seq": 591}
+{"wall": 1795368310.141, "event": "put", "seq": 591, "kind": "live", "status": 201, "ms": 8, "bytes": 99963}
+{"wall": 1795368312.145, "event": "captured", "seq": 592}
+{"wall": 1795368312.152, "event": "put", "seq": 592, "kind": "live", "status": 201, "ms": 7, "bytes": 101393}
+{"wall": 1795368314.139, "event": "captured", "seq": 593}
+{"wall": 1795368314.147, "event": "put", "seq": 593, "kind": "live", "status": 201, "ms": 8, "bytes": 100140}
+{"wall": 1795368314.165, "event": "put", "seq": 593, "kind": "duplicate", "status": 200, "ms": 6, "bytes": 100140}
+{"wall": 1795368316.152, "event": "captured", "seq": 594}
+{"wall": 1795368316.158, "event": "put", "seq": 594, "kind": "live", "status": 201, "ms": 6, "bytes": 101448}
+{"wall": 1795368318.145, "event": "captured", "seq": 595}
+{"wall": 1795368318.155, "event": "put", "seq": 595, "kind": "live", "status": 201, "ms": 10, "bytes": 98781}
+{"wall": 1795368320.138, "event": "captured", "seq": 596}
+{"wall": 1795368320.145, "event": "put", "seq": 596, "kind": "live", "status": 201, "ms": 7, "bytes": 100703}
+{"wall": 1795368322.15, "event": "captured", "seq": 597}
+{"wall": 1795368322.157, "event": "put", "seq": 597, "kind": "live", "status": 201, "ms": 7, "bytes": 101482}
+{"wall": 1795368324.145, "event": "captured", "seq": 598}
+{"wall": 1795368324.155, "event": "put", "seq": 598, "kind": "live", "status": 201, "ms": 9, "bytes": 100729}
+{"wall": 1795368326.138, "event": "captured", "seq": 599}
+{"wall": 1795368326.146, "event": "put", "seq": 599, "kind": "live", "status": 201, "ms": 7, "bytes": 102058}
+{"wall": 1795368326.164, "event": "epoch_end", "status": 200}
+{"wall": 1795368326.169, "event": "finish", "status": 200, "acked": 600, "damaged": []}
+{"wall": 1795368326.172, "event": "status", "state": "finishing", "epochs": [{"epoch": 0, "received_through": 599, "missing": [], "ended": true}], "inits": [0], "playout": {"position_us": 1190966666, "behind_live_ms": 7033, "speed": 1.0}, "playout_delay_ms": 7033}

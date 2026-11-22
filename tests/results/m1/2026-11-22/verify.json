@@ -1,0 +1,144 @@
+{
+ "broadcast_id": "01a20438-4470-71b4-94de-eb3c990342f4",
+ "offline_windows_rel_s": [
+  [
+   120.0,
+   130.0
+  ],
+  [
+   300.0,
+   360.0
+  ],
+  [
+   600.0,
+   900.0
+  ]
+ ],
+ "viewer_warning_lines": [],
+ "recording_seconds": 1215.0,
+ "source_seconds_shown": 834,
+ "source_seconds_range": [
+  0,
+  1199
+ ],
+ "source_frame_largest_step": 9001,
+ "clock_mapping": {
+  "offset_frames": 60,
+  "recorded_switches": 8,
+  "max_mismatch_frames": 0
+ },
+ "cpu_mean_core": 0.228,
+ "cpu_by_showing": {
+  "starting": 0.255,
+  "footage": 0.241,
+  "holding": 0.196,
+  "ended": 0.201
+ },
+ "cpu_max_1s": 0.517,
+ "late_ticks": 7,
+ "late_max_s": 0.125,
+ "phone_puts": {
+  "200": 33,
+  "201": 600,
+  "422": 21
+ },
+ "phone_acknowledged": 600,
+ "phone_segments": 600,
+ "store_play_results": {
+  "played": "417",
+  "skipped": "183"
+ },
+ "checks": [
+  {
+   "name": "publish sessions at the receiver",
+   "passed": true,
+   "value": 1,
+   "gate": "1"
+  },
+  {
+   "name": "viewer sessions (no reconnect)",
+   "passed": true,
+   "value": 1,
+   "gate": "1"
+  },
+  {
+   "name": "viewer disconnected only after the broadcast ended",
+   "passed": true,
+   "value": true,
+   "gate": "True"
+  },
+  {
+   "name": "viewer warnings",
+   "passed": true,
+   "value": 0,
+   "gate": "0"
+  },
+  {
+   "name": "video PTS strictly increasing",
+   "passed": true,
+   "value": "0 non-increasing of 36451",
+   "gate": "0"
+  },
+  {
+   "name": "video gaps over 1.5 frames",
+   "passed": true,
+   "value": "0 (max 34.0 ms)",
+   "gate": "0"
+  },
+  {
+   "name": "audio gaps over 25 ms",
+   "passed": true,
+   "value": "0 (max 1.0 ms)",
+   "gate": "0"
+  },
+  {
+   "name": "footage frames in source order, none twice",
+   "passed": true,
+   "value": "25020 frames, 0 repeated, 0 out of order",
+   "gate": "0 repeated, 0 out of order"
+  },
+  {
+   "name": "recorded switches match the playout log",
+   "passed": true,
+   "value": "8 switches, max 0 frame off",
+   "gate": "<= 1 frame"
+  },
+  {
+   "name": "gap 1: holding visible after uploads stopped",
+   "passed": true,
+   "value": "6.2 s",
+   "gate": "<= 10 s"
+  },
+  {
+   "name": "gap 1: footage back after uploads resumed",
+   "passed": true,
+   "value": "2.3 s",
+   "gate": "<= 12 s"
+  },
+  {
+   "name": "gap 2: holding visible after uploads stopped",
+   "passed": true,
+   "value": "6.3 s",
+   "gate": "<= 10 s"
+  },
+  {
+   "name": "gap 2: footage back after uploads resumed",
+   "passed": true,
+   "value": "6.3 s",
+   "gate": "<= 12 s"
+  },
+  {
+   "name": "gap 3: holding visible after uploads stopped",
+   "passed": true,
+   "value": "6.3 s",
+   "gate": "<= 10 s"
+  },
+  {
+   "name": "gap 3: footage back after uploads resumed",
+   "passed": true,
+   "value": "6.2 s",
+   "gate": "<= 12 s"
+  }
+ ],
+ "verdict": "pass"
+}

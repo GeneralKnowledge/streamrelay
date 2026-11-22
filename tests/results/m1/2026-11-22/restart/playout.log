@@ -1,0 +1,10 @@
+2026-11-22 17:26:25,111 INFO streamrelay.playout.supervisor 01a2044b-7668-713a-a812-fc988965c390: starting playout
+2026-11-22 17:26:32,339 INFO streamrelay.playout 01a2044b-7668-713a-a812-fc988965c390: starting -> live {'jumped_to': (0, 0)}
+2026-11-22 17:26:56,264 WARNING streamrelay.playout.supervisor 01a2044b-7668-713a-a812-fc988965c390: playout exited with -9; restarting in 1 s
+2026-11-22 17:26:57,268 INFO streamrelay.playout.supervisor 01a2044b-7668-713a-a812-fc988965c390: starting playout
+2026-11-22 17:26:57,468 INFO streamrelay.playout 01a2044b-7668-713a-a812-fc988965c390: resumed from checkpoint ('live', 0, 11, 29, 900)
+2026-11-22 17:26:57,627 INFO streamrelay.playout 01a2044b-7668-713a-a812-fc988965c390: resuming -> live {'resumed': True}
+2026-11-22 17:27:24,337 INFO streamrelay.playout 01a2044b-7668-713a-a812-fc988965c390: live -> finishing {}
+2026-11-22 17:27:34,537 INFO streamrelay.playout 01a2044b-7668-713a-a812-fc988965c390: finishing -> ended {}
+2026-11-22 17:27:44,571 INFO streamrelay.playout 01a2044b-7668-713a-a812-fc988965c390: ended -> finished {}
+2026-11-22 17:27:45,476 INFO streamrelay.playout.supervisor 01a2044b-7668-713a-a812-fc988965c390: playout finished

@@ -119,20 +119,21 @@ def gap_timing(codes: list[int], offset: int, t0: float, windows: list[tuple[flo
     wall = [t0 + (k + offset) / FPS for k in range(len(codes))]
     rs = runs(codes)
     checks = []
+    hold_gate, back_gate = f"<= {buffer_target + 2:.0f} s", f"<= {resume_threshold + 2:.0f} s"
     for i, (start, end) in enumerate(windows, 1):
         hold = next(((a, b) for kind, a, b in rs if kind == "card" and wall[b] >= start), None)
         if hold is None or wall[hold[0]] > end + resume_threshold + 30:
-            checks.append(Check(f"gap {i}: holding visible after uploads stopped", False, "never", f"<= {buffer_target + 2:.0f} s"))
+            checks.append(Check(f"gap {i}: holding visible after uploads stopped", False, "never", hold_gate))
             continue
         appear = wall[hold[0]] - start
         checks.append(Check(f"gap {i}: holding visible after uploads stopped", appear <= buffer_target + 2,
-                            f"{appear:.1f} s", f"<= {buffer_target + 2:.0f} s"))
+                            f"{appear:.1f} s", hold_gate))
         if hold[1] + 1 >= len(codes):
-            checks.append(Check(f"gap {i}: footage back after uploads resumed", False, "never", f"<= {resume_threshold + 2:.0f} s"))
+            checks.append(Check(f"gap {i}: footage back after uploads resumed", False, "never", back_gate))
             continue
         back = wall[hold[1] + 1] - end
         checks.append(Check(f"gap {i}: footage back after uploads resumed", back <= resume_threshold + 2,
-                            f"{back:.1f} s", f"<= {resume_threshold + 2:.0f} s"))
+                            f"{back:.1f} s", back_gate))
     return checks
 
 

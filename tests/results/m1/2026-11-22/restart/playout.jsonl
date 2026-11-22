@@ -1,0 +1,91 @@
+{"wall": 1795368385.3056, "event": "start", "n": 0, "t0": 1795368385.3056023, "url": "rtmp://127.0.0.1:1935/live/01a2044b-7668-713a-a812-fc988965c390", "state": "starting"}
+{"wall": 1795368385.3057, "event": "showing", "n": 0, "what": "starting", "key": [0, 0]}
+{"wall": 1795368386.2778, "event": "second", "n": 30, "state": "starting", "showing": "starting", "cpu": 0.279, "ahead_s": 0.0, "key": null, "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368387.2762, "event": "second", "n": 60, "state": "starting", "showing": "starting", "cpu": 0.332, "ahead_s": 2.0, "key": null, "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368388.2766, "event": "second", "n": 90, "state": "starting", "showing": "starting", "cpu": 0.218, "ahead_s": 2.0, "key": null, "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368389.277, "event": "second", "n": 120, "state": "starting", "showing": "starting", "cpu": 0.331, "ahead_s": 4.0, "key": null, "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368390.277, "event": "second", "n": 150, "state": "starting", "showing": "starting", "cpu": 0.219, "ahead_s": 4.0, "key": null, "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368391.2767, "event": "second", "n": 180, "state": "starting", "showing": "starting", "cpu": 0.316, "ahead_s": 6.0, "key": null, "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368392.2772, "event": "second", "n": 210, "state": "starting", "showing": "starting", "cpu": 0.2, "ahead_s": 6.0, "key": null, "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368392.3392, "event": "state", "n": 211, "state": "live", "prev": "starting", "key": [0, 0], "jumped_to": [0, 0]}
+{"wall": 1795368392.3394, "event": "showing", "n": 211, "what": "footage", "key": [0, 0]}
+{"wall": 1795368393.2772, "event": "second", "n": 240, "state": "live", "showing": "footage", "cpu": 0.364, "ahead_s": 7.03, "key": [0, 0], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368394.277, "event": "second", "n": 270, "state": "live", "showing": "footage", "cpu": 0.236, "ahead_s": 6.03, "key": [0, 0], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368395.2768, "event": "second", "n": 300, "state": "live", "showing": "footage", "cpu": 0.35, "ahead_s": 7.03, "key": [0, 1], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368396.2755, "event": "second", "n": 330, "state": "live", "showing": "footage", "cpu": 0.221, "ahead_s": 6.03, "key": [0, 1], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368397.2768, "event": "second", "n": 360, "state": "live", "showing": "footage", "cpu": 0.282, "ahead_s": 7.03, "key": [0, 2], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368398.2765, "event": "second", "n": 390, "state": "live", "showing": "footage", "cpu": 0.215, "ahead_s": 6.03, "key": [0, 2], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368399.2777, "event": "second", "n": 420, "state": "live", "showing": "footage", "cpu": 0.283, "ahead_s": 7.03, "key": [0, 3], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368400.2768, "event": "second", "n": 450, "state": "live", "showing": "footage", "cpu": 0.219, "ahead_s": 8.03, "key": [0, 3], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368401.2771, "event": "second", "n": 480, "state": "live", "showing": "footage", "cpu": 0.302, "ahead_s": 7.03, "key": [0, 4], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368402.2769, "event": "second", "n": 510, "state": "live", "showing": "footage", "cpu": 0.234, "ahead_s": 6.03, "key": [0, 4], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368403.2777, "event": "second", "n": 540, "state": "live", "showing": "footage", "cpu": 0.338, "ahead_s": 7.03, "key": [0, 5], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368404.2765, "event": "second", "n": 570, "state": "live", "showing": "footage", "cpu": 0.245, "ahead_s": 8.03, "key": [0, 5], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368405.2768, "event": "second", "n": 600, "state": "live", "showing": "footage", "cpu": 0.331, "ahead_s": 7.03, "key": [0, 6], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368406.2769, "event": "second", "n": 630, "state": "live", "showing": "footage", "cpu": 0.23, "ahead_s": 8.03, "key": [0, 6], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368407.2775, "event": "second", "n": 660, "state": "live", "showing": "footage", "cpu": 0.31, "ahead_s": 7.03, "key": [0, 7], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368408.2771, "event": "second", "n": 690, "state": "live", "showing": "footage", "cpu": 0.223, "ahead_s": 8.03, "key": [0, 7], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368409.2764, "event": "second", "n": 720, "state": "live", "showing": "footage", "cpu": 0.324, "ahead_s": 7.03, "key": [0, 8], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368410.276, "event": "second", "n": 750, "state": "live", "showing": "footage", "cpu": 0.214, "ahead_s": 8.03, "key": [0, 8], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368411.2762, "event": "second", "n": 780, "state": "live", "showing": "footage", "cpu": 0.287, "ahead_s": 7.03, "key": [0, 9], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368412.2761, "event": "second", "n": 810, "state": "live", "showing": "footage", "cpu": 0.211, "ahead_s": 8.03, "key": [0, 9], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368413.2765, "event": "second", "n": 840, "state": "live", "showing": "footage", "cpu": 0.313, "ahead_s": 7.03, "key": [0, 10], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368414.277, "event": "second", "n": 870, "state": "live", "showing": "footage", "cpu": 0.214, "ahead_s": 8.03, "key": [0, 10], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368415.2773, "event": "second", "n": 900, "state": "live", "showing": "footage", "cpu": 0.288, "ahead_s": 7.03, "key": [0, 11], "late_max": 0.117, "late_ticks": 4}
+{"wall": 1795368417.4686, "event": "restored", "n": 900, "checkpoint": {"state": "live", "key": [0, 11], "offset": 29, "output_frames": 900}}
+{"wall": 1795368417.4703, "event": "start", "n": 900, "t0": 1795368417.4702477, "url": "rtmp://127.0.0.1:1935/live/01a2044b-7668-713a-a812-fc988965c390", "state": "resuming"}
+{"wall": 1795368417.4703, "event": "showing", "n": 900, "what": "holding", "key": [0, 11]}
+{"wall": 1795368417.628, "event": "state", "n": 901, "state": "live", "prev": "resuming", "key": [0, 11], "resumed": true}
+{"wall": 1795368417.629, "event": "showing", "n": 901, "what": "footage", "key": [0, 11]}
+{"wall": 1795368418.4416, "event": "second", "n": 930, "state": "live", "showing": "footage", "cpu": 0.64, "ahead_s": 10.07, "key": [0, 11], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368419.442, "event": "second", "n": 960, "state": "live", "showing": "footage", "cpu": 0.308, "ahead_s": 9.07, "key": [0, 12], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368420.4416, "event": "second", "n": 990, "state": "live", "showing": "footage", "cpu": 0.209, "ahead_s": 10.07, "key": [0, 12], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368421.441, "event": "second", "n": 1020, "state": "live", "showing": "footage", "cpu": 0.271, "ahead_s": 9.07, "key": [0, 13], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368422.441, "event": "second", "n": 1050, "state": "live", "showing": "footage", "cpu": 0.2, "ahead_s": 10.07, "key": [0, 13], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368423.4414, "event": "second", "n": 1080, "state": "live", "showing": "footage", "cpu": 0.317, "ahead_s": 9.07, "key": [0, 14], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368424.4412, "event": "second", "n": 1110, "state": "live", "showing": "footage", "cpu": 0.222, "ahead_s": 10.07, "key": [0, 14], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368425.4412, "event": "second", "n": 1140, "state": "live", "showing": "footage", "cpu": 0.29, "ahead_s": 9.07, "key": [0, 15], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368426.4413, "event": "second", "n": 1170, "state": "live", "showing": "footage", "cpu": 0.201, "ahead_s": 10.07, "key": [0, 15], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368427.4405, "event": "second", "n": 1200, "state": "live", "showing": "footage", "cpu": 0.273, "ahead_s": 9.07, "key": [0, 16], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368428.4406, "event": "second", "n": 1230, "state": "live", "showing": "footage", "cpu": 0.202, "ahead_s": 10.07, "key": [0, 16], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368429.4416, "event": "second", "n": 1260, "state": "live", "showing": "footage", "cpu": 0.258, "ahead_s": 9.07, "key": [0, 17], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368430.441, "event": "second", "n": 1290, "state": "live", "showing": "footage", "cpu": 0.189, "ahead_s": 10.07, "key": [0, 17], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368431.4409, "event": "second", "n": 1320, "state": "live", "showing": "footage", "cpu": 0.275, "ahead_s": 9.07, "key": [0, 18], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368432.4411, "event": "second", "n": 1350, "state": "live", "showing": "footage", "cpu": 0.197, "ahead_s": 10.07, "key": [0, 18], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368433.4434, "event": "second", "n": 1380, "state": "live", "showing": "footage", "cpu": 0.275, "ahead_s": 9.07, "key": [0, 19], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368434.4405, "event": "second", "n": 1410, "state": "live", "showing": "footage", "cpu": 0.198, "ahead_s": 10.07, "key": [0, 19], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368435.4413, "event": "second", "n": 1440, "state": "live", "showing": "footage", "cpu": 0.265, "ahead_s": 9.07, "key": [0, 20], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368436.4409, "event": "second", "n": 1470, "state": "live", "showing": "footage", "cpu": 0.189, "ahead_s": 10.07, "key": [0, 20], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368437.4408, "event": "second", "n": 1500, "state": "live", "showing": "footage", "cpu": 0.281, "ahead_s": 9.07, "key": [0, 21], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368438.4407, "event": "second", "n": 1530, "state": "live", "showing": "footage", "cpu": 0.203, "ahead_s": 10.07, "key": [0, 21], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368439.4408, "event": "second", "n": 1560, "state": "live", "showing": "footage", "cpu": 0.249, "ahead_s": 9.07, "key": [0, 22], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368440.4412, "event": "second", "n": 1590, "state": "live", "showing": "footage", "cpu": 0.203, "ahead_s": 10.07, "key": [0, 22], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368441.441, "event": "second", "n": 1620, "state": "live", "showing": "footage", "cpu": 0.278, "ahead_s": 9.07, "key": [0, 23], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368442.4407, "event": "second", "n": 1650, "state": "live", "showing": "footage", "cpu": 0.221, "ahead_s": 10.07, "key": [0, 23], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368443.4406, "event": "second", "n": 1680, "state": "live", "showing": "footage", "cpu": 0.271, "ahead_s": 9.07, "key": [0, 24], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368444.3373, "event": "state", "n": 1706, "state": "finishing", "prev": "live", "key": [0, 25]}
+{"wall": 1795368444.4414, "event": "second", "n": 1710, "state": "finishing", "showing": "footage", "cpu": 0.217, "ahead_s": 10.07, "key": [0, 24], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368445.4413, "event": "second", "n": 1740, "state": "finishing", "showing": "footage", "cpu": 0.286, "ahead_s": 9.07, "key": [0, 25], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368446.441, "event": "second", "n": 1770, "state": "finishing", "showing": "footage", "cpu": 0.217, "ahead_s": 8.07, "key": [0, 25], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368447.4425, "event": "second", "n": 1800, "state": "finishing", "showing": "footage", "cpu": 0.288, "ahead_s": 7.07, "key": [0, 26], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368448.4413, "event": "second", "n": 1830, "state": "finishing", "showing": "footage", "cpu": 0.244, "ahead_s": 6.07, "key": [0, 26], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368449.4416, "event": "second", "n": 1860, "state": "finishing", "showing": "footage", "cpu": 0.227, "ahead_s": 5.07, "key": [0, 27], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368450.4408, "event": "second", "n": 1890, "state": "finishing", "showing": "footage", "cpu": 0.206, "ahead_s": 4.07, "key": [0, 27], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368451.4411, "event": "second", "n": 1920, "state": "finishing", "showing": "footage", "cpu": 0.209, "ahead_s": 3.07, "key": [0, 28], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368452.4412, "event": "second", "n": 1950, "state": "finishing", "showing": "footage", "cpu": 0.194, "ahead_s": 2.07, "key": [0, 28], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368453.441, "event": "second", "n": 1980, "state": "finishing", "showing": "footage", "cpu": 0.194, "ahead_s": 1.07, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368454.4414, "event": "second", "n": 2010, "state": "finishing", "showing": "footage", "cpu": 0.2, "ahead_s": 0.07, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368454.5372, "event": "state", "n": 2012, "state": "ended", "prev": "finishing", "key": [1, 0]}
+{"wall": 1795368454.5372, "event": "showing", "n": 2012, "what": "ended", "key": [1, 0]}
+{"wall": 1795368455.4405, "event": "second", "n": 2040, "state": "ended", "showing": "ended", "cpu": 0.193, "ahead_s": 0.0, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368456.4415, "event": "second", "n": 2070, "state": "ended", "showing": "ended", "cpu": 0.191, "ahead_s": 0.0, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368457.4411, "event": "second", "n": 2100, "state": "ended", "showing": "ended", "cpu": 0.184, "ahead_s": 0.0, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368458.4411, "event": "second", "n": 2130, "state": "ended", "showing": "ended", "cpu": 0.192, "ahead_s": 0.0, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368459.4405, "event": "second", "n": 2160, "state": "ended", "showing": "ended", "cpu": 0.207, "ahead_s": 0.0, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368460.4404, "event": "second", "n": 2190, "state": "ended", "showing": "ended", "cpu": 0.218, "ahead_s": 0.0, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368461.4405, "event": "second", "n": 2220, "state": "ended", "showing": "ended", "cpu": 0.208, "ahead_s": 0.0, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368462.4409, "event": "second", "n": 2250, "state": "ended", "showing": "ended", "cpu": 0.21, "ahead_s": 0.0, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368463.4408, "event": "second", "n": 2280, "state": "ended", "showing": "ended", "cpu": 0.209, "ahead_s": 0.0, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368464.4412, "event": "second", "n": 2310, "state": "ended", "showing": "ended", "cpu": 0.195, "ahead_s": 0.0, "key": [0, 29], "late_max": 0.124, "late_ticks": 4}
+{"wall": 1795368464.572, "event": "state", "n": 2313, "state": "finished", "prev": "ended", "key": [1, 0]}
+{"wall": 1795368464.5721, "event": "end", "n": 2313, "cpu_total": 11.7, "wall_total": 47.1, "late_max": 0.124, "late_ticks": 4}
