@@ -3,8 +3,8 @@
 ## Decision
 - **Capture:** `AVCaptureSession` (camera + microphone), `AVCaptureVideoDataOutput` / `AVCaptureAudioDataOutput`.
 - **Encoding and segmenting:** `AVAssetWriter` with `outputFileTypeProfile = .mpeg4AppleHLS`, `preferredOutputSegmentInterval = 2 s`, and `AVAssetWriterDelegate`, which hands us an **initialization segment** and then **separable fMP4 segments** as `Data`, with hardware H.264 (VideoToolbox) underneath. This is Apple's supported path for exactly our segment format; no custom muxer.
-- **App:** a Forge app. SwiftUI and AVFoundation in Swift (capture, preview, UI); a Rust core over UniFFI that owns the segment queue, manifest, upload state machine and protocol (the ixOS rule: Rust owns state and rules, Swift presents them). Built on Linux with xtool.
-- **Local queue:** segment files in the app's Application Support directory (excluded from backup), with a SQLite manifest owned by the Rust core.
+- **App:** native Swift: SwiftUI and AVFoundation for capture, preview and UI, built on Linux with the existing xtool workflow. The M2 capture spike is Swift-only. Whether the queue and uploader later move into a Rust core (the ixOS convention, which would share protocol code with a future Android client) is decided before M3 ([status](../plan/status.md#decisions-needed)).
+- **Local queue:** segment files in the app's Application Support directory (excluded from backup), with a SQLite manifest.
 - **Uploads:** foreground: `URLSession` driven by the Rust upload manager (see the protocol). After the app leaves the foreground: a background `URLSession` upload task per remaining segment, so the backlog drains with the app suspended.
 
 ## iPhone limits we design around

@@ -16,7 +16,8 @@ CREATE TABLE devices (
     token_hash   bytea NOT NULL UNIQUE,       -- SHA-256 of the 256-bit device token
     created_at   timestamptz NOT NULL DEFAULT now(),
     last_seen_at timestamptz,
-    revoked_at   timestamptz
+    revoked_at   timestamptz,
+    UNIQUE (id, owner_id)                     -- target for composite FKs: ties rows to one owner
 );
 
 CREATE TABLE pairing_codes (
@@ -34,7 +35,10 @@ CREATE TABLE destinations (
     ingest_url       text NOT NULL,
     stream_key_enc   bytea NOT NULL,          -- AES-256-GCM, key from server config, never returned by the API
     stream_key_nonce bytea NOT NULL,
-    created_at       timestamptz NOT NULL DEFAULT now()
+    insecure_ok      boolean NOT NULL DEFAULT false,   -- plain rtmp:// allowed only for kind 'rtmp' with explicit opt-in
+    created_at       timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (id, owner_id),
+    CHECK (ingest_url LIKE 'rtmps://%' OR (kind = 'rtmp' AND insecure_ok AND ingest_url LIKE 'rtmp://%'))
 );
 
 CREATE TYPE broadcast_state AS ENUM
@@ -43,7 +47,7 @@ CREATE TYPE broadcast_state AS ENUM
 CREATE TABLE broadcasts (
     id                   uuid PRIMARY KEY,    -- UUIDv7
     owner_id             uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    device_id            uuid NOT NULL REFERENCES devices(id),
+    device_id            uuid NOT NULL,
     client_ref           uuid NOT NULL,       -- idempotent creation
     title                text NOT NULL,
     state                broadcast_state NOT NULL DEFAULT 'starting',
@@ -55,7 +59,10 @@ CREATE TABLE broadcasts (
     finish_requested_at  timestamptz,
     finished_at          timestamptz,
     deleted_at           timestamptz,
-    UNIQUE (device_id, client_ref)
+    UNIQUE (device_id, client_ref),
+    UNIQUE (id, owner_id),
+    -- the device must belong to the broadcast's owner, not merely exist
+    FOREIGN KEY (device_id, owner_id) REFERENCES devices (id, owner_id)
 );
 CREATE INDEX broadcasts_owner ON broadcasts (owner_id, created_at DESC);
 
@@ -111,8 +118,12 @@ CREATE TABLE playout_checkpoints (
 );
 
 CREATE TABLE broadcast_destinations (
-    broadcast_id   uuid NOT NULL REFERENCES broadcasts(id) ON DELETE CASCADE,
-    destination_id uuid NOT NULL REFERENCES destinations(id),
+    broadcast_id   uuid NOT NULL,
+    destination_id uuid NOT NULL,
+    owner_id       uuid NOT NULL,
+    -- broadcast and destination must share one owner
+    FOREIGN KEY (broadcast_id, owner_id)   REFERENCES broadcasts (id, owner_id) ON DELETE CASCADE,
+    FOREIGN KEY (destination_id, owner_id) REFERENCES destinations (id, owner_id),
     enabled        boolean NOT NULL DEFAULT true,
     status         text NOT NULL DEFAULT 'idle' CHECK (status IN ('idle', 'connecting', 'up', 'retrying', 'failed', 'stopped')),
     last_error     text,

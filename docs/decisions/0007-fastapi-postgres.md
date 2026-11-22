@@ -7,4 +7,4 @@ FastAPI (Python 3.12, async) for the control and upload API; PostgreSQL 16 for a
 One VPS runs API, Postgres, MediaMTX and playout under Docker Compose. Uploads stream to disk (no buffering whole bodies in memory). Redis is added only if a measured bottleneck needs it.
 
 ## Revisit if
-Upload throughput per broadcast needs more than one API worker can give, or the iPhone's Rust core wants to share protocol code with a Rust server.
+Upload throughput per broadcast needs more than one API worker can give, or a shared protocol library in another language becomes worth it.

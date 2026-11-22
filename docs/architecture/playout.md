@@ -1,6 +1,6 @@
 # Playout engine
 
-The part that decides what viewers see, and the hardest part of StreamRelay. M1 step A proves it on Linux before the phone run.
+The part that decides what viewers see, and the hardest part of StreamRelay. Spike S1 and M1 prove it on Linux before any phone work.
 
 ## Shape
 
@@ -36,7 +36,7 @@ Hysteresis (a resume threshold larger than one segment) stops flapping between h
 - `buffer_target` (Live delay) default 8 s: four segments. Absorbs normal upload jitter.
 - The output clock is monotonic and never pauses or jumps. Source timestamps are only used to order and pace source frames; output PTS = output frame count / 30.
 - Audio: output AAC is generated from a continuous PCM stream; the holding screen sends low-level comfort noise rather than digital silence (some platforms flag silent streams; to verify in M5).
-- Catch-up arithmetic: with backlog B and speed s, catch-up takes B / (s − 1) of real time **provided uploads keep up** (see risk R4). 5 minutes at 1.25× = 20 minutes; at 1.5× = 10 minutes.
+- Catch-up arithmetic: with backlog B and speed s, catch-up takes B / (s − 1) of real time **provided uploads keep up** (risk R4; full arithmetic in [milestones M4](../plan/milestones.md#m4-hybrid-recovery-and-end-to-end-proof)). 5 minutes at 1.25× = 20 minutes; at 1.5× = 10 minutes.
 
 ## Speed stage
 
@@ -51,10 +51,10 @@ Holding screen: a slowly moving element (clock, progress ring) so the encoder do
 
 ## Crash recovery
 
-The playout checkpoints `(state, epoch, sequence, frame offset)` to Postgres every second. On restart it reconnects to MediaMTX and resumes from the checkpoint; the RTMP session to platforms is held by the forwarders, which see a short input gap rather than a reconnect. Whether the forwarders bridge that gap cleanly is measured on the bench in M4 and against real Twitch and YouTube in M5 (risk R3).
+The playout checkpoints `(state, epoch, sequence, frame offset)` to Postgres every second. On restart it reconnects to MediaMTX and resumes from the checkpoint; the RTMP session to platforms is held by the forwarders, which see a short input gap rather than a reconnect. Whether the forwarders bridge that gap cleanly is measured on the bench in M4 and against real Twitch and YouTube in M5 (risk R7).
 
 **Guarantee after a crash: at most about one second repeated, nothing skipped.** Frames already sent to MediaMTX cannot be part of a Postgres transaction, so a crash between sending and the next checkpoint replays the frames since that checkpoint (up to the checkpoint interval plus whatever the encoder had buffered). Without a crash, footage is never repeated. We accept this rather than build a delivery protocol to the platforms, which RTMP does not support. `segments.played_at` records that a segment was handed to the encoder, not that a viewer saw it.
 
 ## Implementation plan
 
-M1 builds this in Python with PyAV. Decision gate after M1 step A: if a 720p30 decode + speed + encode can't hold real time with 30% headroom on a 4-vCPU VPS-class machine, switch the engine to GStreamer (`input-selector`, `scaletempo`) and keep the scheduler in Python.
+M1 builds this in Python with PyAV. Decision gate in spike S1 ([spec](../plan/spike-s1-playout.md)): if a 720p30 decode + speed + encode can't hold real time with 30% headroom on a 4-vCPU VPS-class machine, switch the engine to GStreamer (`input-selector`, `scaletempo`) and keep the scheduler in Python.

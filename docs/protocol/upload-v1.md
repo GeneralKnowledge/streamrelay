@@ -74,6 +74,7 @@ Responses:
 | `404` | Broadcast unknown or not yours | Stop uploading this broadcast; surface to the user |
 | `410 Gone` | Broadcast deleted by the user | Stop; keep local files per retention |
 | `429` / `503` | Server busy | Back off per `Retry-After` |
+| `507 Insufficient Storage` | Server storage cap reached ([limits](../architecture/storage-and-security.md#storage)) | Keep the segment, back off per `Retry-After`, show "Server full" |
 | network error / timeout | Unknown whether stored | Retry; idempotency makes it safe |
 
 Why one PUT instead of the spec's POST-then-PUT: on a bad connection every round trip is a chance to fail; the metadata fits in headers, and the PUT is idempotent by key + checksum, which gives the same guarantees.
@@ -123,9 +124,16 @@ Every 5 s while connected. Lets the server tell "phone offline" from "phone onli
 - **Background:** when the app leaves the foreground, hand the remaining queue to a background `URLSession`; on relaunch, reconcile with `GET status` before resuming.
 - **Local deletion:** only after acknowledgement **and** the retention setting allows it (default: keep local copies until the user deletes them or space runs low, with a warning first).
 
+## Live and archive guarantees
+
+Two different promises, tested separately:
+
+- **Live completeness.** In `catch_up` mode, every segment acknowledged before the playout reaches it is broadcast once, in order (≤ about 1 s repeated after a playout crash). A segment that arrives after the playout has moved past it (skip-to-live, drain wait expired, or broadcast already finished) is marked `skipped` for live.
+- **Archive completeness.** Every acknowledged segment is kept for the archive, whenever it arrives, including after `finish` and after live playout has ended, until the retention period ([limits](../architecture/storage-and-security.md#storage)) or the user deletes the broadcast. The archive download reassembles all epochs in order.
+
 ## Server rules
 
-- Validate: size ≤ `max_segment_bytes`; checksum; `start_us` monotonic within the epoch (±50 ms jitter allowed); duration 0.5–4 s, except a segment flagged `final`, which may be any length above 0.
+- Validate: size ≤ `max_segment_bytes`; checksum; `ffprobe` check of container and codecs in a time- and memory-limited process ([untrusted media](../architecture/storage-and-security.md#security)); `start_us` monotonic within the epoch (±50 ms jitter allowed); duration 0.5–4 s, except a segment flagged `final`, which may be any length above 0.
 - Write to a temp file, fsync it, rename it into place, fsync the directory, then insert the row and **commit** the transaction (Postgres `synchronous_commit` on, the default), and only then respond. No acknowledgement is sent before the commit succeeds.
 - A crash after the rename but before the insert leaves a file with no row. The startup scan **deletes** such files: the client never got an acknowledgement, so it still holds the segment and its metadata and will upload it again.
 - The playout never plays a segment twice in normal running. After a playout crash it resumes from its last checkpoint, so up to about one second can repeat ([playout crash recovery](../architecture/playout.md#crash-recovery)).

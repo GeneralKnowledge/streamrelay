@@ -14,7 +14,7 @@ A long-running **playout** process per broadcast owns **one encoder** and **one 
 Implementation: Python with **PyAV** (FFmpeg's libraries with frame-level control) in M1. If PyAV can't hold real time, fall back to a **GStreamer** pipeline (`input-selector`, `scaletempo`), which is built for live source switching. The FFmpeg CLI alone is not suitable: it cannot switch inputs mid-run without restarting the output.
 
 ## Consequences
-- Output to platforms never changes codec parameters and timestamps never jump: platform discontinuity tolerance mostly stops mattering (risk R3 then only covers playout crashes).
+- Output to platforms never changes codec parameters and timestamps never jump: platform discontinuity tolerance mostly stops mattering (risk R7 then only covers playout crashes).
 - One 720p30 x264 `veryfast` encode per broadcast: about one CPU core. Fine for one VPS and a handful of broadcasts.
 - A passthrough mode (copy segments in Live state) is a later optimisation, not v1.
 
