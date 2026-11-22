@@ -190,10 +190,25 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
     public func recoverCamera() {
         queue.async { [self] in
             guard active else { return }
-            if !session.isRunning {
-                Self.sessionQueue.async { self.session.startRunning() }
+            let gen = generation
+            Self.sessionQueue.async { [self] in
+                if !session.isRunning { session.startRunning() }    // returns once started, or failed
+                let running = session.isRunning
+                queue.async { [self] in
+                    guard generation == gen, active else { return }  // Stop pressed meanwhile
+                    if running {
+                        retryAfterWriterFailure()                    // a new epoch after a short wait
+                        return
+                    }
+                    // the session didn't come back: try the camera again later, never an epoch without it
+                    writerFailures += 1
+                    guard writerFailures <= 5 else {
+                        onEvent?(.gaveUp("Recording stopped: the camera didn't come back. Press Start to try again."))
+                        return
+                    }
+                    queue.asyncAfter(deadline: .now() + Double(writerFailures)) { [self] in recoverCamera() }
+                }
             }
-            retryAfterWriterFailure()
         }
     }
 

@@ -241,11 +241,12 @@ final class AppModel {
     /// The epoch's close is in the manifest: now the broadcast may finish. Stop is done only once the
     /// finish request is saved, or a relaunch would offer to resume a recording the user stopped.
     private func saveFinish(_ m: Manifest) async {
+        let saving = "Couldn't save Stop on this iPhone. Retrying…"
         while (try? m.requestFinish()) == nil {
-            problem = "Couldn't save Stop on this iPhone. Retrying…"
+            problem = saving
             try? await Task.sleep(nanoseconds: 1_000_000_000)
         }
-        problem = nil
+        if problem == saving { problem = nil }      // keep any other message (why it stopped) until the next Start
         if resumable === m { resumable = nil }
         phase = .idle
         await queue?.nudge()
