@@ -253,11 +253,12 @@ final class AppModel {
     /// finish request is saved, or a relaunch would offer to resume a recording the user stopped.
     private func saveFinish(_ m: Manifest) async {
         let saving = "Couldn't save Stop on this iPhone. Retrying…"
+        let reason = problem                        // why it stopped, if anything said so: shown again after the retry
         while (try? m.requestFinish()) == nil {
-            problem = saving
+            if problem == reason || problem == nil { problem = saving }   // never cover a newer error
             try? await Task.sleep(nanoseconds: 1_000_000_000)
         }
-        if problem == saving { problem = nil }      // keep any other message (why it stopped) until the next Start
+        if problem == saving { problem = reason }   // keep the stop reason (or a newer message) until the next Start
         if resumable === m { resumable = nil }
         phase = .idle
         await queue?.nudge()
