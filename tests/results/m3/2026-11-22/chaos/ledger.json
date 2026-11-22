@@ -1,0 +1,16 @@
+{
+ "broadcast_id": "01a204e5-b377-74ba-a5ec-474b6ab8009c",
+ "segments": 3600,
+ "acknowledged": 3600,
+ "stored_with_right_checksum": 3600,
+ "put_statuses": {
+  "0": 745,
+  "200": 215,
+  "201": 3551,
+  "422": 23
+ },
+ "corrupted_uploads": 24,
+ "problems": [],
+ "problem_count": 0,
+ "verdict": "pass"
+}

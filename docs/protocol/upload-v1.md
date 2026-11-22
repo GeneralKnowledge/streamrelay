@@ -23,7 +23,7 @@ A segment's key is `(broadcast_id, epoch, sequence)`.
 
 ## Authentication
 
-- **Device pairing** (once): the dashboard shows a one-time pairing code; the app calls `POST /v1/devices/pair {code, name, platform}` and receives a device token (random 256-bit, shown once, stored in the iPhone Keychain, stored hashed on the server).
+- **Device pairing** (once): the dashboard shows a one-time pairing code; the app calls `POST /v1/devices/pair {code, name, platform}` and receives a device token (random 256-bit, shown once, stored in the iPhone Keychain, stored hashed on the server). Answers: `201 {device_id, token}`; `403` for a code that is unknown, used or expired (codes are 8 characters, single use, valid 10 minutes, made with `streamrelay-admin pair-code EMAIL` until the dashboard exists); `429` when pairing attempts pass 10 a minute. `streamrelay-admin revoke DEVICE_ID` revokes a token; every later request answers `401`.
 - **Requests:** `Authorization: Bearer <device token>` over TLS. Tokens can be revoked from the dashboard.
 - Every broadcast-scoped request checks `broadcast.owner_id == device.owner_id`. A guessed `broadcast_id` from another user returns `404`, the same as a missing one.
 - A **finished** broadcast still accepts its owner's init, segment, epoch-end and status requests, so a queue that drains after Stop reaches the archive. A **deleted** broadcast returns `410` to every request.
@@ -119,7 +119,7 @@ POST /v1/broadcasts/{id}/heartbeat
 { "epoch": 1, "captured_through": 210, "queue_depth": 59, "queue_bytes": 61865984,
   "battery": 0.62, "thermal": "fair", "free_bytes": 23500000000, "network": "cellular" }
 ```
-Every 5 s while connected. Lets the server tell "phone offline" from "phone online but behind", and feeds the dashboard. Optional for correctness: the server never relies on heartbeats to order media.
+Answers `204`. Every 5 s while connected. Lets the server tell "phone offline" from "phone online but behind", and feeds the dashboard. Optional for correctness: the server never relies on heartbeats to order media.
 
 ## Client upload rules
 

@@ -1,0 +1,130 @@
+{"wall": 1795378491.283, "event": "start", "listen": 8091, "upstream": "127.0.0.1:8081", "latency": 0.3, "caps": "3,6", "cap_period": 1800, "online_min": 60, "online_max": 300, "reset_every": 90, "seed": 11}
+{"wall": 1795378565.125, "event": "reset"}
+{"wall": 1795378659.855, "event": "outage", "seconds": 56.4, "cut": 2, "next_loss": 0.014}
+{"wall": 1795378716.217, "event": "online"}
+{"wall": 1795378781.389, "event": "reset"}
+{"wall": 1795378867.429, "event": "reset"}
+{"wall": 1795378870.697, "event": "reset"}
+{"wall": 1795378989.909, "event": "outage", "seconds": 38.8, "cut": 2, "next_loss": 0.0}
+{"wall": 1795379028.74, "event": "online"}
+{"wall": 1795379109.926, "event": "reset"}
+{"wall": 1795379144.014, "event": "reset"}
+{"wall": 1795379186.369, "event": "outage", "seconds": 17.4, "cut": 2, "next_loss": 0.029}
+{"wall": 1795379203.768, "event": "online"}
+{"wall": 1795379218.548, "event": "reset"}
+{"wall": 1795379219.319, "event": "loss_reset", "after_bytes": 453017}
+{"wall": 1795379243.732, "event": "loss_reset", "after_bytes": 1444261}
+{"wall": 1795379275.686, "event": "reset"}
+{"wall": 1795379279.807, "event": "outage", "seconds": 6.7, "cut": 2, "next_loss": 0.041}
+{"wall": 1795379286.551, "event": "online"}
+{"wall": 1795379312.662, "event": "reset"}
+{"wall": 1795379330.269, "event": "reset"}
+{"wall": 1795379568.035, "event": "outage", "seconds": 116.7, "cut": 2, "next_loss": 0.08}
+{"wall": 1795379684.696, "event": "online"}
+{"wall": 1795379709.949, "event": "reset"}
+{"wall": 1795379802.359, "event": "reset"}
+{"wall": 1795379817.692, "event": "outage", "seconds": 93.9, "cut": 2, "next_loss": 0.033}
+{"wall": 1795379911.552, "event": "online"}
+{"wall": 1795379949.607, "event": "reset"}
+{"wall": 1795380009.109, "event": "reset"}
+{"wall": 1795380027.281, "event": "reset"}
+{"wall": 1795380029.876, "event": "outage", "seconds": 68.7, "cut": 3, "next_loss": 0.069}
+{"wall": 1795380098.582, "event": "online"}
+{"wall": 1795380113.032, "event": "loss_reset", "after_bytes": 234917}
+{"wall": 1795380127.344, "event": "loss_reset", "after_bytes": 541035}
+{"wall": 1795380143.599, "event": "reset"}
+{"wall": 1795380188.324, "event": "reset"}
+{"wall": 1795380219.586, "event": "reset"}
+{"wall": 1795380231.749, "event": "reset"}
+{"wall": 1795380251.754, "event": "outage", "seconds": 28.5, "cut": 2, "next_loss": 0.002}
+{"wall": 1795380280.214, "event": "online"}
+{"wall": 1795380289.57, "event": "reset"}
+{"wall": 1795380357.715, "event": "reset"}
+{"wall": 1795380447.184, "event": "outage", "seconds": 9.0, "cut": 2, "next_loss": 0.002}
+{"wall": 1795380456.22, "event": "online"}
+{"wall": 1795380557.143, "event": "reset"}
+{"wall": 1795380563.411, "event": "reset"}
+{"wall": 1795380734.673, "event": "outage", "seconds": 45.5, "cut": 2, "next_loss": 0.069}
+{"wall": 1795380780.136, "event": "online"}
+{"wall": 1795381056.338, "event": "outage", "seconds": 88.7, "cut": 3, "next_loss": 0.039}
+{"wall": 1795381145.088, "event": "online"}
+{"wall": 1795381224.943, "event": "reset"}
+{"wall": 1795381290.757, "event": "reset"}
+{"wall": 1795381314.308, "event": "reset"}
+{"wall": 1795381376.198, "event": "reset"}
+{"wall": 1795381381.499, "event": "outage", "seconds": 109.2, "cut": 3, "next_loss": 0.066}
+{"wall": 1795381490.659, "event": "online"}
+{"wall": 1795381530.726, "event": "reset"}
+{"wall": 1795381677.263, "event": "reset"}
+{"wall": 1795381720.93, "event": "reset"}
+{"wall": 1795381759.805, "event": "reset"}
+{"wall": 1795381764.674, "event": "outage", "seconds": 111.5, "cut": 3, "next_loss": 0.083}
+{"wall": 1795381876.136, "event": "online"}
+{"wall": 1795381915.072, "event": "reset"}
+{"wall": 1795381917.553, "event": "loss_reset", "after_bytes": 81920}
+{"wall": 1795381969.284, "event": "reset"}
+{"wall": 1795381973.099, "event": "reset"}
+{"wall": 1795382012.456, "event": "reset"}
+{"wall": 1795382027.949, "event": "outage", "seconds": 35.6, "cut": 2, "next_loss": 0.078}
+{"wall": 1795382063.592, "event": "online"}
+{"wall": 1795382202.658, "event": "reset"}
+{"wall": 1795382229.278, "event": "reset"}
+{"wall": 1795382355.883, "event": "reset"}
+{"wall": 1795382359.755, "event": "outage", "seconds": 15.0, "cut": 3, "next_loss": 0.093}
+{"wall": 1795382374.787, "event": "online"}
+{"wall": 1795382400.891, "event": "reset"}
+{"wall": 1795382443.452, "event": "reset"}
+{"wall": 1795382499.53, "event": "reset"}
+{"wall": 1795382521.122, "event": "reset"}
+{"wall": 1795382590.417, "event": "reset"}
+{"wall": 1795382608.159, "event": "outage", "seconds": 14.5, "cut": 2, "next_loss": 0.044}
+{"wall": 1795382622.68, "event": "online"}
+{"wall": 1795382628.983, "event": "reset"}
+{"wall": 1795382814.753, "event": "outage", "seconds": 9.0, "cut": 2, "next_loss": 0.053}
+{"wall": 1795382823.794, "event": "online"}
+{"wall": 1795382856.027, "event": "reset"}
+{"wall": 1795383048.574, "event": "outage", "seconds": 78.5, "cut": 2, "next_loss": 0.052}
+{"wall": 1795383127.05, "event": "online"}
+{"wall": 1795383285.295, "event": "reset"}
+{"wall": 1795383317.971, "event": "reset"}
+{"wall": 1795383321.444, "event": "outage", "seconds": 64.3, "cut": 3, "next_loss": 0.04}
+{"wall": 1795383385.792, "event": "online"}
+{"wall": 1795383526.273, "event": "reset"}
+{"wall": 1795383554.501, "event": "reset"}
+{"wall": 1795383580.881, "event": "outage", "seconds": 8.4, "cut": 2, "next_loss": 0.026}
+{"wall": 1795383589.266, "event": "online"}
+{"wall": 1795383621.498, "event": "reset"}
+{"wall": 1795383726.049, "event": "reset"}
+{"wall": 1795383817.773, "event": "outage", "seconds": 106.1, "cut": 2, "next_loss": 0.002}
+{"wall": 1795383923.827, "event": "online"}
+{"wall": 1795383988.176, "event": "reset"}
+{"wall": 1795384079.744, "event": "reset"}
+{"wall": 1795384103.579, "event": "reset"}
+{"wall": 1795384137.744, "event": "reset"}
+{"wall": 1795384181.871, "event": "outage", "seconds": 16.1, "cut": 2, "next_loss": 0.089}
+{"wall": 1795384198.014, "event": "online"}
+{"wall": 1795384219.392, "event": "loss_reset", "after_bytes": 822721}
+{"wall": 1795384273.331, "event": "reset"}
+{"wall": 1795384289.825, "event": "outage", "seconds": 96.9, "cut": 2, "next_loss": 0.01}
+{"wall": 1795384386.698, "event": "online"}
+{"wall": 1795384409.263, "event": "reset"}
+{"wall": 1795384472.15, "event": "reset"}
+{"wall": 1795384618.289, "event": "reset"}
+{"wall": 1795384632.552, "event": "reset"}
+{"wall": 1795384643.733, "event": "outage", "seconds": 37.6, "cut": 2, "next_loss": 0.067}
+{"wall": 1795384681.293, "event": "online"}
+{"wall": 1795384727.623, "event": "reset"}
+{"wall": 1795384773.562, "event": "outage", "seconds": 54.5, "cut": 2, "next_loss": 0.06}
+{"wall": 1795384828.029, "event": "online"}
+{"wall": 1795384894.12, "event": "reset"}
+{"wall": 1795385090.653, "event": "outage", "seconds": 14.8, "cut": 2, "next_loss": 0.084}
+{"wall": 1795385105.409, "event": "online"}
+{"wall": 1795385123.557, "event": "reset"}
+{"wall": 1795385186.716, "event": "reset"}
+{"wall": 1795385216.222, "event": "reset"}
+{"wall": 1795385229.09, "event": "reset"}
+{"wall": 1795385335.902, "event": "reset"}
+{"wall": 1795385375.561, "event": "outage", "seconds": 81.6, "cut": 2, "next_loss": 0.034}
+{"wall": 1795385457.163, "event": "online"}
+{"wall": 1795385675.507, "event": "outage", "seconds": 117.7, "cut": 3, "next_loss": 0.002}
+{"wall": 1795385793.225, "event": "online"}

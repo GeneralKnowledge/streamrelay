@@ -1,0 +1,166 @@
+{
+ "folder": "/tmp/ioscore-20/phone/4630314C-B8C8-4BD1-ACC5-CFAA23AC6026",
+ "epochs": [
+  {
+   "epoch": 0,
+   "last_sequence": 59,
+   "end_reason": "interrupted",
+   "segments": 60,
+   "states": {
+    "acknowledged": 60
+   },
+   "seconds_declared": 120.0,
+   "codecs": [
+    "h264",
+    "aac"
+   ],
+   "seconds_decoded": 120.0,
+   "max_audio_gap_ms": 0.0
+  },
+  {
+   "epoch": 1,
+   "last_sequence": 59,
+   "end_reason": "interrupted",
+   "segments": 60,
+   "states": {
+    "acknowledged": 60
+   },
+   "seconds_declared": 120.0,
+   "codecs": [
+    "h264",
+    "aac"
+   ],
+   "seconds_decoded": 120.0,
+   "max_audio_gap_ms": 0.0
+  },
+  {
+   "epoch": 2,
+   "last_sequence": 59,
+   "end_reason": "interrupted",
+   "segments": 60,
+   "states": {
+    "acknowledged": 60
+   },
+   "seconds_declared": 120.0,
+   "codecs": [
+    "h264",
+    "aac"
+   ],
+   "seconds_decoded": 120.0,
+   "max_audio_gap_ms": 0.0
+  },
+  {
+   "epoch": 3,
+   "last_sequence": 59,
+   "end_reason": "interrupted",
+   "segments": 60,
+   "states": {
+    "acknowledged": 60
+   },
+   "seconds_declared": 120.0,
+   "codecs": [
+    "h264",
+    "aac"
+   ],
+   "seconds_decoded": 120.0,
+   "max_audio_gap_ms": 0.0
+  },
+  {
+   "epoch": 4,
+   "last_sequence": 59,
+   "end_reason": "interrupted",
+   "segments": 60,
+   "states": {
+    "acknowledged": 60
+   },
+   "seconds_declared": 120.0,
+   "codecs": [
+    "h264",
+    "aac"
+   ],
+   "seconds_decoded": 120.0,
+   "max_audio_gap_ms": 0.0
+  },
+  {
+   "epoch": 5,
+   "last_sequence": 59,
+   "end_reason": "interrupted",
+   "segments": 60,
+   "states": {
+    "acknowledged": 60
+   },
+   "seconds_declared": 120.0,
+   "codecs": [
+    "h264",
+    "aac"
+   ],
+   "seconds_decoded": 120.0,
+   "max_audio_gap_ms": 0.0
+  },
+  {
+   "epoch": 6,
+   "last_sequence": 59,
+   "end_reason": "interrupted",
+   "segments": 60,
+   "states": {
+    "acknowledged": 60
+   },
+   "seconds_declared": 120.0,
+   "codecs": [
+    "h264",
+    "aac"
+   ],
+   "seconds_decoded": 120.0,
+   "max_audio_gap_ms": 0.0
+  },
+  {
+   "epoch": 7,
+   "last_sequence": 59,
+   "end_reason": "interrupted",
+   "segments": 60,
+   "states": {
+    "acknowledged": 60
+   },
+   "seconds_declared": 120.0,
+   "codecs": [
+    "h264",
+    "aac"
+   ],
+   "seconds_decoded": 120.0,
+   "max_audio_gap_ms": 0.0
+  },
+  {
+   "epoch": 8,
+   "last_sequence": 59,
+   "end_reason": "interrupted",
+   "segments": 60,
+   "states": {
+    "acknowledged": 60
+   },
+   "seconds_declared": 120.0,
+   "codecs": [
+    "h264",
+    "aac"
+   ],
+   "seconds_decoded": 120.0,
+   "max_audio_gap_ms": 0.0
+  },
+  {
+   "epoch": 9,
+   "last_sequence": 59,
+   "end_reason": "stopped",
+   "segments": 60,
+   "states": {
+    "acknowledged": 60
+   },
+   "seconds_declared": 120.0,
+   "codecs": [
+    "h264",
+    "aac"
+   ],
+   "seconds_decoded": 120.0,
+   "max_audio_gap_ms": 0.0
+  }
+ ],
+ "problems": []
+}

@@ -69,6 +69,8 @@ Later, not scheduled: Android client (same protocol, no server change), adaptive
 
 **Slot:** StreamRelay installs as its own app; Reuben frees a slot for the sitting (decided 2026-11-22).
 
+**Status (2026-11-22):** code written in `ios/` (recorder, manifest, conditions); not compiled for iOS yet; no phone run. The checker for pulled folders is `tools/ios_check/check_recording.py`. Sitting plan: [phone-sitting-m2-m3.md](phone-sitting-m2-m3.md).
+
 ## M3: Reliable upload
 
 **Goal.** Protocol v1 complete and trustworthy: a `201`/`200` means durably stored, and nothing is lost or duplicated across disconnects and restarts on either side.
@@ -83,6 +85,8 @@ Later, not scheduled: Android client (same protocol, no server change), adaptive
 - *Security:* account B's device gets `404` on every endpoint of A's broadcast; revoked token `401`; path traversal and symlink attempts rejected; `tests/sql/cross_account.sql` passes.
 
 **Evidence kept:** chaos report (per-segment ledger), server logs, iPhone run results file.
+
+**Status (2026-11-22):** server side, chaos run and the iPhone upload core (on Linux, against the real server) done: [results](../../tests/results/m3/2026-11-22/RESULTS.md). The iPhone run waits for the phone sitting.
 
 ## M4: Hybrid recovery and end-to-end proof
 

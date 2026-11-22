@@ -1,25 +1,17 @@
 # Repository status
 
-Audit of `GeneralKnowledge/streamrelay` on 2026-11-22, from the repository itself, not from PR descriptions.
-
 ## What exists
 
-| Where | Contents |
-|---|---|
-| `main` (772d8e5) | A one-paragraph `README.md`. Nothing else. |
-| PR #1 (open, docs only) | ADRs 0001–0009, upload protocol v1, playout design, Postgres schema, milestones, risks, issue list, and (from this review) a cross-account SQL test |
-| Issues | None |
-| Code, CI, Compose files, iOS project | None |
-
-## Assessment
+Updated 2026-11-22 (evening), from the repository.
 
 | State | Items |
 |---|---|
-| **Implemented** | **M1 (media pipeline proof)**: upload API subset with the durable segment store, playout service (skip-to-live, checkpoints), supervisor, testclip, fake phone, verify, Compose and CI; `m1_gaps.sh` passed every gate on 2026-11-22 ([results](../../tests/results/m1/2026-11-22/RESULTS.md)). Spike S1 (continuous playout, Linux) ran and passed every measured gate at 1.25× and 1.5× ([results](../../spikes/s1_playout/RESULTS.md)); the listening check is still open. Also: `schema.sql` loads into PostgreSQL 16, and `tests/sql/cross_account.sql` proves the database rejects cross-account links (device, destination) and plain `rtmp://` ingest URLs for Twitch, YouTube and custom destinations. |
-| **Partially implemented** | None. Everything below is a written design. |
-| **Specified, not started** | Upload protocol v1; playout state machine; schema; destination forwarders; segment store; iPhone capture and queue; all tests and tools named in the milestones. |
-| **Technically uncertain** (proved or disproved only by running code) | 1. One PyAV process can switch between decoded segments, generated holding frames and 1.25–1.5× catch-up while publishing one unbroken RTMP stream in real time on a small VPS. 2. AVAssetWriter's fMP4 segment output gives 2 s IDR-aligned segments with continuous audio across boundaries that join cleanly. 3. `atempo` speech at 1.25–1.5× is acceptable. 4. How the iPhone behaves for capture under lock, background, calls, Low Power Mode, thermal pressure and low storage (we know the documented rules, not the measured behaviour). 5. Twitch and YouTube behaviour over long holding periods and after a forwarder reconnect. 6. Whether the phone's uplink leaves enough headroom to clear a backlog in practice. |
-| **Needs a decision (Reuben)** | None open; see [Decisions made](#decisions-made-reuben-2026-11-22). |
+| **Done, with evidence** | **M1 (media pipeline proof)**: upload API, durable segment store, playout service (skip-to-live, checkpoints), supervisor, testclip, fake phone, verify, Compose and CI; `m1_gaps.sh` passed every gate ([results](../../tests/results/m1/2026-11-22/RESULTS.md)). Spike S1 passed every measured gate ([results](../../spikes/s1_playout/RESULTS.md)); the listening check is still open. `tests/sql/cross_account.sql` passes. |
+| **Built, Linux part tested, phone part waiting** | **M3 server**: pairing and device tokens, revocation, ownership checks, media validation (ffprobe), storage caps (`507`), rate limits, path safety, heartbeat, late uploads archived as `skipped`; unit tests in `tests/unit/test_m3.py`. **M3 chaos harness** and its 2-hour run: 3600/3600 segments stored once with the right checksum through 28 outages and 6 API kills ([results](../../tests/results/m3/2026-11-22/RESULTS.md)). **iPhone app** (`ios/`): the upload core (manifest, protocol client, queue) is tested on Linux, in CI, and against the real server through the bad-network proxy; the recorder, the condition handling, the background hand-off and the screens are written but **not yet compiled** (they need the iOS SDK: laptop xtool build). **Recording checker** for pulled phone folders. |
+| **Waiting on the phone** | M2 segment validity, reconstruction and condition matrix; the M3 iPhone run. Steps in [phone-sitting-m2-m3.md](phone-sitting-m2-m3.md). |
+| **Not started** | M4 catch-up speed stage and end-to-end proof, M5 destinations, M6, M7. |
+| **Technically uncertain** | 1. AVAssetWriter's fMP4 output gives 2 s IDR-aligned segments with continuous audio that join cleanly (M2). 2. `atempo` speech at 1.25–1.5× is acceptable. 3. How the iPhone behaves under lock, background, calls, Low Power Mode, thermal pressure and low storage (M2). 4. Twitch and YouTube behaviour over long holding periods. 5. Whether the phone's uplink leaves headroom to clear a backlog. |
+| **Needs a decision (Reuben)** | None open. |
 
 ## Consistency check of the current docs
 
@@ -43,7 +35,7 @@ Checked and consistent: protocol endpoints ↔ schema tables (`inits`, `epochs`,
 | Decode/encode/filters | PyAV (FFmpeg libraries), `atempo` | Our own codec glue |
 | RTMP server, preview, fan-out hub | MediaMTX | An RTMP server |
 | Per-destination push | `ffmpeg -c copy` processes | An RTMP client |
-| Network faults | `tc netem` in a network namespace | A proxy-based simulator |
+| Network faults | A small user-space TCP proxy (`tools/chaos/proxy.py`): runs on any CI runner without root; loss is modelled as mid-request resets, its visible effect over TCP | `tc netem` (needs root and namespaces) |
 | Media checks | `ffprobe` JSON output | A parser |
 | iOS build and install from Linux | The existing ixOS/xtool workflow and build queue on the laptop | A Mac or CI-only build |
 | Background uploads on iPhone | Background `URLSession` | Our own scheduler |
