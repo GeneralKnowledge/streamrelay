@@ -123,7 +123,7 @@ struct RecordView: View {
         switch model.phase {
         case .recording: return "Stop broadcast"
         case .stopping: return "Stopping broadcast"
-        case .idle: return model.resumable != nil ? "Resume broadcast" : "Start broadcast"
+        case .idle: return model.canResume ? "Resume broadcast" : "Start broadcast"
         }
     }
 }

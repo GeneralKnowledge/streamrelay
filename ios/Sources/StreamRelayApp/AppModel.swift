@@ -25,9 +25,13 @@ enum Pairing {
         try Data(ServerURL.origin(server).utf8).write(to: m.folder.appendingPathComponent("server-origin"), options: .atomic)
     }
 
-    /// Whether the recording may go to this server (a recording from before owners were kept is adopted).
+    /// Whether the recording may go to this server. One without an owner file is adopted only while no
+    /// server has given it a broadcast yet; once it has one, its owner is unknown and it goes nowhere.
     static func belongs(_ m: Manifest, to server: URL) -> Bool {
-        guard let o = owner(of: m) else { return (try? setOwner(m, server)) != nil }
+        guard let o = owner(of: m) else {
+            guard let rec = try? m.recording(), rec.broadcastID == nil else { return false }
+            return (try? setOwner(m, server)) != nil
+        }
         return o == ServerURL.origin(server)
     }
 
@@ -88,6 +92,11 @@ final class AppModel {
     private(set) var resumable: Manifest?
 
     var recording: Bool { phase == .recording }
+    /// Whether Start would resume: only a recording of the server paired now.
+    var canResume: Bool {
+        guard let r = resumable, let server = Pairing.server else { return false }
+        return Pairing.owner(of: r) == ServerURL.origin(server)
+    }
 
     // machinery
     private(set) var recorder: SegmentRecorder?
@@ -191,14 +200,16 @@ final class AppModel {
         problem = nil
         do {
             let m: Manifest
-            if let r = resumable, (try? r.recording().finishRequested) == false {
-                m = r                                   // resume: a new epoch in the same broadcast
+            guard let server = Pairing.server else { problem = "Pair this iPhone first."; return }
+            if let r = resumable, (try? r.recording().finishRequested) == false, Pairing.belongs(r, to: server) {
+                m = r                                   // resume: a new epoch in the same broadcast, same owner
             } else {
+                // a recording of another server is never resumed here: it waits for that server
                 m = try Manifest.create(in: Pairing.recordingsFolder, title: title, mode: mode,
                                         holdMaxDelaySeconds: mode == .hold ? holdMaxDelayMinutes * 60 : nil)
+                try Pairing.setOwner(m, server)
                 uploads.append(m)
             }
-            if let server = Pairing.server { try Pairing.setOwner(m, server) }
             current = m
             resumable = m
             let origin = ((try? m.folder.resourceValues(forKeys: [.creationDateKey]))?.creationDate) ?? Date()
