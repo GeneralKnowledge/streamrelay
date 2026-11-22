@@ -23,7 +23,7 @@ The spec's state machine, made concrete for the playout (the phone has its own s
 | `live` | Footage at 1×, `playout_delay` behind capture | Buffer healthy | Next segment not on disk at its deadline → `holding` |
 | `holding` | Holding screen with "Reconnecting… back shortly" and elapsed time | Underrun | Enough contiguous footage after the play point (`resume_threshold`, default 10 s) → `catching_up` (or `live` in skip-to-live) |
 | `catching_up` | Backlog at `speed` (1.25× default, 1.5× max) | Resumed with backlog > `buffer_target` | Behind-live ≤ `buffer_target` → `live`; underrun → `holding` |
-| `finishing` | Remaining footage, then an end card for 10 s | Client called `finish` and all received footage played | Outputs closed → `finished` |
+| `finishing` | Remaining footage (at the catch-up speed if behind), then an end card for 10 s | Client called `finish`, from any state; start and resume thresholds no longer apply | Backlog complete (protocol: [finish](../protocol/upload-v1.md#end-an-epoch-or-the-broadcast)) and played, or the drain wait expired; end card shown; outputs closed → `finished` |
 
 Hysteresis (a resume threshold larger than one segment) stops flapping between holding and footage on a connection that delivers in bursts.
 
@@ -51,7 +51,9 @@ Holding screen: a slowly moving element (clock, progress ring) so the encoder do
 
 ## Crash recovery
 
-The playout checkpoints `(state, epoch, sequence, frame offset)` to Postgres every second. On restart it reconnects to MediaMTX and resumes from the checkpoint; the RTMP session to platforms is held by the forwarders, which see a short input gap rather than a reconnect. Whether the forwarders bridge that gap cleanly is a measured item in M1 (risk R3).
+The playout checkpoints `(state, epoch, sequence, frame offset)` to Postgres every second. On restart it reconnects to MediaMTX and resumes from the checkpoint; the RTMP session to platforms is held by the forwarders, which see a short input gap rather than a reconnect. Whether the forwarders bridge that gap cleanly is measured on the bench in M4 and against real Twitch and YouTube in M5 (risk R3).
+
+**Guarantee after a crash: at most about one second repeated, nothing skipped.** Frames already sent to MediaMTX cannot be part of a Postgres transaction, so a crash between sending and the next checkpoint replays the frames since that checkpoint (up to the checkpoint interval plus whatever the encoder had buffered). Without a crash, footage is never repeated. We accept this rather than build a delivery protocol to the platforms, which RTMP does not support. `segments.played_at` records that a segment was handed to the encoder, not that a viewer saw it.
 
 ## Implementation plan
 

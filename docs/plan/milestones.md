@@ -27,7 +27,7 @@ Later (not scheduled): Android client, adaptive bitrate, separate archive/broadc
 
 *A. Server and Linux bench (no phone).*
 - Repository skeleton, Docker Compose (API, Postgres, MediaMTX, playout).
-- API subset of protocol v1: create broadcast, PUT init, PUT segment, status. One static device token from the server's config file (pairing comes in M3).
+- API subset of protocol v1: create broadcast, PUT init, PUT segment, epoch end, finish, status. The phone's Stop closes the current epoch (`epochs/{n}/end` with the last sequence), then calls `finish`; both are queued and retried like segments. One static device token from the server's config file (pairing comes in M3).
 - Filesystem segment store, fsync before acknowledging.
 - Playout (ADR 0005) with `starting`, `live`, `holding`, `catching_up`, `finishing`: PyAV decode, frame-drop + `atempo` at 1.25×, one x264 encoder, holding screen with a moving clock and quiet audio.
 - One forwarder to Twitch (stream key in the server's config file, never in the repo), plus a local stand-in MediaMTX for tests.
@@ -88,7 +88,7 @@ Later (not scheduled): Android client, adaptive bitrate, separate archive/broadc
 **Built.** Skip-to-live mode; playout checkpoint and restart; epoch gaps shown as a short "Camera interrupted" card; speed ramps; 1.5× option; heartbeats and offline detection; phone shows Live / Holding / Catching up and minutes behind; lower default bitrate on cellular.
 
 **Acceptance test.**
-- Bench: kill the playout at minute 12 of the M1 bench run; the stand-in sees one session or one reconnect under 5 s, and no footage is lost or repeated. 20-minute outage with a 4 Mbps uplink cap: catches up, or the report says how long it would take.
+- Bench: kill the playout at minute 12 of the M1 bench run; the stand-in sees one session or one reconnect under 5 s; no footage is lost and at most about 1 s repeats. 20-minute outage with a 4 Mbps uplink cap: catches up, or the report says how long it would take.
 - Phone: repeat the M1 phone run in skip-to-live mode: footage jumps to near-live within 15 s of reconnecting; the archive still holds every minute.
 
 ## M5: Multi-destination
@@ -97,7 +97,7 @@ Later (not scheduled): Android client, adaptive bitrate, separate archive/broadc
 
 **Acceptance test.**
 - Two stand-in destinations; block one with `iptables` for 2 minutes: the other's session never drops; the blocked one reconnects by itself.
-- Real Twitch and YouTube test channels, one 45-minute broadcast with a 5-minute outage: both stay live without a viewer refresh; record what each platform shows (stream health warnings, VOD continuity). M1 settles risk R3 for Twitch; this settles it for YouTube.
+- Real Twitch and YouTube test channels, one 45-minute broadcast with a 5-minute outage and one forced playout restart: both stay live without a viewer refresh; record what each platform shows (stream health warnings, VOD continuity). M1 settles risk R3 for Twitch; this settles it for YouTube.
 
 ## M6: Product-quality iPhone app (Device)
 

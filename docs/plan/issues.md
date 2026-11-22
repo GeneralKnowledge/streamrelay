@@ -6,7 +6,7 @@ One tracking issue per milestone, with the task issues below as sub-issues. Labe
 Step A, server and bench (no phone):
 - [ ] Repository skeleton: `services/`, `packages/protocol/`, `tools/`, `tests/`, Docker Compose (Postgres, MediaMTX, API, playout), CI (ruff, mypy, pytest)
 - [ ] Postgres schema v1 + Alembic baseline
-- [ ] API subset: create broadcast, PUT init, PUT segment, status; static token; filesystem store with fsync-then-ack
+- [ ] API subset: create broadcast, PUT init, PUT segment, epoch end, finish, status; static token; filesystem store with fsync-then-ack
 - [ ] `tools/testclip`, `tools/fake-phone`, `tools/verify`, netem helpers
 - [ ] Playout: scheduler + states; PyAV decode/encode with monotonic output clock; holding screen; frame drop + `atempo` at 1.25×
 - [ ] Forwarder to Twitch (key from server config) and to a local stand-in
@@ -21,6 +21,7 @@ Step B, iPhone app (`needs-device` for the run only):
 - [ ] Preview, Start/Stop, status line, settings (server URL, token)
 
 Step C, the run:
+- [ ] Platform terms check (R9), before deploying and the run
 - [ ] Server deployed where the phone can reach it (Hetzner recommended) with TLS
 - [ ] 30-minute phone run to Twitch with a 3–5 minute outage; results recorded per check
 
@@ -49,8 +50,7 @@ Step C, the run:
 ## M5: Multi-destination
 - [ ] Encrypted stream keys; destination CRUD API
 - [ ] Per-destination forwarder supervision, health, reconnect
-- [ ] Platform terms check (R9)
-- [ ] Stand-in isolation test; real Twitch + YouTube 45-minute run
+- [ ] Stand-in isolation test; real Twitch + YouTube 45-minute run with a forced playout restart
 
 ## M6: Product-quality iPhone app (`needs-device`)
 - [ ] Broadcast setup, preview controls, audio meter, Bluetooth mics
