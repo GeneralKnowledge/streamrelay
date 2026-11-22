@@ -35,10 +35,9 @@ CREATE TABLE destinations (
     ingest_url       text NOT NULL,
     stream_key_enc   bytea NOT NULL,          -- AES-256-GCM, key from server config, never returned by the API
     stream_key_nonce bytea NOT NULL,
-    insecure_ok      boolean NOT NULL DEFAULT false,   -- plain rtmp:// allowed only for kind 'rtmp' with explicit opt-in
     created_at       timestamptz NOT NULL DEFAULT now(),
     UNIQUE (id, owner_id),
-    CHECK (ingest_url LIKE 'rtmps://%' OR (kind = 'rtmp' AND insecure_ok AND ingest_url LIKE 'rtmp://%'))
+    CHECK (ingest_url LIKE 'rtmps://%')       -- encrypted ingest only (ADR 0006)
 );
 
 CREATE TYPE broadcast_state AS ENUM

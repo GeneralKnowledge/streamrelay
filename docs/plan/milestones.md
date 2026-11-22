@@ -65,7 +65,7 @@ Later, not scheduled: Android client (same protocol, no server change), adaptive
 
 **Evidence kept:** `tests/results/m2/<date>/` with ffprobe reports, the reconstruction log, a 2-minute sample of real segments, and `ios-capture-findings.md` filling the "Measured" column.
 
-**Needs first:** the slot decision ([status](status.md#decisions-needed)).
+**Slot:** StreamRelay installs as its own app; Reuben frees a slot for the sitting (decided 2026-11-22).
 
 ## M3: Reliable upload
 

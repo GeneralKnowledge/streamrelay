@@ -38,8 +38,8 @@ SELECT must_fail($q$INSERT INTO destinations (id, owner_id, kind, name, ingest_u
   'Twitch destination over plain rtmp');
 SELECT must_fail($q$INSERT INTO destinations (id, owner_id, kind, name, ingest_url, stream_key_enc, stream_key_nonce)
   VALUES (gen_random_uuid(), '00000000-0000-0000-0000-00000000000a', 'rtmp', 'plain', 'rtmp://obs.local/live', 'k', 'n')$q$,
-  'custom plain rtmp without opt-in');
--- allowed: custom plain rtmp with explicit opt-in
-INSERT INTO destinations (id, owner_id, kind, name, ingest_url, stream_key_enc, stream_key_nonce, insecure_ok)
-  VALUES (gen_random_uuid(), '00000000-0000-0000-0000-00000000000a', 'rtmp', 'OBS', 'rtmp://obs.local/live', 'k', 'n', true);
+  'custom destination over plain rtmp');
+-- allowed: custom destination over rtmps
+INSERT INTO destinations (id, owner_id, kind, name, ingest_url, stream_key_enc, stream_key_nonce)
+  VALUES (gen_random_uuid(), '00000000-0000-0000-0000-00000000000a', 'rtmp', 'Custom', 'rtmps://ingest.example/live', 'k', 'n');
 ROLLBACK;

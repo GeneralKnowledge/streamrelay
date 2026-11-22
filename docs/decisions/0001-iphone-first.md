@@ -8,7 +8,7 @@ The first capture client is an iPhone app. Android comes after M7 and implements
 
 ## Consequences
 - Background camera capture is not available on iPhone (see 0002). The product promise becomes: "keeps recording while the app is open, even with no signal; finishes uploading in the background."
-- Phone slots: the free Apple team allows 3 sideloaded apps and all 3 are used (Device Lab, WebDriverAgent, VPN). M2 needs a decision: a StreamRelay screen inside Device Lab for development, or a slot swapped for the sitting.
+- Phone slots: the free Apple team allows 3 sideloaded apps and all 3 are used. Decided 2026-11-22: Reuben deletes an app for each phone sitting and StreamRelay installs as its own app, always with the same bundle id.
 - A paid Apple account is not needed for development, only for TestFlight/App Store distribution later.
 
 ## Revisit if

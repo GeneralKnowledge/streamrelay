@@ -14,7 +14,7 @@ Ordered by how badly each would damage the architecture if wrong. Each names the
 | R8 | **Battery and heat over hours** | Long field broadcasts fail | M2 thermal observations; M6 field use |
 | R9 | **Platform terms** for delayed/replayed footage and holding screens | Account action | Read before M5 |
 | R10 | **Untrusted media crashes or exhausts the server** | Denial of service | M3 validation tests with fuzzed and truncated segments |
-| R11 | **iPhone slots** (free team: 3, all used) | No way to run the M2 spike | Decision before M2 |
+| R11 | **iPhone slots** (free team: 3, all used) | No way to run the M2 spike | Decided 2026-11-22: Reuben frees a slot per sitting; one bundle id |
 | R12 | **Focus**: a new product competing with ixOS, Relay and VPN | Slows all of them | One milestone at a time, only when Reuben asks |
 | R13 | **Name** "StreamRelay" likely taken | Rename before release | Check before M7 |
 
