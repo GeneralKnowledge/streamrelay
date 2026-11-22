@@ -13,7 +13,7 @@
 **Phone.**
 - Before Start: estimate hours remaining from free space at the chosen preset and show it; warn under 1 hour.
 - Reserve: stop recording cleanly (final segment flagged, epoch ended) when free space falls below 500 MB, so the OS and the queue database keep working.
-- Never delete an unacknowledged segment. Acknowledged segments are deleted only by the retention setting (default: keep until the user deletes, or the "free space after upload" setting is on).
+- Never delete an unacknowledged segment. Acknowledged segments are deleted only by the user or by the opt-in "free space after upload" setting (default off). Low free space never deletes footage by itself: it stops recording at the reserve and warns.
 - Show backlog: count, bytes, and minutes of footage waiting.
 
 **Server.** Configured in the server's environment:

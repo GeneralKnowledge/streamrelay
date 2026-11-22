@@ -124,7 +124,7 @@ Every 5 s while connected. Lets the server tell "phone offline" from "phone onli
 - **Concurrency:** up to 3 segment PUTs in flight over one HTTP/2 connection; drop to 1 when error rate rises.
 - **Backoff:** exponential from 1 s to 30 s with full jitter; reset on success. Network-change notifications (`NWPathMonitor`) retry at once.
 - **Background:** when the app leaves the foreground, hand the remaining queue to a background `URLSession`; on relaunch, reconcile with `GET status` before resuming.
-- **Local deletion:** only after acknowledgement **and** the retention setting allows it (default: keep local copies until the user deletes them or space runs low, with a warning first).
+- **Local deletion:** only after acknowledgement **and** the retention setting allows it (default: keep local copies until the user deletes them; low free space never deletes footage on its own, it stops recording at the reserve and warns, and the "free space after upload" setting is an explicit opt-in) ([phone storage](../architecture/storage-and-security.md#storage)).
 
 ## Live and archive guarantees
 
@@ -137,6 +137,6 @@ Two different promises, tested separately:
 
 - Validate: size ≤ `max_segment_bytes`; checksum; `ffprobe` check of container and codecs in a time- and memory-limited process ([untrusted media](../architecture/storage-and-security.md#security)); `start_us` monotonic within the epoch (±50 ms jitter allowed); duration 0.5–4 s, except a segment flagged `final`, which may be any length above 0.
 - Writes are **serialised per segment key**: the handler takes a Postgres transaction-scoped advisory lock on `(broadcast_id, epoch, sequence)` before touching storage. Under the lock: if a row exists with the same checksum, respond `200` without writing; if a row exists with a different checksum, respond `409` without touching the stored file; otherwise write the body to a temp file, fsync it, rename it into place, fsync the directory, insert the row and **commit** (Postgres `synchronous_commit` on, the default), which releases the lock. Only then respond. No acknowledgement is sent before the commit succeeds, and a stored file is never replaced.
-- A crash after the rename but before the commit leaves a file with no row (the lock dies with the transaction). The startup scan **deletes** such files: the client never got an acknowledgement, so it still holds the segment and its metadata and will upload it again. A file with a committed row is never deleted by the scan.
+- A crash after the rename but before the commit leaves a file with no row (the lock dies with the transaction). The startup scan runs to completion **before the server accepts any segment `PUT`**, so it can never race a live write, and it **deletes** such files: the client never got an acknowledgement, so it still holds the segment and its metadata and will upload it again. A file with a committed row is never deleted by the scan.
 - The playout never plays a segment twice in normal running. After a playout crash it resumes from its last checkpoint, so up to about one second can repeat ([playout crash recovery](../architecture/playout.md#crash-recovery)).
 - Rate limit per device (default 20 segment PUTs/s, far above the 0.5/s a live client needs plus catch-up).

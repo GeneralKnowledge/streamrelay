@@ -30,7 +30,7 @@ The rule everything else follows: **recording and broadcasting are independent.*
 ## What changed from the original spec
 
 - **iPhone first.** The capture client is an iPhone app; the Android/Kotlin/CameraX stack becomes the later Android client (ADR 0001, 0002).
-- **The iPhone cannot record with the camera in the background.** Capture runs while StreamRelay is on screen; the screen can dim but not lock. Uploads do continue in the background. This narrows "records regardless" and the app must say so (ADR 0002, risk R3).
+- **The iPhone cannot record with the camera in the background.** Capture runs while StreamRelay is on screen; the screen can dim but not lock. Uploads continue in the background, but iOS schedules background transfers at its discretion and can delay them by minutes or more, so the backlog drains fastest with the app open. This narrows "records regardless" and the app must say so (ADR 0002, risk R3).
 - **The playout always re-encodes, once.** Catch-up at 1.25–1.5× and the holding screen both need encoding anyway, and a single encoder is what keeps timestamps continuous for Twitch and YouTube (ADR 0005).
 - **One PUT per segment instead of POST + PUT.** Fewer round trips on a bad connection; idempotent by checksum (protocol doc).
 - **"Catch up or skip to live" is a broadcaster setting, not a viewer one.** Twitch and YouTube viewers all see the same stream; a per-viewer choice needs our own player (later).

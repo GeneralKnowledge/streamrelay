@@ -8,9 +8,9 @@ Runs entirely on Linux. No API, no database, no phone.
 
 A single Python script (`spikes/s1_playout/playout.py`, PyAV) plus a shell harness:
 
-1. `make_segments.sh`: FFmpeg makes a 10-minute test clip (frame counter, timecode, 1 kHz tone, 1 s beeps) and cuts it into fMP4 init + 2 s segments with the HLS muxer, so segment structure matches what AVAssetWriter produces.
+1. `make_clip.py` + `make_segments.sh`: a 20-minute test clip (frame number as a machine-readable barcode and as text, continuous 1 kHz tone, 30 s of speech) cut into fMP4 init + 2 s segments with the HLS muxer, so segment structure matches what AVAssetWriter produces. 20 minutes, because at 1.25× the 3-minute backlog takes 12 minutes to clear and the run must then show a continuing live feed.
 2. `feeder.py`: copies segments into an input folder in real time, following a schedule: normal for 2 min, nothing for 3 min, then the 90 missed segments at once, then real time again.
-3. `playout.py`: watches the folder; one output at 720p30 x264 CBR 2 s GOP + AAC 48 kHz to `rtmp://localhost:1935/s1` (MediaMTX in Docker); states `live` → `holding` (generated moving clock + comfort noise) → `catching_up` at 1.25× (frame drop + `atempo`) → `live`. Speed from a command-line flag so 1.5× can be tried.
+3. `playout.py`: watches the folder; one output at 720p30 x264 CBR 2 s GOP + AAC 48 kHz to `rtmp://localhost:1935/s1` (MediaMTX); states `live` → `holding` (generated moving clock + comfort noise) → `catching_up` at 1.25× (frame drop + `atempo`) → `live`. Speed from a command-line flag so 1.5× can be tried.
 4. `verify.py`: a second process records the stream from MediaMTX with FFmpeg and checks the recording.
 
 Roughly 300–500 lines in total. Throwaway code: what survives goes into `services/playout` in M1 with tests.

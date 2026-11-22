@@ -37,6 +37,9 @@ SELECT must_fail($q$INSERT INTO destinations (id, owner_id, kind, name, ingest_u
   VALUES (gen_random_uuid(), '00000000-0000-0000-0000-00000000000a', 'twitch', 'plain', 'rtmp://ingest.example/app', 'k', 'n')$q$,
   'Twitch destination over plain rtmp');
 SELECT must_fail($q$INSERT INTO destinations (id, owner_id, kind, name, ingest_url, stream_key_enc, stream_key_nonce)
+  VALUES (gen_random_uuid(), '00000000-0000-0000-0000-00000000000a', 'youtube', 'plain', 'rtmp://a.rtmp.youtube.com/live2', 'k', 'n')$q$,
+  'YouTube destination over plain rtmp');
+SELECT must_fail($q$INSERT INTO destinations (id, owner_id, kind, name, ingest_url, stream_key_enc, stream_key_nonce)
   VALUES (gen_random_uuid(), '00000000-0000-0000-0000-00000000000a', 'rtmp', 'plain', 'rtmp://obs.local/live', 'k', 'n')$q$,
   'custom destination over plain rtmp');
 -- allowed: custom destination over rtmps
