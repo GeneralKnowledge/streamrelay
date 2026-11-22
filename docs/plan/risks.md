@@ -20,5 +20,5 @@ Ordered by how badly each would damage the architecture if wrong. Each names the
 
 ## Guarantees we will and won't make
 
-- **Will:** recording never waits on the network; acknowledged segments are durable; every acknowledged segment reaches the archive; in catch-up mode every segment acknowledged in time is broadcast once in order.
+- **Will:** recording never waits on the network; acknowledged segments are durable; every acknowledged segment reaches the archive; in catch-up and hold modes every segment acknowledged in time is broadcast once in order.
 - **Won't:** exactly-once RTMP delivery across a playout crash (≤ about 1 s may repeat); recording while iOS has taken the camera away (lock, background, call); live completeness for footage that arrives after the drain wait (it goes to the archive).

@@ -21,13 +21,15 @@ The spec's state machine, made concrete for the playout (the phone has its own s
 |---|---|---|---|
 | `starting` | Holding screen ("Starting soon") | Broadcast created | First `buffer_target` of footage received → `live` |
 | `live` | Footage at 1×, `playout_delay` behind capture | Buffer healthy | Next segment not on disk at its deadline → `holding` |
-| `holding` | Holding screen with "Reconnecting… back shortly" and elapsed time | Underrun | Enough contiguous footage after the play point (`resume_threshold`, default 10 s) → `catching_up` (or `live` in skip-to-live) |
-| `catching_up` | Backlog at `speed` (1.25× default, 1.5× max) | Resumed with backlog > `buffer_target` | Behind-live ≤ `buffer_target` → `live`; underrun → `holding` |
+| `holding` | Holding screen with "Reconnecting… back shortly" and elapsed time; in `hold` mode the last frame, frozen, with a small "Reconnecting…" badge | Underrun | Enough contiguous footage after the play point (`resume_threshold`, default 10 s) → `catching_up` (`live` in skip-to-live, and in `hold` while the delay is within its limit) |
+| `catching_up` | Backlog at `speed` (1.25× default, 1.5× max) | Resumed with backlog > `buffer_target`; in `hold` mode only when the delay exceeds `max_delay_s` (never if it is unset) | Behind-live ≤ `buffer_target` (in `hold`: ≤ `max_delay_s`) → `live`; underrun → `holding` |
 | `finishing` | Remaining footage (at the catch-up speed if behind), then an end card for 10 s | Client called `finish`, from any state; start and resume thresholds no longer apply | All stored footage the mode plays has played and the backlog is complete (protocol: [finish](../protocol/upload-v1.md#end-an-epoch-or-the-broadcast)); empty epochs need only their end call, so a broadcast with no footage ends at once. If the **drain wait** expires first (both modes), missing segments are marked `skipped` and the stored footage still drains. A stored segment that fails to decode (any segment, including the final one) is marked `damaged`, counts as played for this rule, and the playout moves on to the next one; it never waits on it. Then end card; outputs closed → `finished` |
 
 Hysteresis (a resume threshold larger than one segment) stops flapping between holding and footage on a connection that delivers in bursts.
 
 **Skip to live:** on leaving `holding`, the scheduler jumps to the newest contiguous footage minus `buffer_target`. The skipped footage is still stored and archived; it is just not broadcast.
+
+**Hold and continue:** on leaving `holding`, playout continues at 1× from the frame it froze on, so the broadcast simply runs later than capture by the total outage time. With `max_delay_s` unset that delay is never reduced and the broadcast ends that much after the phone stops; with a limit, playout speeds up only while the delay is above the limit. The phone and dashboard show the current delay. The holding screen in this mode is the frozen last frame with a badge, not the full card.
 
 **Gaps between epochs** (real lost footage, e.g. a phone call): never shown as holding forever. The scheduler plays up to the end of the epoch, shows a 2 s "Camera interrupted" card, then continues with the next epoch.
 

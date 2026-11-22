@@ -33,13 +33,16 @@ A segment's key is `(broadcast_id, epoch, sequence)`.
 ### Create a broadcast
 ```
 POST /v1/broadcasts
-{ "title": "Pentland Hills walk", "destination_ids": ["..."], "catch_up": {"mode": "catch_up", "max_speed": 1.5},
+{ "title": "Pentland Hills walk", "destination_ids": ["..."], "catch_up": {"mode": "catch_up", "max_speed": 1.5, "max_delay_s": null},
   "client_broadcast_ref": "6f1c…" }
 → 201 { "broadcast_id": "0193…", "playout_delay_target_ms": 8000, "max_segment_bytes": 8388608 }
 ```
 `client_broadcast_ref` is a client-generated UUID that makes creation idempotent: retrying with the same ref returns the same broadcast. The app may start recording **before** this succeeds (no signal at the start); segments wait in the queue until it has a `broadcast_id`.
 
-`catch_up.mode`: `catch_up` (play the backlog faster until live) or `skip_to_live` (after an outage, jump to the newest footage; the backlog is still uploaded and archived). Broadcaster's choice, changeable during the broadcast.
+`catch_up.mode`, the broadcaster's choice, changeable during the broadcast:
+- `catch_up`: play the backlog faster (`max_speed`) until live.
+- `hold`: freeze on the last frame during an outage, then carry on at 1× from exactly where it stopped. Nothing is skipped or sped up; every outage adds its length to the delay. `max_delay_s` sets a limit: `null` (the default) means never speed up and accept any delay (for example a body-cam stream where all footage matters); a number means speed up at `max_speed` only while the delay is above that many seconds, then return to 1×.
+- `skip_to_live`: after an outage, jump to the newest footage; the backlog is still uploaded and archived.
 
 ### Upload an init segment
 ```
@@ -92,7 +95,7 @@ POST /v1/broadcasts/{id}/finish               { "last_epoch": 2 }
 
 **When a backlog counts as complete:** every epoch `0..last_epoch` has an end call, and every sequence `0..last_sequence` of each epoch is stored (nothing, for an empty epoch with `last_sequence: -1`). An empty epoch (`last_sequence: -1`) is complete as soon as its end call arrives; a broadcast whose epochs are all empty finishes as soon as `finish` is accepted.
 
-In `finishing`, the playout plays what its mode plays (`catch_up`: everything in order; `skip_to_live`: from its current position onwards) until the backlog is complete and that footage has played. Both modes have the same bound: if the backlog is still incomplete when the **drain wait** (default 15 minutes, per broadcast) expires, the missing segments are marked `skipped`, the playout keeps draining the footage it already has, then shows the end card and closes the outputs. Uploads after that are accepted for the archive only. A stored segment that fails to decode, including the final one, is marked `damaged` and skipped at once; it counts as played, so it never holds up the finish.
+In `finishing`, the playout plays what its mode plays (`catch_up` and `hold`: everything in order; `skip_to_live`: from its current position onwards) until the backlog is complete and that footage has played. Both modes have the same bound: if the backlog is still incomplete when the **drain wait** (default 15 minutes, per broadcast) expires, the missing segments are marked `skipped`, the playout keeps draining the footage it already has, then shows the end card and closes the outputs. Uploads after that are accepted for the archive only. A stored segment that fails to decode, including the final one, is marked `damaged` and skipped at once; it counts as played, so it never holds up the finish.
 
 ### Status (reconciliation)
 ```
@@ -120,7 +123,7 @@ Every 5 s while connected. Lets the server tell "phone offline" from "phone onli
 
 ## Client upload rules
 
-- **Order:** in `catch_up` mode, oldest missing first. In `skip_to_live` mode, newest first, then backfill oldest-first for the archive.
+- **Order:** in `catch_up` and `hold` modes, oldest missing first. In `skip_to_live` mode, newest first, then backfill oldest-first for the archive.
 - **Concurrency:** up to 3 segment PUTs in flight over one HTTP/2 connection; drop to 1 when error rate rises.
 - **Backoff:** exponential from 1 s to 30 s with full jitter; reset on success. Network-change notifications (`NWPathMonitor`) retry at once.
 - **Background:** when the app leaves the foreground, hand the remaining queue to a background `URLSession`; on relaunch, reconcile with `GET status` before resuming.
@@ -130,7 +133,7 @@ Every 5 s while connected. Lets the server tell "phone offline" from "phone onli
 
 Two different promises, tested separately:
 
-- **Live completeness.** In `catch_up` mode, every segment acknowledged before the playout reaches it is broadcast once, in order, except one that fails to decode, which is marked `damaged` and skipped (≤ about 1 s repeated after a playout crash). A segment that arrives after the playout has moved past it (skip-to-live, drain wait expired, or broadcast already finished) is marked `skipped` for live.
+- **Live completeness.** In `catch_up` and `hold` modes, every segment acknowledged before the playout reaches it is broadcast once, in order, except one that fails to decode, which is marked `damaged` and skipped (≤ about 1 s repeated after a playout crash). A segment that arrives after the playout has moved past it (skip-to-live, drain wait expired, or broadcast already finished) is marked `skipped` for live.
 - **Archive completeness.** Every acknowledged segment is kept for the archive, whenever it arrives, including after `finish` and after live playout has ended, until the retention period ([limits](../architecture/storage-and-security.md#storage)) or the user deletes the broadcast. The archive download reassembles all epochs in order.
 
 ## Server rules

@@ -86,7 +86,7 @@ Later, not scheduled: Android client (same protocol, no server change), adaptive
 
 **Goal.** Catch-up playback and the full scenario from the iPhone.
 
-**Built.** `catching_up` state with frame-drop video and `atempo` audio at a configurable speed (default 1.25×, tested up to 1.5×), speed ramps, `catch_up` / `skip_to_live` setting, `finishing` with drain wait, playout checkpoints and restart, heartbeats; phone shows Live / Holding / Catching up and minutes behind live.
+**Built.** `catching_up` state with frame-drop video and `atempo` audio at a configurable speed (default 1.25×, tested up to 1.5×), speed ramps, `catch_up` / `hold` (optional `max_delay_s`) / `skip_to_live` setting, `finishing` with drain wait, playout checkpoints and restart, heartbeats; phone shows Live / Holding / Catching up and minutes behind live.
 
 **Backlog arithmetic** (shown in the phone and dashboard, and checked in tests). With outage length B, catch-up speed s, recording bitrate r and uplink u:
 - upload of the backlog needs at least B × r / (u − r) after reconnecting (u must exceed r);
@@ -97,6 +97,7 @@ Example: 5 min outage, 1.25×, 4 Mbps recording, 6 Mbps uplink → upload 10 min
 
 **Acceptance tests.**
 - *Bench:* M1 test with catch-up mode and a 5-minute gap: tone stays 1 kHz ±2% during catch-up (pitch preserved), beeps every 1/s seconds, every source second appears once and in order, back to `live` within the arithmetic's prediction + 2 min. Same at 1.5×. Listening test notes for speech at 1.25× and 1.5×.
+- *Hold mode:* same clip and gaps in `hold` mode with no limit → frozen last frame within 10 s of each gap, then 1× with every source second once and in order, and the final delay equals the total gap time (±2 s). With `max_delay_s` = 120 → speed-up only while the delay is over 120 s, then 1×.
 - *Restarts:* playout killed mid-catch-up → one session or one reconnect under 5 s at the receiver, nothing skipped, ≤ 1 s repeated. Client restarted mid-outage → reconciliation, nothing lost.
 - *End-to-end proof (iPhone → relay → OBS), semi-automated:* a script on the server records the receiver output and the playout state log while the person follows `tests/e2e/phone-outage.md`:
   1. start a broadcast on the iPhone;

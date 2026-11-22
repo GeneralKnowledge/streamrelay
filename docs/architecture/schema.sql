@@ -50,7 +50,8 @@ CREATE TABLE broadcasts (
     client_ref           uuid NOT NULL,       -- idempotent creation
     title                text NOT NULL,
     state                broadcast_state NOT NULL DEFAULT 'starting',
-    catch_up_mode        text NOT NULL DEFAULT 'catch_up' CHECK (catch_up_mode IN ('catch_up', 'skip_to_live')),
+    catch_up_mode        text NOT NULL DEFAULT 'catch_up' CHECK (catch_up_mode IN ('catch_up', 'hold', 'skip_to_live')),
+    hold_max_delay_s     integer CHECK (hold_max_delay_s > 0),   -- 'hold' only: NULL = never speed up
     catch_up_max_speed   numeric(3,2) NOT NULL DEFAULT 1.25 CHECK (catch_up_max_speed BETWEEN 1.0 AND 1.5),
     buffer_target_ms     integer NOT NULL DEFAULT 8000,
     archive              boolean NOT NULL DEFAULT true,

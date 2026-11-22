@@ -8,7 +8,7 @@ Each segment is uploaded with one idempotent `PUT` over HTTPS, verified by SHA-2
 
 ## Consequences
 - Upload headroom is what clears the backlog: at 4 Mbps recording, a 5 Mbps uplink only drains backlog at 1 Mbps. See risks R4.
-- HTTP/2 lets several segments upload concurrently on one connection; the client sends up to 3 at once, oldest first (or newest first in skip-to-live mode).
+- HTTP/2 lets several segments upload concurrently on one connection; the client sends up to 3 at once, oldest first (newest first in skip-to-live mode).
 - Higher latency than RTMP in the normal state: the playout delay is at least one segment plus upload time. Target 6–10 s glass-to-glass in Live.
 
 ## Revisit if
