@@ -5,7 +5,6 @@ import dataclasses
 import hashlib
 import os
 import shutil
-import subprocess
 import uuid
 from pathlib import Path
 
@@ -23,21 +22,6 @@ needs_ffmpeg = pytest.mark.skipif(not shutil.which("ffmpeg") or not shutil.which
 
 def sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
-
-
-@pytest.fixture(scope="session")
-def media(tmp_path_factory) -> Path:
-    """6 s of the test clip cut into init + three 2 s segments, plus a wrong-codec init."""
-    d = tmp_path_factory.mktemp("media")
-    subprocess.run(["python3", str(ROOT / "tools/testclip/make_clip.py"), str(d / "clip.mp4"), "--seconds", "6"], check=True)
-    subprocess.run([str(ROOT / "tools/testclip/segment.sh"), str(d / "clip.mp4"), str(d / "segs")], check=True,
-                   capture_output=True)
-    (d / "mp4v").mkdir()
-    subprocess.run(["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "testsrc=size=320x240:rate=30:duration=2",
-                    "-c:v", "mpeg4", "-f", "hls", "-hls_time", "2", "-hls_segment_type", "fmp4",
-                    "-hls_fmp4_init_filename", "init.mp4", "-hls_segment_filename", str(d / "mp4v/%05d.m4s"),
-                    str(d / "mp4v/index.m3u8")], check=True)
-    return d / "segs"
 
 
 def pair_device(client: TestClient, database_url: str, email: str, platform: str = "test") -> dict:
