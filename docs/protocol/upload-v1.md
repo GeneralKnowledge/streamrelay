@@ -92,7 +92,7 @@ POST /v1/broadcasts/{id}/finish               { "last_epoch": 2 }
 
 **When a backlog counts as complete:** every epoch `0..last_epoch` has an end call, and every sequence `0..last_sequence` of each epoch is stored (nothing, for an empty epoch with `last_sequence: -1`). An empty epoch (`last_sequence: -1`) is complete as soon as its end call arrives; a broadcast whose epochs are all empty finishes as soon as `finish` is accepted.
 
-In `finishing`, the playout plays what its mode plays (`catch_up`: everything in order; `skip_to_live`: from its current position onwards) until the backlog is complete and that footage has played. Both modes have the same bound: if the backlog is still incomplete when the **drain wait** (default 15 minutes, per broadcast) expires, the missing segments are marked `skipped`, the playout keeps draining the footage it already has, then shows the end card and closes the outputs. Uploads after that are accepted for the archive only.
+In `finishing`, the playout plays what its mode plays (`catch_up`: everything in order; `skip_to_live`: from its current position onwards) until the backlog is complete and that footage has played. Both modes have the same bound: if the backlog is still incomplete when the **drain wait** (default 15 minutes, per broadcast) expires, the missing segments are marked `skipped`, the playout keeps draining the footage it already has, then shows the end card and closes the outputs. Uploads after that are accepted for the archive only. A stored segment that fails to decode, including the final one, is marked `damaged` and skipped at once; it counts as played, so it never holds up the finish.
 
 ### Status (reconciliation)
 ```
