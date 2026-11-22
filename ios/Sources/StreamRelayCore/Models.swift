@@ -23,6 +23,7 @@ public enum UploadState: String, Codable, Sendable {
     case pending        // on disk, not yet acknowledged
     case acknowledged   // the server answered 201/200: durably stored
     case damaged        // the server rejected it twice with 422; kept on disk, reported
+    case blocked        // its init file is missing on the phone; goes back to pending if the file returns
 }
 
 /// Recovery mode chosen by the broadcaster (protocol v1, create broadcast).

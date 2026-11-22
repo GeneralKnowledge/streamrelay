@@ -24,7 +24,6 @@ public final class DeviceConditions: @unchecked Sendable {
     private let folder: URL
     private var tokens: [NSObjectProtocol] = []
     public var onStop: (@Sendable (Stop) -> Void)?
-    public var recording = true
 
     public init(recorder: SegmentRecorder, folder: URL) {
         self.recorder = recorder
@@ -33,22 +32,21 @@ public final class DeviceConditions: @unchecked Sendable {
 
     public func start() {
         let nc = NotificationCenter.default
-        UIDevice.current.isBatteryMonitoringEnabled = true
         tokens.append(nc.addObserver(forName: AVCaptureSession.wasInterruptedNotification, object: recorder.session,
                                      queue: .main) { [weak self] _ in
             self?.recorder.endEpoch(.interrupted)
         })
         tokens.append(nc.addObserver(forName: AVCaptureSession.interruptionEndedNotification, object: recorder.session,
                                      queue: .main) { [weak self] _ in
-            guard let self, self.recording else { return }
-            self.recorder.startEpoch()
+            self?.recorder.resume()               // a no-op once Stop was pressed
         })
         tokens.append(nc.addObserver(forName: AVCaptureSession.runtimeErrorNotification, object: recorder.session,
                                      queue: .main) { [weak self] _ in
             guard let self else { return }
-            self.recorder.endEpoch(.cameraLost) { [weak self] in
-                guard let self, self.recording else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { self.recorder.startEpoch() }
+            let recorder = self.recorder
+            recorder.endEpoch(.cameraLost) {
+                // resume() checks, when it runs, that recording wasn't stopped in the meantime
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { recorder.resume() }
             }
         })
         tokens.append(nc.addObserver(forName: ProcessInfo.thermalStateDidChangeNotification, object: nil,
@@ -59,7 +57,6 @@ public final class DeviceConditions: @unchecked Sendable {
     }
 
     public func stop() {
-        recording = false
         tokens.forEach(NotificationCenter.default.removeObserver)
         tokens.removeAll()
     }

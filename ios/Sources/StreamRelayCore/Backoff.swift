@@ -2,7 +2,7 @@ import Foundation
 
 /// Exponential backoff with full jitter (protocol v1 client rules): the n-th
 /// consecutive failure waits a random time in [0, min(cap, base * 2^n)];
-/// a success resets it. A server's Retry-After wins over the computed wait.
+/// a success resets it. A server's Retry-After wins over the computed wait, unshortened.
 public struct Backoff: Sendable {
     public var base: Double
     public var cap: Double
@@ -18,7 +18,7 @@ public struct Backoff: Sendable {
 
     /// Records a failure and returns how long to wait before the next attempt.
     public mutating func fail(retryAfter: Double? = nil, random: Double = Double.random(in: 0...1)) -> Double {
-        let wait = retryAfter.map { min($0, 300) } ?? ceiling * random
+        let wait = retryAfter ?? ceiling * random      // the server's delay is honoured as given
         failures = min(failures + 1, 16)
         return wait
     }

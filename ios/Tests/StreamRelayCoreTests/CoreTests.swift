@@ -74,6 +74,7 @@ final class ManifestTests: XCTestCase {
         // a second close keeps the first answer
         try m.closeEpoch(0, lastSequence: 1, reason: .stopped)
         XCTAssertEqual(try m.epochs().first?.lastSequence, 2)
+        XCTAssertEqual(try m.segment(SegmentKey(epoch: 0, sequence: 1))?.isFinal, false, "a repeated close moves no flag")
         XCTAssertEqual(try m.epochs().first?.endReason, .interrupted)
     }
 
@@ -171,19 +172,24 @@ final class UploadQueueTests: XCTestCase {
             if case .stored = e { counter.with { $0 += 1 } }
         })
         let task = Task { await q.run() }
-        while counter.with({ $0 }) < 10 { await Task.yield() }
+        await eventually("10 segments stored") { counter.with { $0 } >= 10 }
         await q.stop()
-        _ = await task.value
-        // the app died: the phone lost its acknowledgements for 5 segments the server holds
-        for i in 3..<8 { try m.markAcknowledged(SegmentKey(epoch: 0, sequence: i)) }
+        let first = await task.value
+        XCTAssertEqual(first, .stopped)
+        XCTAssertGreaterThan(try m.backlog().segments, 0, "the first run stopped with work left")
+        // the app died before recording five acknowledgements: the server holds 0/3-0/7, the phone says pending
+        for i in 3..<8 { try m.markPending(SegmentKey(epoch: 0, sequence: i)) }
         let reopened = try Manifest(folder: m.folder)
         try reopened.recoverAfterRelaunch()
-        server.log.removeAll()
+        server.locked { server.log.removeAll() }
         let ending = await queue(reopened, server, clock).run()
         XCTAssertEqual(ending, .finished)
         XCTAssertEqual(server.segments.count, 30)
         XCTAssertEqual(server.created, 1, "the broadcast id was kept; no second create")
-        XCTAssertFalse(server.log.contains("PUT 0/0"), "reconciled: nothing the server holds goes again")
+        for i in 0..<8 {
+            XCTAssertFalse(server.log.contains("PUT 0/\(i)"), "reconciled: 0/\(i), held by the server, is not sent again")
+            XCTAssertEqual(try reopened.segment(SegmentKey(epoch: 0, sequence: i))?.state, .acknowledged)
+        }
     }
 
     func testReuploadsTheInitOn412() async throws {
@@ -230,7 +236,7 @@ final class UploadQueueTests: XCTestCase {
         let server = FakeServer(), clock = VirtualClock()
         let q = queue(m, server, clock)
         let task = Task { await q.run() }
-        while server.locked({ server.segments.count }) < 3 { await Task.yield() }
+        await eventually("three segments stored") { server.locked { server.segments.count } >= 3 }
         for _ in 0..<200 { await Task.yield() }
         XCTAssertNil(server.locked { server.segments[SegmentKey(epoch: 0, sequence: 3)] }, "held back while the epoch is open")
         try m.closeEpoch(0, lastSequence: 3, reason: .stopped)
@@ -246,7 +252,7 @@ final class UploadQueueTests: XCTestCase {
         let server = FakeServer(), clock = VirtualClock()
         let q = queue(m, server, clock, concurrency: 1)
         let task = Task { await q.run() }
-        while server.locked({ server.segments.count }) < 1 { await Task.yield() }
+        await eventually("the first segment stored") { server.locked { server.segments.count } >= 1 }
         XCTAssertEqual(server.locked { server.log.first(where: { $0.hasPrefix("PUT") }) }, "PUT 0/9",
                        "the newest segment goes first")
         try m.closeEpoch(0, lastSequence: 9, reason: .stopped)
@@ -268,14 +274,110 @@ final class UploadQueueTests: XCTestCase {
             if case let .waiting(s, _) = e { waits.with { $0.append(s) } }
         })
         let task = Task { await q.run() }
-        while waits.with({ $0.count }) < 12 {
+        let until = Date().addingTimeInterval(10)
+        while waits.with({ $0.count }) < 12 && Date() < until {
             await q.nudge()                      // new segments keep arriving while recording
             for _ in 0..<20 { await Task.yield() }
         }
+        XCTAssertGreaterThanOrEqual(waits.with { $0.count }, 12)
         XCTAssertGreaterThan(waits.with { $0.suffix(6).max() ?? 0 }, 4, "the backoff kept growing")
         server.locked { server.faults.putsOffline = false }
         await q.networkChanged()
         let ending = await task.value
         XCTAssertEqual(ending, .finished)
+    }
+
+    func testCreateHonoursRetryAfterAndStopsOnARefusedRecording() async throws {
+        let server = FakeServer(), clock = VirtualClock()
+        server.faults.createReply = (429, "60")           // too many active broadcasts
+        let waits = Locked<[Double]>([])
+        let q = queue(try makeRecording(count: 1), server, clock, events: { e in
+            if case let .waiting(s, _) = e { waits.with { $0.append(s) } }
+        })
+        let task = Task { await q.run() }
+        await eventually("a wait") { waits.with { !$0.isEmpty } }
+        XCTAssertEqual(waits.with { $0.first }, 60, "Retry-After is honoured, not shortened")
+        server.locked { server.faults.createReply = (422, nil) }    // the recording's own settings refused
+        let ending = await task.value
+        guard case .refused(422, _) = ending else { return XCTFail("\(ending)") }
+    }
+
+    func testAMissingInitBlocksOnlyItsOwnEpoch() async throws {
+        let m = try makeRecording(count: 2, close: false)
+        try m.closeEpoch(0, lastSequence: 1, reason: .interrupted)
+        try m.addInit(id: 1, data: Data("init one".utf8))
+        try m.openEpoch(1)
+        try m.addSegment(SegmentKey(epoch: 1, sequence: 0), initID: 1, startMicros: 9_000_000, durationMicros: 2_000_000, data: Data([1]))
+        try m.closeEpoch(1, lastSequence: 0, reason: .stopped)
+        try m.requestFinish()
+        try FileManager.default.removeItem(at: m.url(of: "init-0.mp4"))
+        let server = FakeServer(), clock = VirtualClock()
+        let ending = await queue(m, server, clock).run()
+        XCTAssertEqual(ending, .finished)
+        XCTAssertNotNil(server.segments[SegmentKey(epoch: 1, sequence: 0)], "epoch 1 uploads")
+        XCTAssertEqual(try m.segment(SegmentKey(epoch: 0, sequence: 0))?.state, .blocked)
+        XCTAssertEqual(try m.backlog().damaged, 2)
+        // the file comes back: the next launch makes those segments uploadable again
+        try Data("init".utf8).write(to: m.url(of: "init-0.mp4"))
+        try m.recoverAfterRelaunch()
+        XCTAssertEqual(try m.segment(SegmentKey(epoch: 0, sequence: 0))?.state, .pending)
+    }
+
+    func testNoNewRequestAfterStop() async throws {
+        let m = try makeRecording(count: 3)
+        let server = FakeServer(), clock = VirtualClock()
+        let q = queue(m, server, clock)
+        await q.stop()
+        let ending = await q.run()
+        XCTAssertEqual(ending, .stopped)
+        XCTAssertEqual(server.locked { server.log }, [], "nothing sent once stopped")
+    }
+
+    func testLiveEdgeSkipsAShortTailAndTakesTheSegmentBefore() async throws {
+        let m = try makeRecording(mode: .skipToLive, count: 10, close: false)
+        try m.addSegment(SegmentKey(epoch: 0, sequence: 10), initID: 0, startMicros: 20_000_000,
+                         durationMicros: 600_000, data: Data([10]))
+        let server = FakeServer(), clock = VirtualClock()
+        let q = queue(m, server, clock, concurrency: 1)
+        let task = Task { await q.run() }
+        await eventually("the first segment stored") { server.locked { server.segments.count } >= 1 }
+        XCTAssertEqual(server.locked { server.log.first(where: { $0.hasPrefix("PUT") }) }, "PUT 0/9",
+                       "the newest ready segment, not the open epoch's short tail and not old backfill")
+        await q.stop()
+        _ = await task.value
+    }
+}
+
+final class ManifestSafetyTests: XCTestCase {
+    func testConflictingBytesNeverReplaceAStoredFile() throws {
+        let m = try makeRecording(count: 1)
+        let key = SegmentKey(epoch: 0, sequence: 0)
+        let before = try Data(contentsOf: m.url(of: "seg-0-0.m4s"))
+        XCTAssertThrowsError(try m.addSegment(key, initID: 0, startMicros: 0, durationMicros: 2_000_000, data: Data("other".utf8)))
+        XCTAssertEqual(try Data(contentsOf: m.url(of: "seg-0-0.m4s")), before)
+        try m.addSegment(key, initID: 0, startMicros: 0, durationMicros: 2_000_000, data: before)   // identical: fine
+        XCTAssertThrowsError(try m.addInit(id: 0, data: Data("another init".utf8)))
+        XCTAssertEqual(try Data(contentsOf: m.url(of: "init-0.mp4")), Data("init".utf8))
+    }
+
+    func testReconcileResendsAnEpochEndTheServerLost() throws {
+        let m = try makeRecording(count: 2)
+        try m.markEpochEndSent(0)
+        try m.markFinishSent()
+        try m.reconcile(with: BroadcastStatus(state: "live", epochs: [
+            BroadcastStatus.Epoch(epoch: 0, receivedThrough: 1, ended: false),
+        ], inits: [0]))
+        XCTAssertEqual(try m.epochs().first?.endSent, false)
+        XCTAssertEqual(try m.recording().finishSent, false, "finish goes again after the end")
+    }
+
+    func testOnlyHTTPSOrTailnetCarriesCredentials() {
+        for ok in ["https://relay.example.com", "http://127.0.0.1:8080", "http://localhost:8080", "http://100.72.135.124:8080"] {
+            XCTAssertTrue(ServerURL.isAllowed(URL(string: ok)!), ok)
+        }
+        for bad in ["http://relay.example.com", "http://192.168.1.169:8080", "http://100.128.0.1", "ftp://x", "http://127.0.0.1.evil.com"] {
+            XCTAssertFalse(ServerURL.isAllowed(URL(string: bad)!), bad)
+        }
+        XCTAssertEqual(ServerURL.origin(URL(string: "HTTPS://Relay.Example.com/x")!), "https://relay.example.com:443")
     }
 }

@@ -5,6 +5,38 @@ import Observation
 import StreamRelayCapture
 import StreamRelayCore
 
+/// The paired server: its URL and the origin its token is filed under. Readable from any thread.
+enum Pairing {
+    static var server: URL? {
+        UserDefaults.standard.string(forKey: "pairedServer").flatMap(URL.init(string:))
+    }
+
+    static func token(for server: URL) -> String? {
+        Keychain.token(for: ServerURL.origin(server))
+    }
+
+    static var recordingsFolder: URL {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let f = docs.appendingPathComponent("Recordings", isDirectory: true)
+        try? FileManager.default.createDirectory(at: f, withIntermediateDirectories: true)
+        return f
+    }
+
+    /// The background hand-off for the paired server, shared by the app and the app delegate (which
+    /// iOS may wake for finished transfers without any scene).
+    @MainActor static var handOff: BackgroundHandOff? = makeHandOff()
+
+    @MainActor static func makeHandOff() -> BackgroundHandOff? {
+        guard let server, ServerURL.isAllowed(server) else { return nil }
+        let folder = recordingsFolder
+        let h = BackgroundHandOff(base: server, token: { Pairing.token(for: server) }) { name in
+            try? Manifest(folder: folder.appendingPathComponent(name))
+        }
+        h.resume()
+        return h
+    }
+}
+
 /// The app's state: pairing, the current recording, the recorder and the
 /// upload queue. Views only read it and call its methods.
 @MainActor
@@ -22,70 +54,57 @@ final class AppModel {
     }
     var title: String = "StreamRelay broadcast"
 
+    enum Phase: Equatable { case idle, recording, stopping }
+
     // state shown on screen
-    private(set) var paired = Keychain.token != nil
-    private(set) var recording = false
+    private(set) var paired = Pairing.server.map { Pairing.token(for: $0) != nil } ?? false
+    private(set) var phase = Phase.idle
     private(set) var epoch: Int?
     private(set) var captured = 0
-    private(set) var backlog = Manifest.Backlog(segments: 0, bytes: 0, seconds: 0, damaged: 0)
+    private(set) var backlog = Manifest.Backlog()
     private(set) var uploadLine = "Idle"
     private(set) var hoursLeft: Double?
     private(set) var problem: String?
-    private(set) var unfinished: Manifest?
+    /// The recording Start would continue (a new epoch in the same broadcast), if any.
+    private(set) var resumable: Manifest?
+
+    var recording: Bool { phase == .recording }
 
     // machinery
     private(set) var recorder: SegmentRecorder?
     private var conditions: DeviceConditions?
+    private var uploads: [Manifest] = []        // recordings still to deliver, oldest first
     private var queue: UploadQueue?
+    private var queueManifest: Manifest?
     private var queueTask: Task<Void, Never>?
     private var ticker: Task<Void, Never>?
-    private var handOff: BackgroundHandOff?
-    private let path = NWPathMonitor()
+    private var foreground = true
     private var current: Manifest?
-
-    static var recordingsFolder: URL {
-        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let f = docs.appendingPathComponent("Recordings", isDirectory: true)
-        try? FileManager.default.createDirectory(at: f, withIntermediateDirectories: true)
-        return f
-    }
-
-    var base: URL? { URL(string: serverURL.trimmingCharacters(in: .whitespaces)) }
-
-    private func client() -> ProtocolClient? {
-        guard let base else { return nil }
-        return ProtocolClient(transport: URLSessionTransport(base: base, token: { Keychain.token }))
-    }
+    private let path = NWPathMonitor()
 
     // MARK: Launch
 
-    /// After a crash or force-quit: close open epochs, tidy files, and pick up
-    /// the newest recording that has not finished uploading.
+    /// After a crash or force-quit: close open epochs, tidy files, queue every recording that hasn't
+    /// finished uploading (oldest first), and offer the newest unfinished one for resuming.
     func launch() {
-        let folders = (try? FileManager.default.contentsOfDirectory(at: Self.recordingsFolder, includingPropertiesForKeys: [.creationDateKey])) ?? []
-        for f in folders.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
+        let folders = (try? FileManager.default.contentsOfDirectory(
+            at: Pairing.recordingsFolder, includingPropertiesForKeys: [.creationDateKey])) ?? []
+        func created(_ u: URL) -> Date { (try? u.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? .distantPast }
+        for f in folders.sorted(by: { created($0) < created($1) }) {
             guard let m = try? Manifest(folder: f) else { continue }
             try? m.recoverAfterRelaunch()
-            if let r = try? m.recording(), !(r.finishSent && ((try? m.backlog().segments) ?? 0) == 0) {
-                unfinished = m
-            }
+            guard let r = try? m.recording() else { continue }
+            let done = r.finishSent && ((try? m.backlog().segments) ?? 0) == 0
+            if !done { uploads.append(m) }
+            if !r.finishRequested { resumable = m }           // the newest such wins (sorted oldest first)
         }
-        if let base {
-            let h = BackgroundHandOff(base: base, token: { Keychain.token }) { name in
-                try? Manifest(folder: AppModel.recordingsFolder.appendingPathComponent(name))
-            }
-            h.resume()
-            handOff = h
-        }
-        if let m = unfinished {
-            current = m
-            startQueue(m)
-        }
+        current = resumable ?? uploads.last
         path.pathUpdateHandler = { [weak self] p in
             guard p.status == .satisfied else { return }
             Task { @MainActor in await self?.queue?.networkChanged() }   // retry at once
         }
         path.start(queue: DispatchQueue(label: "streamrelay.path"))
+        pumpUploads()
         startTicker()
     }
 
@@ -93,25 +112,44 @@ final class AppModel {
 
     func pair(code: String) async {
         problem = nil
-        guard let base, base.scheme == "https" || base.scheme == "http" else {
-            problem = "Enter the server address, for example https://relay.example.com"
+        guard let base = URL(string: serverURL.trimmingCharacters(in: .whitespaces)), ServerURL.isAllowed(base) else {
+            problem = "Enter the server address with https:// (plain http only for a Tailscale address)."
             return
         }
         do {
             let c = ProtocolClient(transport: URLSessionTransport(base: base, token: { nil }))
             let (_, token) = try await c.pair(code: code.trimmingCharacters(in: .whitespaces), name: deviceName())
-            Keychain.token = token
+            try Keychain.save(token, for: ServerURL.origin(base))
+            await retireUploadsForOldServer(base)
+            UserDefaults.standard.set(base.absoluteString, forKey: "pairedServer")
+            Pairing.handOff = Pairing.makeHandOff()
             paired = true
+            pumpUploads()
         } catch let e as ProtocolError where e.status == 403 {
             problem = "That code is unknown, used or expired. Make a new one with streamrelay-admin pair-code."
+        } catch let e as Keychain.Failure {
+            problem = "Couldn't save the pairing on this iPhone (\(e)). Try again."
         } catch {
             problem = "Couldn't reach the server: \(error.localizedDescription)"
         }
     }
 
     func unpair() {
-        Keychain.token = nil
-        paired = false
+        Task {
+            await retireUploadsForOldServer(nil)
+            if let s = Pairing.server { Keychain.delete(for: ServerURL.origin(s)) }
+            UserDefaults.standard.removeObject(forKey: "pairedServer")
+            Pairing.handOff = nil
+            paired = false
+        }
+    }
+
+    /// Uploads belong to the server that paired them: stop the queue and the background
+    /// transfers before another server's token can come into play.
+    private func retireUploadsForOldServer(_ next: URL?) async {
+        guard let old = Pairing.server, next.map({ ServerURL.origin($0) }) != ServerURL.origin(old) else { return }
+        await queue?.stop()
+        Pairing.handOff?.cancelAll()
     }
 
     private func deviceName() -> String {
@@ -121,17 +159,19 @@ final class AppModel {
     // MARK: Recording
 
     func start() {
+        guard phase == .idle else { return }        // Stop must finish before another Start
         problem = nil
         do {
             let m: Manifest
-            if let u = unfinished, (try? u.recording().finishRequested) == false {
-                m = u                                   // resume: a new epoch in the same broadcast
+            if let r = resumable, (try? r.recording().finishRequested) == false {
+                m = r                                   // resume: a new epoch in the same broadcast
             } else {
-                m = try Manifest.create(in: Self.recordingsFolder, title: title, mode: mode,
+                m = try Manifest.create(in: Pairing.recordingsFolder, title: title, mode: mode,
                                         holdMaxDelaySeconds: mode == .hold ? holdMaxDelayMinutes * 60 : nil)
+                uploads.append(m)
             }
             current = m
-            unfinished = m
+            resumable = m
             let origin = ((try? m.folder.resourceValues(forKeys: [.creationDateKey]))?.creationDate) ?? Date()
             let r = SegmentRecorder(manifest: m, origin: origin)
             try r.configure()
@@ -146,23 +186,28 @@ final class AppModel {
             recorder = r
             conditions = cond
             cond.start()
-            r.startEpoch()
-            recording = true
-            startQueue(m)
+            r.begin()
+            phase = .recording
+            pumpUploads()
         } catch {
             problem = "Couldn't start the camera: \(error)"
         }
     }
 
     func stop() {
-        guard recording, let r = recorder, let m = current else { return }
-        recording = false
+        guard phase == .recording, let r = recorder, let m = current else { return }
+        phase = .stopping
         conditions?.stop()
-        r.endEpoch(.stopped) { [weak self] in
+        r.finish { [weak self] in
+            // the epoch's close is in the manifest: now the broadcast may finish
             try? m.requestFinish()
             r.stopSession()
             Task { @MainActor in
-                await self?.queue?.nudge()
+                guard let self else { return }
+                if self.resumable === m { self.resumable = nil }
+                self.phase = .idle
+                await self.queue?.nudge()
+                self.pumpUploads()
             }
         }
     }
@@ -181,23 +226,35 @@ final class AppModel {
 
     // MARK: Uploading
 
-    private func startQueue(_ m: Manifest) {
-        guard queueTask == nil, let c = client() else { return }
+    /// Runs one queue at a time over the recordings still to deliver, the one being recorded first.
+    /// Called whenever something changes (launch, Start, Stop, foreground, a queue ending), so a
+    /// request that arrives while an old queue is still winding down is picked up when it exits.
+    private func pumpUploads() {
+        guard foreground, queueTask == nil, paired, let server = Pairing.server, ServerURL.isAllowed(server) else { return }
+        guard let m = (current.flatMap { c in uploads.first { $0 === c } }) ?? uploads.first else { return }
+        let c = ProtocolClient(transport: URLSessionTransport(base: server, token: { Pairing.token(for: server) }))
         let q = UploadQueue(manifest: m, client: c, onEvent: { [weak self] e in
             Task { @MainActor in self?.queueEvent(e) }
         })
         queue = q
+        queueManifest = m
         queueTask = Task { [weak self] in
             let ending = await q.run()
             await MainActor.run {
-                self?.queueTask = nil
-                self?.queue = nil
+                guard let self else { return }
+                self.queueTask = nil
+                self.queue = nil
+                self.queueManifest = nil
                 switch ending {
                 case .finished:
-                    self?.uploadLine = "Everything uploaded"
-                    if self?.unfinished === m { self?.unfinished = nil }
-                case .stopped: self?.uploadLine = "Paused"
-                case .refused(let status, let why): self?.problem = "The server refused (\(status)): \(why)"
+                    self.uploadLine = "Everything uploaded"
+                    self.uploads.removeAll { $0 === m }
+                    self.pumpUploads()                   // the next recording, if any
+                case .stopped:
+                    self.uploadLine = "Paused"
+                    self.pumpUploads()                   // back in the foreground meanwhile? carry on
+                case .refused(let status, let why):
+                    self.problem = "The server refused (\(status)): \(why)"
                 }
             }
         }
@@ -207,7 +264,7 @@ final class AppModel {
         switch e {
         case .stored(let k, _): uploadLine = "Uploaded \(k)"
         case .waiting(let s, _): uploadLine = String(format: "Offline, retrying in %.0f s", s)
-        case .damaged(let k, let why): problem = "Segment \(k) was rejected: \(why)"
+        case .damaged(let k, let why): problem = "Segment \(k) could not be delivered: \(why)"
         case .finished: uploadLine = "Finished"
         default: break
         }
@@ -215,16 +272,18 @@ final class AppModel {
 
     /// Leaving the foreground: the camera stops (iOS), the queue goes to the background session.
     func enteredBackground() {
-        guard let m = current else { return }
+        foreground = false
+        let pending = uploads
         Task {
             await queue?.stop()
-            handOff?.handOff(m)
+            for m in pending { Pairing.handOff?.handOff(m) }
         }
     }
 
     func enteredForeground() {
-        handOff?.cancelAll()
-        if let m = current { startQueue(m) }
+        foreground = true
+        Pairing.handOff?.cancelAll()
+        pumpUploads()
     }
 
     // MARK: Status, heartbeat
@@ -243,7 +302,8 @@ final class AppModel {
         guard let m = current else { return }
         if let b = try? m.backlog() { backlog = b }
         hoursLeft = conditions?.hoursRemaining()
-        guard let bid = try? m.recording().broadcastID, let c = client() else { return }
+        guard let server = Pairing.server, ServerURL.isAllowed(server), let bid = try? m.recording().broadcastID else { return }
+        let c = ProtocolClient(transport: URLSessionTransport(base: server, token: { Pairing.token(for: server) }))
         let body = HeartbeatBody(epoch: epoch, capturedThrough: (try? m.lastStoredSequence(epoch: epoch ?? 0)),
                                  queueDepth: backlog.segments, queueBytes: backlog.bytes,
                                  thermal: DeviceConditions.thermalName,

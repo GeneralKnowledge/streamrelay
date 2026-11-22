@@ -17,9 +17,12 @@ rm -rf "$work"; mkdir -p "$work"; work=$(realpath "$work")
 n=$((minutes * 30))
 
 pids=()
-cleanup() { for p in "${pids[@]}"; do kill "$p" 2>/dev/null || true; done; [[ -n "${api:-}" ]] && kill "$api" 2>/dev/null
-            wait 2>/dev/null || true
-            if [[ -n "${pgdir:-}" ]]; then $as_pg "$PG_BIN/pg_ctl -D $pgdir/data -m fast stop" >/dev/null 2>&1 || true; fi; }
+cleanup() { local rc=$?; set +e     # keep the run's own exit status; tidying up can't change it
+            [[ -n "${phone:-}" ]] && kill "$phone" 2>/dev/null; [[ -n "${container:-}" ]] && docker kill "$container" >/dev/null 2>&1
+            for p in "${pids[@]}"; do kill "$p" 2>/dev/null; done; [[ -n "${api:-}" ]] && kill "$api" 2>/dev/null
+            wait 2>/dev/null
+            if [[ -n "${pgdir:-}" ]]; then $as_pg "$PG_BIN/pg_ctl -D $pgdir/data -m fast stop" >/dev/null 2>&1; fi
+            exit "$rc"; }
 trap cleanup EXIT
 trap 'exit 1' INT TERM
 PG_BIN=${PG_BIN:-/usr/lib/postgresql/16/bin}; pgdir=$(mktemp -d); port=${PGPORT_IOS:-5496}
@@ -29,8 +32,20 @@ $as_pg "$PG_BIN/pg_ctl -D $pgdir/data -o '-p $port -k /tmp' -l $pgdir/log -w sta
 export SR_DATABASE_URL="postgresql://postgres@127.0.0.1:$port/postgres"
 export SR_STORE_DIR="$work/store" SR_PORT=${SR_PORT:-8082} SR_STORAGE_FREE_MIN_BYTES=${SR_STORAGE_FREE_MIN_BYTES:-500000000}
 proxy_port=${PROXY_PORT:-8092}
-start_api() { streamrelay-api >> "$work/api.log" 2>&1 & api=$!
-              until curl -sf "http://127.0.0.1:$SR_PORT/v1/health" > /dev/null; do sleep 0.2; done; }
+start_api() { local deadline=$(( $(date +%s) + 10 ))
+              # a server left over from another run would answer the health check in this one's place
+              while curl -s -o /dev/null "http://127.0.0.1:$SR_PORT/v1/health"; do
+                (( $(date +%s) > deadline )) && { echo "port $SR_PORT is already in use"; exit 1; }
+                sleep 0.2
+              done
+              streamrelay-api >> "$work/api.log" 2>&1 & api=$!
+              deadline=$(( $(date +%s) + 60 ))
+              until curl -sf "http://127.0.0.1:$SR_PORT/v1/health" > /dev/null; do
+                if ! kill -0 "$api" 2>/dev/null || (( $(date +%s) > deadline )); then
+                  echo "API did not start:"; tail -20 "$work/api.log"; exit 1
+                fi
+                sleep 0.2
+              done; }
 start_api
 code=$(streamrelay-admin pair-code ios-core@localhost)
 python3 "$root/tools/chaos/proxy.py" --listen "$proxy_port" --upstream "127.0.0.1:$SR_PORT" --log "$work/proxy.jsonl" \
@@ -43,7 +58,8 @@ if command -v swift > /dev/null; then
   (cd "$root/ios" && swift build --product sr-upload > "$work/build.log" 2>&1)
   "$root/ios/.build/debug/sr-upload" "${args[@]}" > "$work/broadcast_id" 2> "$work/phone.log" & phone=$!
 else
-  docker run --rm --network host -v "$root/ios:/src" -v "$base:$base:ro" -v "$work:$work" -w /src "${SWIFT_IMAGE:-swift-sqlite}" \
+  container=sr-upload-$$
+  docker run --rm --name "$container" --network host -v "$root/ios:/src" -v "$base:$base:ro" -v "$work:$work" -w /src "${SWIFT_IMAGE:-swift-sqlite}" \
     bash -c "swift build --product sr-upload > $work/build.log 2>&1 && .build/debug/sr-upload ${args[*]}" \
     > "$work/broadcast_id" 2> "$work/phone.log" & phone=$!
 fi
@@ -57,8 +73,10 @@ while kill -0 $phone 2>/dev/null; do
     start_api; killed=1
   fi
 done
-wait $phone && echo "uploader: finished" || echo "uploader: exit $?"
-python3 - "$work" "$base" "$n" "$epoch_every" <<'PY'
+uploader=0; wait $phone || uploader=$?
+echo "uploader: exit $uploader"; phone=
+verdict=0
+python3 - "$work" "$base" "$n" "$epoch_every" <<'PY' || verdict=$?
 import hashlib, json, os, sys
 import psycopg
 work, base, n, every = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
@@ -101,3 +119,5 @@ for p in problems[:20]:
     print("  ", p)
 sys.exit(1 if problems else 0)
 PY
+(( uploader == 0 && verdict == 0 )) || { echo "FAIL (uploader $uploader, server check $verdict)"; exit 1; }
+echo PASS

@@ -5,7 +5,7 @@ What the next iPhone sitting needs to prove, in order, with the time each takes.
 ## Before the sitting (laptop, no phone)
 
 1. Build the app through the build queue: `cd ios && forge queue run --note streamrelay -- xtool dev build`. This is the first compile of `StreamRelayCapture` and `StreamRelayApp` (only `StreamRelayCore` compiles on Linux), so expect a round of compile fixes.
-2. Start a server the phone can reach (the laptop on the tailnet is enough for M2/M3; M4 uses Hetzner): `docker compose up` or `streamrelay-api`, then `streamrelay-admin pair-code you@example.com`.
+2. Start a server the phone can reach on the laptop's Tailscale address (enough for M2/M3; M4 uses Hetzner). Compose publishes the API on `127.0.0.1:8080` only, which the phone can't reach, so forward the tailnet port to it: `tailscale serve --bg --http=8080 127.0.0.1:8080` (or run `streamrelay-api` bound to the Tailscale address). The app accepts plain `http://` only for a Tailscale (100.64.0.0/10) or loopback address; anything else must be `https://`. Then `streamrelay-admin pair-code you@example.com`.
 
 ## At the sitting
 

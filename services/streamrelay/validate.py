@@ -2,9 +2,11 @@
 
 `ffprobe` runs in a separate process with a 5 s wall-clock timeout, a CPU-time
 limit and an address-space limit, and reads every packet, so truncated or
-fuzzed data is caught here rather than in the playout. Accepted: H.264 video
-no larger than 1920x1080 (either orientation) and AAC audio; a media segment's
-video length must match the duration the client declared.
+fuzzed data is caught here rather than in the playout. Accepted: an MP4
+(fragmented) container, read with the mp4 demuxer only, holding one H.264 video
+stream no larger than 1920x1080 (either orientation) and one AAC audio stream,
+as the playout's decoder expects; a media segment's video length must match the
+duration the client declared, the final one included.
 """
 from __future__ import annotations
 
@@ -45,8 +47,8 @@ def _limits() -> None:  # runs in the child before exec
 async def probe(path: str, ffprobe: str = "ffprobe") -> Probe:
     """Probe one file; Rejected(422) for anything that isn't clean H.264 (+ AAC)."""
     proc = await asyncio.create_subprocess_exec(
-        ffprobe, "-v", "error", "-count_packets",
-        "-show_entries", "stream=codec_type,codec_name,width,height,avg_frame_rate,nb_read_packets",
+        ffprobe, "-v", "error", "-f", "mp4", "-count_packets",
+        "-show_entries", "format=format_name:stream=codec_type,codec_name,width,height,avg_frame_rate,nb_read_packets",
         "-of", "json", path,
         stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, preexec_fn=_limits)
     try:
@@ -58,15 +60,19 @@ async def probe(path: str, ffprobe: str = "ffprobe") -> Probe:
     if proc.returncode != 0 or err.strip():
         raise Rejected(422, f"media check failed: {err.decode(errors='replace').strip()[:200] or proc.returncode}")
     try:
-        streams = json.loads(out).get("streams", [])
-    except ValueError:
+        parsed = json.loads(out)
+        streams = parsed.get("streams", [])
+        container = str(parsed.get("format", {}).get("format_name", ""))
+    except (ValueError, AttributeError):
         raise Rejected(422, "media check failed: unreadable probe output") from None
+    if "mp4" not in container.split(","):
+        raise Rejected(422, f"expected an MP4 container, got {container or 'none'}")
     video = [s for s in streams if s.get("codec_type") == "video"]
     audio = [s for s in streams if s.get("codec_type") == "audio"]
     if len(video) != 1 or video[0].get("codec_name") != "h264":
         raise Rejected(422, "expected exactly one H.264 video stream")
-    if len(audio) > 1 or (audio and audio[0].get("codec_name") != "aac"):
-        raise Rejected(422, "expected at most one AAC audio stream")
+    if len(audio) != 1 or audio[0].get("codec_name") != "aac":
+        raise Rejected(422, "expected exactly one AAC audio stream")
     if len(streams) != len(video) + len(audio):
         raise Rejected(422, "unexpected extra streams")
     v = video[0]
@@ -104,7 +110,7 @@ async def check_segment(init_path: str, body_path: str, duration_us: int, final:
             pass
     if p.video_packets == 0:
         raise Rejected(422, "segment has no video")
-    if p.fps and not final:
+    if p.fps:
         got = p.video_packets / p.fps
         if abs(got - duration_us / 1e6) > DURATION_TOLERANCE_S:
             raise Rejected(422, f"segment holds {got:.2f} s of video, X-SR-Duration-Us says {duration_us / 1e6:.2f} s")

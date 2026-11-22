@@ -27,10 +27,14 @@ cp "$base/init.mp4" "$work/segs/"
   done; } > "$work/segs/index.m3u8"
 
 pids=()
-cleanup() { for p in "${pids[@]}"; do kill "$p" 2>/dev/null || true; done; [[ -n "${api:-}" ]] && kill "$api" 2>/dev/null
-            wait 2>/dev/null || true
-            if [[ -n "${pgdir:-}" ]]; then $as_pg "$PG_BIN/pg_ctl -D $pgdir/data -m fast stop" >/dev/null 2>&1 || true; fi; }
+cleanup() { local rc=$?; set +e     # keep the run's own exit status; tidying up can't change it
+            [[ -n "${phone:-}" ]] && kill "$phone" 2>/dev/null; [[ -n "${container:-}" ]] && docker kill "$container" >/dev/null 2>&1
+            for p in "${pids[@]}"; do kill "$p" 2>/dev/null; done; [[ -n "${api:-}" ]] && kill "$api" 2>/dev/null
+            wait 2>/dev/null
+            if [[ -n "${pgdir:-}" ]]; then $as_pg "$PG_BIN/pg_ctl -D $pgdir/data -m fast stop" >/dev/null 2>&1; fi
+            exit "$rc"; }
 trap cleanup EXIT
+trap 'exit 1' INT TERM
 if [[ -z "${SR_DATABASE_URL:-}" ]]; then
   PG_BIN=${PG_BIN:-/usr/lib/postgresql/16/bin}; pgdir=$(mktemp -d); port=${PGPORT_CHAOS:-5497}
   as_pg="sh -c"; if [[ $(id -u) == 0 ]]; then chown postgres "$pgdir"; as_pg="su postgres -c"; fi
@@ -39,12 +43,24 @@ if [[ -z "${SR_DATABASE_URL:-}" ]]; then
   export SR_DATABASE_URL="postgresql://postgres@127.0.0.1:$port/postgres"
 fi
 export SR_STORE_DIR="$work/store" SR_PORT=${SR_PORT:-8081} SR_STORAGE_FREE_MIN_BYTES=${SR_STORAGE_FREE_MIN_BYTES:-500000000}
-start_api() { streamrelay-api >> "$work/api.log" 2>&1 & api=$!
-              until curl -sf "http://127.0.0.1:$SR_PORT/v1/health" > /dev/null; do sleep 0.2; done; }
+start_api() { local deadline=$(( $(date +%s) + 10 ))
+              # a server left over from another run would answer the health check in this one's place
+              while curl -s -o /dev/null "http://127.0.0.1:$SR_PORT/v1/health"; do
+                (( $(date +%s) > deadline )) && { echo "port $SR_PORT is already in use"; exit 1; }
+                sleep 0.2
+              done
+              streamrelay-api >> "$work/api.log" 2>&1 & api=$!
+              deadline=$(( $(date +%s) + 60 ))
+              until curl -sf "http://127.0.0.1:$SR_PORT/v1/health" > /dev/null; do
+                if ! kill -0 "$api" 2>/dev/null || (( $(date +%s) > deadline )); then
+                  echo "API did not start:"; tail -20 "$work/api.log"; exit 1
+                fi
+                sleep 0.2
+              done; }
 start_api
 code=$(streamrelay-admin pair-code chaos@localhost)
 python3 "$root/tools/chaos/proxy.py" --listen 8091 --upstream "127.0.0.1:$SR_PORT" --log "$work/proxy.jsonl" & pids+=($!)
-python3 "$root/tools/fake_phone/fake_phone.py" --api http://127.0.0.1:8091 --pair "$code" --segments "$work/segs" \
+python3 "$root/tools/fake_phone/fake_phone.py" --api http://127.0.0.1:8091 --pair "$code" --pair-api "http://127.0.0.1:$SR_PORT" --segments "$work/segs" \
   --mode catch_up --duplicate 0.05 --reorder 0.05 --corrupt 0.01 --seed 5 --log "$work/phone.jsonl" > "$work/phone.out" 2>&1 & phone=$!
 echo "chaos run: $minutes min of segments, API killed every $kill_every s"
 last_kill=$(date +%s)
@@ -56,5 +72,8 @@ while kill -0 $phone 2>/dev/null; do
     start_api; last_kill=$(date +%s)
   fi
 done
-wait $phone || { echo "fake phone failed:"; tail -5 "$work/phone.out"; }
-python3 "$root/tools/chaos/ledger.py" "$work" "$work/segs" --db "$SR_DATABASE_URL" --store "$SR_STORE_DIR"
+phone_status=0; wait $phone || phone_status=$?
+phone=''
+(( phone_status == 0 )) || { echo "fake phone failed ($phone_status):"; tail -5 "$work/phone.out"; }
+python3 "$root/tools/chaos/ledger.py" "$work" "$work/segs" --db "$SR_DATABASE_URL" --store "$SR_STORE_DIR" || exit 1
+(( phone_status == 0 ))

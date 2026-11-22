@@ -74,3 +74,21 @@ def test_damage_is_found(media, tmp_path):
     assert "stray file seg-9-9.m4s" in out
     assert "goes back before the previous epoch" in out
     assert "0/0: video lasts" in out
+
+
+def test_gaps_lost_rows_and_escaping_paths_are_reported_not_crashed(media, tmp_path):
+    rec = recording(tmp_path / "take#2", media)        # '#' in the folder name must not break the SQLite URI
+    db = sqlite3.connect(rec / "manifest.sqlite")
+    db.execute("DELETE FROM segments WHERE epoch = 0 AND sequence = 0")          # a hole before sequence 1
+    db.execute("INSERT INTO epochs VALUES (2, 0, 'interrupted', 1)")             # closed at 0, rows lost
+    db.execute("INSERT INTO segments VALUES (7, 0, 0, 0, 2000000, 1, 'x', '../outside.m4s', 1, 'pending', 0)")
+    db.commit()
+    (tmp_path / "outside.m4s").write_bytes(b"secret")
+    r = run(rec)
+    assert r.returncode == 1, r.stdout + r.stderr
+    assert "Traceback" not in r.stderr
+    out = r.stdout
+    assert "epoch 0: sequences are not" in out
+    assert "epoch 2: closed at 0 but has no segment rows" in out
+    assert "7/0: segment row with no epoch row" in out
+    assert "../outside.m4s: path leaves the recording folder" in out

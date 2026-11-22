@@ -21,6 +21,8 @@ import json
 import random
 import time
 
+CHUNK = 16384
+
 
 class Chaos:
     def __init__(self, a: argparse.Namespace):
@@ -47,7 +49,8 @@ class Chaos:
         while True:
             now = time.monotonic()
             rate = self.cap()
-            self.tokens = min(rate, self.tokens + (now - self.tok_time) * rate)
+            # the bucket holds at least one full chunk, so a low cap still lets a chunk through
+            self.tokens = min(max(rate, CHUNK), self.tokens + (now - self.tok_time) * rate)
             self.tok_time = now
             if self.tokens >= n:
                 self.tokens -= n
@@ -83,9 +86,15 @@ class Chaos:
         sent = 0
         try:
             while True:
-                chunk = await r.read(16384)
+                chunk = await r.read(CHUNK)
                 if not chunk:
-                    break
+                    # a normal half-close: pass it on and let the other direction finish its reply
+                    try:
+                        if w.can_write_eof():
+                            w.write_eof()
+                    except OSError:
+                        pass
+                    return
                 if up:
                     await self.take(len(chunk))
                 await asyncio.sleep(self.a.latency)
@@ -99,9 +108,9 @@ class Chaos:
                 await w.drain()
         except (ConnectionError, asyncio.IncompleteReadError, OSError):
             pass
-        finally:
-            for x in (w, peer):
-                x.transport.abort()
+        # a fault (outage, injected loss, reset) or a broken connection: cut both sides at once
+        for x in (w, peer):
+            x.transport.abort()
 
     async def handle(self, cr: asyncio.StreamReader, cw: asyncio.StreamWriter) -> None:
         if self.offline():
@@ -113,11 +122,17 @@ class Chaos:
         except OSError:
             cw.transport.abort()                      # server down (killed): the phone sees a reset
             return
+        if self.offline():                            # an outage began while connecting
+            sw.transport.abort()
+            cw.transport.abort()
+            return
         self.conns.add(cw)
         try:
             await asyncio.gather(self.pipe(cr, sw, True, cw), self.pipe(sr, cw, False, sw))
         finally:
             self.conns.discard(cw)
+            for x in (cw, sw):
+                x.close()
 
     async def main(self) -> None:
         srv = await asyncio.start_server(self.handle, "127.0.0.1", self.a.listen)

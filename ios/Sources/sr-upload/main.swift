@@ -24,30 +24,57 @@ guard let api = arg("--api").flatMap(URL.init(string:)), let segs = arg("--segme
     say("usage: sr-upload --api URL (--token T | --pair CODE) --segments DIR [--mode M] [--realtime] [--limit N]")
     exit(2)
 }
-let folder = URL(fileURLWithPath: segs)
-let index = try String(contentsOf: folder.appendingPathComponent("index.m3u8"), encoding: .utf8)
-var durations = index.split(separator: "\n").compactMap { line -> Double? in
-    guard line.hasPrefix("#EXTINF:") else { return nil }
-    return Double(line.dropFirst(8).split(separator: ",")[0])
+func fail(_ why: String) -> Never {
+    say("sr-upload: \(why)")
+    exit(2)
 }
-if let n = arg("--limit").flatMap(Int.init) { durations = Array(durations.prefix(n)) }
-let mode = CatchUpMode(rawValue: arg("--mode") ?? "catch_up") ?? .catchUp
-let epochEvery = arg("--epoch-every").flatMap(Int.init)   // start a new epoch every N segments (interruptions)
+guard ServerURL.isAllowed(api) else { fail("\(api): use https (plain http only for loopback or a Tailscale address)") }
+let folder = URL(fileURLWithPath: segs)
+guard let index = try? String(contentsOf: folder.appendingPathComponent("index.m3u8"), encoding: .utf8) else {
+    fail("\(segs)/index.m3u8 can't be read")
+}
+// every input is checked before any request goes out
+var durations: [Double] = []
+for line in index.split(separator: "\n") where line.hasPrefix("#EXTINF:") {
+    guard let field = line.dropFirst(8).split(separator: ",", omittingEmptySubsequences: false).first,
+          let d = Double(field), d.isFinite, d > 0, d < 60 else { fail("bad #EXTINF line: \(line)") }
+    durations.append(d)
+}
+if let v = arg("--limit") {
+    guard let n = Int(v), n > 0 else { fail("--limit must be a positive whole number") }
+    durations = Array(durations.prefix(n))
+}
+guard !durations.isEmpty else { fail("no segments in \(segs)/index.m3u8") }
+guard let mode = CatchUpMode(rawValue: arg("--mode") ?? "catch_up") else { fail("--mode is catch_up, hold or skip_to_live") }
+var epochEvery: Int? = nil   // start a new epoch every N segments (interruptions)
+if let v = arg("--epoch-every") {
+    guard let n = Int(v), n > 0 else { fail("--epoch-every must be a positive whole number") }
+    epochEvery = n
+}
+let title = arg("--title") ?? "sr-upload"
+guard !title.isEmpty, title.count <= 200 else { fail("--title must be 1-200 characters") }
 
 final class Token: @unchecked Sendable {
     var value: String?
     init(_ v: String?) { value = v }
 }
 let token = Token(arg("--token") ?? ProcessInfo.processInfo.environment["SR_TOKEN"])
-let client = ProtocolClient(transport: URLSessionTransport(base: api, token: { token.value }))
 if let code = arg("--pair") {
-    let (device, t) = try await client.pair(code: code, name: "sr-upload")
-    token.value = t
-    say("paired as \(device)")
+    // pairing carries no bearer token: an existing token for another server is never sent here
+    let pairing = ProtocolClient(transport: URLSessionTransport(base: api, token: { nil }))
+    do {
+        let (device, t) = try await pairing.pair(code: code, name: "sr-upload")
+        token.value = t
+        say("paired as \(device)")
+    } catch {
+        fail("pairing failed: \(error)")
+    }
 }
+guard token.value != nil else { fail("give --token, SR_TOKEN or --pair") }
+let client = ProtocolClient(transport: URLSessionTransport(base: api, token: { token.value }))
 
 let work = URL(fileURLWithPath: arg("--work") ?? NSTemporaryDirectory())
-let m = try Manifest.create(in: work, title: arg("--title") ?? "sr-upload", mode: mode)
+let m = try Manifest.create(in: work, title: title, mode: mode)
 try m.addInit(id: 0, data: try Data(contentsOf: folder.appendingPathComponent("init.mp4")))
 
 let queue = UploadQueue(manifest: m, client: client, onEvent: { e in

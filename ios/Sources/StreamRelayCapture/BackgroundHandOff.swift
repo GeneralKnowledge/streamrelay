@@ -36,9 +36,21 @@ public final class BackgroundHandOff: NSObject, URLSessionDataDelegate, @uncheck
         _ = session
     }
 
-    /// Hands every pending segment of the recording (and its inits) to iOS.
+    /// Hands the recording's pending inits and segments to iOS, with the foreground queue's rules:
+    /// a short segment of a still-open epoch waits for its final flag; skip_to_live hands over only
+    /// the live edge (iOS can't pace a backfill), and the foreground queue backfills later.
     public func handOff(_ manifest: Manifest, limit: Int = 300) {
-        guard let bid = try? manifest.recording().broadcastID, let t = token() else { return }
+        guard ServerURL.isAllowed(base), let rec = try? manifest.recording(), let bid = rec.broadcastID,
+              let t = token() else { return }
+        // epochs before segments: a segment read after its epoch closed already carries its final flag
+        guard let open = try? Set(manifest.epochs().filter { $0.lastSequence == nil }.map(\.epoch)) else { return }
+        func ready(_ s: SegmentRecord) -> Bool { !(open.contains(s.key.epoch) && s.durationMicros < 1_750_000) }
+        let segments: [SegmentRecord]
+        if rec.mode == .skipToLive {
+            segments = ((try? manifest.newestPending(limit: 3)) ?? []).filter(ready).prefix(1).map { $0 }
+        } else {
+            segments = ((try? manifest.pending(limit: limit)) ?? []).filter(ready)
+        }
         let folder = manifest.folder.lastPathComponent
         session.getAllTasks { [self] running in
             let already = Set(running.compactMap(\.taskDescription))
@@ -54,7 +66,7 @@ public final class BackgroundHandOff: NSObject, URLSessionDataDelegate, @uncheck
                 task.taskDescription = desc
                 task.resume()
             }
-            for s in (try? manifest.pending(limit: limit)) ?? [] {
+            for s in segments {
                 let desc = "\(folder)|seg|\(s.key.epoch)|\(s.key.sequence)"
                 guard !already.contains(desc) else { continue }
                 var req = URLRequest(url: base.appendingPathComponent(
@@ -75,7 +87,9 @@ public final class BackgroundHandOff: NSObject, URLSessionDataDelegate, @uncheck
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        // the answer must come from the paired server itself, not from wherever a redirect led
         guard error == nil, let http = task.response as? HTTPURLResponse, [200, 201].contains(http.statusCode),
+              let answered = http.url, ServerURL.origin(answered) == ServerURL.origin(base),
               let parts = task.taskDescription?.split(separator: "|").map(String.init), parts.count >= 3,
               let m = manifestFor(parts[0]) else { return }
         if parts[1] == "init", let id = Int(parts[2]) {
@@ -83,6 +97,12 @@ public final class BackgroundHandOff: NSObject, URLSessionDataDelegate, @uncheck
         } else if parts[1] == "seg", parts.count == 4, let e = Int(parts[2]), let s = Int(parts[3]) {
             try? m.markAcknowledged(SegmentKey(epoch: e, sequence: s))
         }
+    }
+
+    /// Refuse redirects: an upload goes to the paired server or not at all.
+    public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+                           newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+        completionHandler(nil)
     }
 
     public func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {

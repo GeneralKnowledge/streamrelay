@@ -17,7 +17,11 @@ public struct HTTPReply: Sendable {
         self.body = body
     }
 
-    public var retryAfter: Double? { headers["retry-after"].flatMap(Double.init) }
+    /// Retry-After in seconds, when present, finite and not negative.
+    public var retryAfter: Double? {
+        guard let v = headers["retry-after"].flatMap(Double.init), v.isFinite, v >= 0 else { return nil }
+        return v
+    }
     public var errorText: String {
         (try? JSONDecoder().decode([String: String].self, from: body))?["error"]
             ?? (try? JSONDecoder().decode([String: String].self, from: body))?["detail"]
@@ -37,7 +41,35 @@ public protocol HTTPTransport: Sendable {
     func send(_ request: HTTPRequest) async throws -> HTTPReply
 }
 
-/// URLSession transport. `token` is read on every request so a re-pair takes effect at once.
+/// Where credentials may be sent: https anywhere; plain http only to this device
+/// (loopback) or a Tailscale address (100.64.0.0/10, encrypted by WireGuard),
+/// for development servers on the tailnet.
+public enum ServerURL {
+    public static func isAllowed(_ url: URL) -> Bool {
+        guard let scheme = url.scheme?.lowercased(), let host = url.host?.lowercased(), !host.isEmpty else { return false }
+        if scheme == "https" { return true }
+        guard scheme == "http" else { return false }
+        if host == "localhost" || host == "::1" || host == "[::1]" { return true }
+        let parts = host.split(separator: ".").compactMap { UInt8($0) }
+        guard parts.count == 4, host.split(separator: ".").count == 4 else { return false }
+        return parts[0] == 127 || (parts[0] == 100 && (64...127).contains(parts[1]))
+    }
+
+    /// scheme://host:port, the identity a token belongs to.
+    public static func origin(_ url: URL) -> String {
+        let scheme = url.scheme?.lowercased() ?? ""
+        let port = url.port ?? (scheme == "https" ? 443 : 80)
+        return "\(scheme)://\(url.host?.lowercased() ?? ""):\(port)"
+    }
+}
+
+public struct InsecureServer: Error, CustomStringConvertible {
+    public var url: URL
+    public var description: String { "\(url.absoluteString): use https (plain http only for loopback or a Tailscale address)" }
+}
+
+/// URLSession transport. `token` is read on every request; the caller binds it to
+/// this transport's server, so a token is never sent to a server it wasn't issued by.
 public final class URLSessionTransport: HTTPTransport, @unchecked Sendable {
     public let base: URL
     private let session: URLSession
@@ -50,6 +82,7 @@ public final class URLSessionTransport: HTTPTransport, @unchecked Sendable {
     }
 
     public func send(_ r: HTTPRequest) async throws -> HTTPReply {
+        guard ServerURL.isAllowed(base) else { throw InsecureServer(url: base) }
         var req = URLRequest(url: base.appendingPathComponent(r.path))
         req.httpMethod = r.method
         req.timeoutInterval = 30
@@ -185,6 +218,14 @@ public enum PutOutcome: Equatable, Sendable {
 public struct ProtocolError: Error, Equatable, CustomStringConvertible {
     public var status: Int
     public var message: String
+    public var retryAfter: Double?        // the server's Retry-After, when it sent one
+
+    public init(status: Int, message: String, retryAfter: Double? = nil) {
+        self.status = status
+        self.message = message
+        self.retryAfter = retryAfter
+    }
+
     public var description: String { "HTTP \(status): \(message)" }
 }
 
@@ -203,7 +244,9 @@ public struct ProtocolClient: Sendable {
     }
 
     private func expect(_ reply: HTTPReply, _ ok: Set<Int>) throws -> HTTPReply {
-        guard ok.contains(reply.status) else { throw ProtocolError(status: reply.status, message: reply.errorText) }
+        guard ok.contains(reply.status) else {
+            throw ProtocolError(status: reply.status, message: reply.errorText, retryAfter: reply.retryAfter)
+        }
         return reply
     }
 

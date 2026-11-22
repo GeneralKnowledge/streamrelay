@@ -61,7 +61,7 @@ public actor UploadQueue {
     public init(manifest: Manifest, client: ProtocolClient, options: Options = Options(),
                 onEvent: @escaping @Sendable (QueueEvent) -> Void = { _ in },
                 sleep: @escaping @Sendable (Double) async throws -> Void = { try await Task.sleep(nanoseconds: UInt64(max(0, $0) * 1e9)) },
-                now: @escaping @Sendable () -> Double = { Date().timeIntervalSince1970 },
+                now: @escaping @Sendable () -> Double = { ProcessInfo.processInfo.systemUptime },   // monotonic
                 random: @escaping @Sendable () -> Double = { Double.random(in: 0...1) }) {
         self.manifest = manifest
         self.client = client
@@ -126,8 +126,8 @@ public actor UploadQueue {
             } catch is CancellationError {
                 return .stopped
             } catch {
-                // no answer, a 5xx on a control call, or a local read error: wait and try again
-                let wait = backoff.fail(random: random())
+                // no answer, a 429/5xx/507 on a control call, or a local read error: wait and try again
+                let wait = backoff.fail(retryAfter: (error as? ProtocolError)?.retryAfter, random: random())
                 onEvent(.waiting(seconds: wait, reason: String(describing: error)))
                 try? await sleep(wait)
             }
@@ -142,18 +142,31 @@ public actor UploadQueue {
 
     // MARK: Steps
 
+    /// Throws CancellationError once stop() was called, so no new request starts.
+    private func checkStop() throws {
+        if stopRequested { throw CancellationError() }
+    }
+
     private func ensureBroadcast() async throws -> String {
         let r = try manifest.recording()
         if let id = r.broadcastID { return id }
-        let id = try await client.createBroadcast(title: r.title, clientRef: r.clientRef, mode: r.mode,
+        try checkStop()
+        let id: String
+        do {
+            id = try await client.createBroadcast(title: r.title, clientRef: r.clientRef, mode: r.mode,
                                                   holdMaxDelaySeconds: r.holdMaxDelaySeconds)
+        } catch let e as ProtocolError where (400..<500).contains(e.status) && ![408, 429].contains(e.status) {
+            // the recording's own settings were refused: retrying the same request can't help
+            throw Refusal(status: e.status, reason: "create broadcast: \(e.message)")
+        }
         try manifest.setBroadcastID(id)
         onEvent(.broadcastCreated(id))
         return id
     }
 
     private func uploadInits(_ bid: String) async throws {
-        for i in try manifest.inits() where !i.uploaded {
+        for i in try manifest.inits() where !i.uploaded && !i.lost {
+            try checkStop()
             try await uploadInit(bid, i.id)
         }
     }
@@ -162,12 +175,19 @@ public actor UploadQueue {
         guard let i = try manifest.inits().first(where: { $0.id == id }) else {
             throw Refusal(status: 412, reason: "init \(id) is not on the phone")
         }
-        let data = try Data(contentsOf: manifest.url(of: i.file))
+        let data: Data
+        do {
+            data = try Data(contentsOf: manifest.url(of: i.file))
+        } catch let e as CocoaError where e.code == .fileReadNoSuchFile {
+            // the init is gone from the phone: its epoch's segments can't be played; other epochs go on
+            for key in try manifest.markInitLost(id) { onEvent(.damaged(key, reason: "init \(id) missing on the phone")) }
+            return
+        }
         let reply = try await client.putInit(broadcast: bid, initID: id, data: data, sha256: i.sha256)
         switch reply.status {
         case 200, 201: try manifest.markInitUploaded(id)
         case 401, 403, 404, 409, 410, 422: throw Refusal(status: reply.status, reason: "init \(id): \(reply.errorText)")
-        default: throw ProtocolError(status: reply.status, message: reply.errorText)
+        default: throw ProtocolError(status: reply.status, message: reply.errorText, retryAfter: reply.retryAfter)
         }
     }
 
@@ -183,8 +203,9 @@ public actor UploadQueue {
 
         // skip_to_live: the live edge first, then backfill oldest first, rate-limited.
         var out: [SegmentRecord] = []
-        if let newest = try manifest.newestPending(), ready(newest), try isLiveEdge(newest) {
-            out.append(newest)
+        // the newest ready segment within the live window (a short tail of an open epoch waits)
+        if let live = try manifest.newestPending(limit: 3).first(where: { ready($0) }), try isLiveEdge(live) {
+            out.append(live)
         }
         let t = now()
         tokens = min(2, tokens + (t - tokensAt) * options.backfillPerSecond)
@@ -253,7 +274,7 @@ public actor UploadQueue {
             if successesInRow >= options.recoverAfter { limit = options.concurrency }
             if case .success(let r) = result { onEvent(.stored(s.key, status: r.status)) }
         case .needInit:
-            try await uploadInit(bid, s.initID)
+            if !stopRequested { try await uploadInit(bid, s.initID) }
         case .rejected(let reason):
             let n = (rejections[s.key] ?? 0) + 1
             rejections[s.key] = n
@@ -276,13 +297,14 @@ public actor UploadQueue {
     private func sendEpochEnds(_ bid: String) async throws {
         for e in try manifest.epochs() where !e.endSent {
             guard let last = e.lastSequence, let reason = e.endReason else { continue }
+            try checkStop()
             let r = try await client.endEpoch(broadcast: bid, epoch: e.epoch, lastSequence: last, reason: reason)
             switch r.status {
             case 200, 201:
                 try manifest.markEpochEndSent(e.epoch)
                 onEvent(.epochEnded(e.epoch))
             case 401, 403, 404, 409, 410, 422: throw Refusal(status: r.status, reason: "epoch \(e.epoch) end: \(r.errorText)")
-            default: throw ProtocolError(status: r.status, message: r.errorText)
+            default: throw ProtocolError(status: r.status, message: r.errorText, retryAfter: r.retryAfter)
             }
         }
     }
@@ -297,11 +319,12 @@ public actor UploadQueue {
         if !rec.finishSent {
             let lastEpoch = epochs.map(\.epoch).max() ?? -1
             if lastEpoch >= 0 {
+                try checkStop()
                 let r = try await client.finish(broadcast: bid, lastEpoch: lastEpoch)
                 switch r.status {
                 case 200, 201: break
                 case 401, 403, 404, 409, 410, 422: throw Refusal(status: r.status, reason: "finish: \(r.errorText)")
-                default: throw ProtocolError(status: r.status, message: r.errorText)
+                default: throw ProtocolError(status: r.status, message: r.errorText, retryAfter: r.retryAfter)
                 }
             }
             try manifest.markFinishSent()

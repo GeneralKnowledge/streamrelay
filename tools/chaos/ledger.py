@@ -41,6 +41,7 @@ def main() -> int:
             "SELECT sequence, sha256, storage_key, count(*) OVER (PARTITION BY sequence) FROM segments"
             " WHERE broadcast_id = %s AND epoch = 0", (bid,))}
     ledger, problems = [], []
+    rejected_then_stored = 0
     statuses: dict[int, int] = defaultdict(int)
     for seq in range(n):
         src = open(os.path.join(a.segments, f"{seq:05d}.m4s"), "rb").read()
@@ -68,12 +69,18 @@ def main() -> int:
             problems.append(f"{seq}: got 409")
         corrupted = [i for i, p in enumerate(ps) if p.get("corrupt")]
         for i in corrupted:
+            if ps[i]["status"] == 422 and any(p["status"] in (200, 201) for p in ps[i + 1:]):
+                rejected_then_stored += 1
             if ps[i]["status"] in (0, 200):      # never arrived / key already stored: body not read
                 continue
             if ps[i]["status"] != 422:
                 problems.append(f"{seq}: corrupted upload answered {ps[i]['status']}")
             elif not any(p["status"] in (200, 201) for p in ps[i + 1:]):
                 problems.append(f"{seq}: corrupted upload never re-sent successfully")
+    corrupted_total = sum(1 for ps in puts.values() for p in ps if p.get("corrupt"))
+    # a run that corrupted uploads must have seen at least one rejected and then re-sent,
+    # or the corruption gate was never exercised (every corrupted attempt lost its answer)
+    corruption_gate = "not run" if not corrupted_total else ("pass" if rejected_then_stored else "inconclusive")
     with open(os.path.join(a.run, "ledger.csv"), "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(ledger[0].keys()))
         w.writeheader()
@@ -86,9 +93,11 @@ def main() -> int:
         "acknowledged": sum(1 for r in ledger if r["first_ack"]),
         "stored_with_right_checksum": sum(1 for r in ledger if r["row_sha_ok"] and r["file_ok"]),
         "put_statuses": {str(k): v for k, v in sorted(statuses.items())},
-        "corrupted_uploads": sum(1 for ps in puts.values() for p in ps if p.get("corrupt")),
+        "corrupted_uploads": corrupted_total,
+        "corrupted_rejected_422_then_stored": rejected_then_stored,
+        "corruption_gate": corruption_gate,
         "problems": problems[:50], "problem_count": len(problems),
-        "verdict": "pass" if not problems else "fail",
+        "verdict": "fail" if problems else ("inconclusive" if corruption_gate == "inconclusive" else "pass"),
     }
     json.dump(summary, open(os.path.join(a.run, "ledger.json"), "w"), indent=1)
     print(json.dumps(summary, indent=1))

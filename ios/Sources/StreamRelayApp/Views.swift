@@ -7,6 +7,7 @@ import UIKit
 
 @main
 struct StreamRelayApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var model = AppModel()
     @Environment(\.scenePhase) private var phase
 
@@ -21,6 +22,21 @@ struct StreamRelayApp: App {
                 if p == .background { model.enteredBackground() }
                 if p == .active { model.enteredForeground() }
             }
+        }
+    }
+}
+
+/// iOS may relaunch the app in the background for finished uploads: reattach the background session
+/// and tell iOS when its events are delivered.
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String,
+                     completionHandler: @escaping () -> Void) {
+        guard identifier == BackgroundHandOff.identifier else { completionHandler(); return }
+        MainActor.assumeIsolated {
+            if Pairing.handOff == nil { Pairing.handOff = Pairing.makeHandOff() }
+            guard let h = Pairing.handOff else { completionHandler(); return }
+            h.finishedEvents = { completionHandler() }
+            h.resume()
         }
     }
 }
@@ -81,16 +97,18 @@ struct RecordView: View {
                     Button { showSettings = true } label: {
                         Image(systemName: "gearshape").font(.title2).frame(width: 52, height: 52)
                     }
-                    .disabled(model.recording)
+                    .disabled(model.phase != .idle)
                     .accessibilityIdentifier("record.settings")
                     .accessibilityLabel("Settings")
                     Spacer()
                     Button { model.recording ? model.stop() : model.start() } label: {
-                        Circle().fill(model.recording ? .red : .white).frame(width: 72, height: 72)
+                        Circle().fill(model.phase == .idle ? .white : .red).frame(width: 72, height: 72)
                             .overlay(Circle().stroke(.white, lineWidth: 4).padding(-6))
+                            .opacity(model.phase == .stopping ? 0.5 : 1)
                     }
+                    .disabled(model.phase == .stopping)
                     .accessibilityIdentifier("record.toggle")
-                    .accessibilityLabel(model.recording ? "Stop broadcast" : (model.unfinished != nil ? "Resume broadcast" : "Start broadcast"))
+                    .accessibilityLabel(toggleLabel)
                     Spacer()
                     Color.clear.frame(width: 52, height: 52)
                 }
@@ -99,6 +117,14 @@ struct RecordView: View {
             .padding(.bottom, 24)
         }
         .sheet(isPresented: $showSettings) { SettingsView() }
+    }
+
+    private var toggleLabel: String {
+        switch model.phase {
+        case .recording: return "Stop broadcast"
+        case .stopping: return "Stopping broadcast"
+        case .idle: return model.resumable != nil ? "Resume broadcast" : "Start broadcast"
+        }
     }
 }
 
@@ -171,6 +197,8 @@ struct CameraPreview: UIViewRepresentable {
         return v
     }
 
-    func updateUIView(_ view: PreviewView, context: Context) {}
+    func updateUIView(_ view: PreviewView, context: Context) {
+        if view.preview.session !== session { view.preview.session = session }   // a new recorder after Stop/Start
+    }
 }
 #endif

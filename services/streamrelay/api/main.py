@@ -8,6 +8,7 @@ is a 404, a deleted one a 410. Media is probed before it is accepted, uploads
 are rate-limited per device and refused with 507 when storage is full.
 """
 
+import json
 import logging
 import os
 import uuid
@@ -29,6 +30,58 @@ from ..store import Rejected, SegmentMeta, Store
 
 log = logging.getLogger("streamrelay.api")
 MISSING_CAP = 500
+CONTROL_BODY_LIMIT = 64 * 1024     # JSON bodies; media uploads have their own limit (max_segment_bytes)
+
+
+class ControlBodyLimit:
+    """Caps the bytes of every request body except init and segment uploads before
+    FastAPI reads or parses it (Content-Length or chunked), answering 413. Runs
+    before any route, so an unauthenticated pairing request can't make the API
+    buffer a large body."""
+
+    def __init__(self, app: Any, limit: int = CONTROL_BODY_LIMIT):
+        self.app, self.limit = app, limit
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        path = scope.get("path", "") if scope["type"] == "http" else ""
+        if scope["type"] != "http" or "/segments/" in path or "/inits/" in path:
+            await self.app(scope, receive, send)
+            return
+        for k, v in scope.get("headers", []):
+            if k == b"content-length" and v.isdigit() and int(v) > self.limit:
+                await self._too_large(send)
+                return
+        seen, refused = 0, False
+
+        async def limited() -> Any:
+            nonlocal seen, refused
+            if refused:
+                return {"type": "http.disconnect"}
+            msg = await receive()
+            if msg["type"] == "http.request":
+                seen += len(msg.get("body", b""))
+                if seen > self.limit:
+                    # answer now and tell the app the client went away; whatever it sends after is dropped
+                    refused = True
+                    await self._too_large(send)
+                    return {"type": "http.disconnect"}
+            return msg
+
+        async def guarded_send(msg: Any) -> None:
+            if not refused:
+                await send(msg)
+
+        try:
+            await self.app(scope, limited, guarded_send)
+        except Exception:
+            if not refused:
+                raise
+
+    async def _too_large(self, send: Any) -> None:
+        body = json.dumps({"error": f"request body over {self.limit} bytes"}).encode()
+        await send({"type": "http.response.start", "status": 413,
+                    "headers": [(b"content-type", b"application/json"), (b"content-length", str(len(body)).encode())]})
+        await send({"type": "http.response.body", "body": body})
 
 
 class CatchUp(BaseModel):
@@ -94,6 +147,7 @@ def create_app(settings: Settings) -> FastAPI:
         await pool.close()
 
     app = FastAPI(title="StreamRelay upload API", version="1", lifespan=lifespan)
+    app.add_middleware(ControlBodyLimit)
     app.state.store = store
 
     @app.exception_handler(Rejected)
@@ -211,23 +265,31 @@ def create_app(settings: Settings) -> FastAPI:
         if init_id < 0:
             raise Rejected(422, "init_id must be >= 0")
         want = sha_header(x_sr_sha256)
+        # a replay of a stored init is answered without reading the body, even when storage is full
+        cur = await conn.execute("SELECT sha256 FROM inits WHERE broadcast_id = %s AND init_id = %s", (bid, init_id))
+        row = await cur.fetchone()
+        if row is not None and bytes(row[0]) == want:
+            return Response(status_code=200)
         n = content_length(request)
-        await storage.check(conn, n or 0)
-        rec = await store.receive(request.stream(), settings.max_segment_bytes, n)
-        if rec.sha256 != want:
-            store.discard(rec)
-            raise Rejected(422, "checksum mismatch")
-        codec, width, height = "unprobed", None, None
-        if settings.validate_media:
-            try:
-                p = await validate.check_init(rec.path, settings.ffprobe)
-            except Rejected:
+        held = await storage.admit(conn, n if n is not None else settings.max_segment_bytes)
+        try:
+            rec = await store.receive(request.stream(), settings.max_segment_bytes, n)
+            if rec.sha256 != want:
                 store.discard(rec)
-                raise
-            codec, width, height = p.codec, p.width, p.height
-        status = await store.put_init(conn, bid, init_id, rec, codec, width, height)
-        if status == 201:
-            storage.stored(rec.size)
+                raise Rejected(422, "checksum mismatch")
+            codec, width, height = "unprobed", None, None
+            if settings.validate_media:
+                try:
+                    p = await validate.check_init(rec.path, settings.ffprobe)
+                except Rejected:
+                    store.discard(rec)
+                    raise
+                codec, width, height = p.codec, p.width, p.height
+            status = await store.put_init(conn, bid, init_id, rec, codec, width, height)
+            if status == 201:
+                storage.stored(rec.size)
+        finally:
+            storage.release(held)
         return Response(status_code=status)
 
     @app.put("/v1/broadcasts/{bid}/segments/{epoch}/{sequence}")
@@ -258,30 +320,33 @@ def create_app(settings: Settings) -> FastAPI:
         if row is not None and bytes(row[0]) == want:
             return Response(status_code=200)
         n = content_length(request)
-        await storage.check(conn, n or 0)
-        rec = await store.receive(request.stream(), settings.max_segment_bytes, n)
-        if rec.sha256 != want:
-            store.discard(rec)
-            raise Rejected(422, "checksum mismatch")
-        if settings.validate_media and row is None:
-            cur = await conn.execute("SELECT storage_key FROM inits WHERE broadcast_id = %s AND init_id = %s",
-                                     (bid, x_sr_init))
-            init = await cur.fetchone()
-            if init is None:
+        held = await storage.admit(conn, n if n is not None else settings.max_segment_bytes)
+        try:
+            rec = await store.receive(request.stream(), settings.max_segment_bytes, n)
+            if rec.sha256 != want:
                 store.discard(rec)
-                raise Rejected(412, f"init segment {x_sr_init} not uploaded yet")
-            try:
-                await validate.check_segment(store.path(init[0]), rec.path, x_sr_duration_us, final,
-                                             os.path.dirname(rec.path), settings.ffprobe)
-            except Rejected:
-                store.discard(rec)
-                raise
-        cur = await conn.execute("SELECT state = 'finished' FROM broadcasts WHERE id = %s", (bid,))
-        late = bool((await cur.fetchone() or [False])[0])
-        meta = SegmentMeta(bid, epoch, sequence, x_sr_init, x_sr_start_us, x_sr_duration_us, final)
-        status = await store.put_segment(conn, meta, rec, late_for_live=late)
-        if status == 201:
-            storage.stored(rec.size)
+                raise Rejected(422, "checksum mismatch")
+            if settings.validate_media and row is None:
+                cur = await conn.execute("SELECT storage_key FROM inits WHERE broadcast_id = %s AND init_id = %s",
+                                         (bid, x_sr_init))
+                init = await cur.fetchone()
+                if init is None:
+                    store.discard(rec)
+                    raise Rejected(412, f"init segment {x_sr_init} not uploaded yet")
+                try:
+                    await validate.check_segment(store.path(init[0]), rec.path, x_sr_duration_us, final,
+                                                 os.path.dirname(rec.path), settings.ffprobe)
+                except Rejected:
+                    store.discard(rec)
+                    raise
+            cur = await conn.execute("SELECT state = 'finished' FROM broadcasts WHERE id = %s", (bid,))
+            late = bool((await cur.fetchone() or [False])[0])
+            meta = SegmentMeta(bid, epoch, sequence, x_sr_init, x_sr_start_us, x_sr_duration_us, final)
+            status = await store.put_segment(conn, meta, rec, late_for_live=late)
+            if status == 201:
+                storage.stored(rec.size)
+        finally:
+            storage.release(held)
         return Response(status_code=status)
 
     @app.post("/v1/broadcasts/{bid}/epochs/{epoch}/end")

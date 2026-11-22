@@ -1,4 +1,5 @@
 import Foundation
+import XCTest
 @testable import StreamRelayCore
 
 /// A virtual clock: sleeping moves time forward at once, so backoff waits cost nothing.
@@ -30,6 +31,7 @@ final class FakeServer: HTTPTransport, @unchecked Sendable {
         var corrupt = 0.0          // chance a segment's first attempt arrives damaged (422)
         var alwaysReject: Set<String> = []   // "epoch/sequence" always answered 422
         var refuseWith: Int?       // every request answered with this status
+        var createReply: (status: Int, retryAfter: String?)?   // answer broadcast creation with this
     }
 
     private let lock = NSLock()
@@ -63,6 +65,10 @@ final class FakeServer: HTTPTransport, @unchecked Sendable {
         let parts = r.path.split(separator: "/").map(String.init)
         switch (r.method, parts.count) {
         case ("POST", 2) where parts == ["v1", "broadcasts"]:
+            if let c = faults.createReply {
+                return HTTPReply(status: c.status, headers: c.retryAfter.map { ["retry-after": $0] } ?? [:],
+                                 body: Data(#"{"error": "create refused"}"#.utf8))
+            }
             created += 1
             return json(created == 1 ? 201 : 200, ["broadcast_id": broadcastID])
         case ("GET", 4) where parts[3] == "status":
@@ -95,6 +101,10 @@ final class FakeServer: HTTPTransport, @unchecked Sendable {
             let sha = SHA256.hex(body)
             guard sha == r.headers["X-SR-SHA256"] else { return json(422, ["error": "sha256 mismatch"]) }
             if let have = segments[key] { return json(have.sha == sha ? 200 : 409, [:]) }
+            // the real server's duration rule: 0.5-4 s, or any positive length for the final segment
+            let dur = Int64(r.headers["X-SR-Duration-Us"] ?? "") ?? 0
+            let final = (r.headers["X-SR-Flags"] ?? "").split(separator: ",").contains("final")
+            guard final ? dur > 0 : (500_000...4_000_000).contains(dur) else { return json(422, ["error": "duration_us out of range"]) }
             guard inits[Int(r.headers["X-SR-Init"]!)!] != nil else { return json(412, ["error": "init missing"]) }
             if let last = epochEnds[key.epoch], key.sequence > last { return json(422, ["error": "after epoch end"]) }
             segments[key] = (sha, r.headers["X-SR-Flags"], Int64(r.headers["X-SR-Duration-Us"]!)!)
@@ -172,4 +182,17 @@ final class Locked<T>: @unchecked Sendable {
     private let lock = NSLock()
     init(_ v: T) { value = v }
     func with<R>(_ f: (inout T) -> R) -> R { lock.lock(); defer { lock.unlock() }; return f(&value) }
+}
+
+/// Waits (real time, bounded) for a condition while the queue runs; fails instead of hanging.
+func eventually(_ what: String, timeout: Double = 10, file: StaticString = #filePath, line: UInt = #line,
+                _ cond: () -> Bool) async {
+    let until = Date().addingTimeInterval(timeout)
+    while !cond() {
+        if Date() > until {
+            XCTFail("timed out waiting for \(what)", file: file, line: line)
+            return
+        }
+        await Task.yield()
+    }
 }

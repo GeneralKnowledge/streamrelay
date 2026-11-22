@@ -23,6 +23,7 @@ import argparse
 import hashlib
 import json
 import os
+import pathlib
 import sqlite3
 import subprocess
 import sys
@@ -55,6 +56,35 @@ def probe_packets(path: str, stream: str) -> list[tuple[float, float, bool]]:
     return rows
 
 
+def frame_step(packets: list[tuple[float, float, bool]]) -> float:
+    """One packet's length when ffprobe doesn't give it: the smallest positive step between sorted starts."""
+    starts = sorted(p[0] for p in packets)
+    steps = [b - a for a, b in zip(starts, starts[1:], strict=False) if b - a > 1e-6]
+    return min(steps, default=0.0)
+
+
+def span(packets: list[tuple[float, float, bool]]) -> float:
+    """Presentation-time length: earliest start to latest end (packets may arrive out of order)."""
+    if not packets:
+        return 0.0
+    step = frame_step(packets)
+    return max(p[0] + (p[1] or step) for p in packets) - min(p[0] for p in packets)
+
+
+def max_gap(packets: list[tuple[float, float, bool]]) -> float:
+    """The largest hole between one packet's end and the next packet's start, in time order."""
+    step = frame_step(packets)
+    ordered = sorted(packets)
+    return max(((b[0] - (a[0] + (a[1] or step))) for a, b in zip(ordered, ordered[1:], strict=False)), default=0.0)
+
+
+def inside(folder: str, name: str) -> str | None:
+    """The file's path if it stays inside the folder (no ../, no absolute path, no symlink out)."""
+    root = os.path.realpath(folder)
+    path = os.path.realpath(os.path.join(root, name))
+    return path if os.path.commonpath([root, path]) == root and os.path.dirname(path) == root else None
+
+
 def codecs(path: str) -> list[str]:
     out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_name", "-of", "csv=p=0", path],
                          capture_output=True, text=True, timeout=60)
@@ -63,7 +93,8 @@ def codecs(path: str) -> list[str]:
 
 def check(folder: str) -> Report:
     rep = Report()
-    db = sqlite3.connect(f"file:{os.path.join(folder, 'manifest.sqlite')}?mode=ro", uri=True)
+    manifest = pathlib.Path(folder, "manifest.sqlite").resolve()
+    db = sqlite3.connect(manifest.as_uri() + "?mode=ro", uri=True)
     inits = {r[0]: r[1:] for r in db.execute("SELECT init_id, file, sha256, bytes FROM inits")}
     epochs = db.execute("SELECT epoch, last_sequence, end_reason FROM epochs ORDER BY epoch").fetchall()
     known = {r[0] for r in db.execute("SELECT file FROM segments")} | {v[0] for v in inits.values()}
@@ -72,7 +103,10 @@ def check(folder: str) -> Report:
             rep.fail(f"stray file {name} (no manifest row)")
 
     def file_ok(name: str, sha: str, size: int) -> bytes | None:
-        p = os.path.join(folder, name)
+        p = inside(folder, name)
+        if p is None:
+            rep.fail(f"{name}: path leaves the recording folder")
+            return None
         if not os.path.exists(p):
             rep.fail(f"{name}: missing")
             return None
@@ -80,6 +114,16 @@ def check(folder: str) -> Report:
         if hashlib.sha256(data).hexdigest() != sha or len(data) != size:
             rep.fail(f"{name}: checksum or size differs from the manifest")
         return data
+
+    epoch_ids = {e[0] for e in epochs}
+    for epoch, seq, name, sha, size in db.execute("SELECT epoch, sequence, file, sha256, bytes FROM segments"):
+        if epoch not in epoch_ids:
+            rep.fail(f"{epoch}/{seq}: segment row with no epoch row")
+            file_ok(name, sha, size)
+    used_inits = {r[0] for r in db.execute("SELECT DISTINCT init_id FROM segments")}
+    for iid, (name, sha, size) in inits.items():
+        if iid not in used_inits:
+            file_ok(name, sha, size)             # an init no segment uses must still be intact
 
     prev_end = None
     for epoch, last, reason in epochs:
@@ -89,6 +133,8 @@ def check(folder: str) -> Report:
                 "states": {}, "seconds_declared": 0.0}
         rep.epochs.append(info)
         if not segs:
+            if last is not None and last >= 0:
+                rep.fail(f"epoch {epoch}: closed at {last} but has no segment rows")
             continue
         for s in segs:
             info["states"][s[8]] = info["states"].get(s[8], 0) + 1
@@ -112,9 +158,10 @@ def check(folder: str) -> Report:
             open(ip, "wb").write(init_data)
             cs = codecs(ip)
             info["codecs"] = cs
-            if not cs or cs[0] != "h264" or any(c not in ("h264", "aac") for c in cs) or cs.count("aac") > 1:
-                rep.fail(f"epoch {epoch}: codecs {cs} (want h264 + at most one aac)")
+            if cs.count("h264") != 1 or cs.count("aac") != 1 or len(cs) != 2:
+                rep.fail(f"epoch {epoch}: codecs {cs} (want one h264 and one aac track)")
             joined = os.path.join(tmp, "epoch.mp4")
+            by_seq = {r[0]: r for r in segs}
             with open(joined, "wb") as j:
                 j.write(init_data)
                 for seq, _, start, dur, size, sha, name, final, _state in segs:
@@ -130,15 +177,15 @@ def check(folder: str) -> Report:
                         continue
                     if not video[0][2]:
                         rep.fail(f"{epoch}/{seq}: does not start with a keyframe")
-                    vdur = video[-1][0] + video[-1][1] - video[0][0]
+                    vdur = span(video)
                     if abs(vdur - dur / 1e6) > FRAME_TOL:
                         rep.fail(f"{epoch}/{seq}: video lasts {vdur:.3f} s, manifest says {dur / 1e6:.3f} s")
                     if not final and abs(dur / 1e6 - 2.0) > FRAME_TOL:
                         rep.fail(f"{epoch}/{seq}: {dur / 1e6:.3f} s, not 2.0 s (and not final)")
                     if prev_end is not None and seq == 0 and start < prev_end - 50_000:
                         rep.fail(f"{epoch}/0: start_us {start} goes back before the previous epoch's end {prev_end}")
-                    if seq > 0:
-                        ps = segs[seq - 1]
+                    ps = by_seq.get(seq - 1)
+                    if ps is not None:              # a missing sequence is reported above
                         if abs(start - (ps[2] + ps[3])) > FRAME_TOL * 1e6:
                             rep.fail(f"{epoch}/{seq}: start_us {start} != previous start + duration {ps[2] + ps[3]}")
                     info["seconds_declared"] += dur / 1e6
@@ -149,18 +196,15 @@ def check(folder: str) -> Report:
                 rep.fail(f"epoch {epoch}: decode errors: {dec.stderr.strip()[:300]}")
             video = probe_packets(joined, "v:0")
             if video:
-                total = video[-1][0] + video[-1][1] - video[0][0]
+                total = span(video)
                 info["seconds_decoded"] = round(total, 3)
                 want = info["seconds_declared"]
                 if want and abs(total - want) / want > 0.001 and abs(total - want) > FRAME_TOL:
                     rep.fail(f"epoch {epoch}: decodes to {total:.3f} s, declared {want:.3f} s")
-            audio = probe_packets(joined, "a:0")
-            steps = sorted(b[0] - a[0] for a, b in zip(audio, audio[1:], strict=False))
-            frame = steps[len(steps) // 2] if steps else 0.0     # one AAC frame
-            gaps = [step - frame for step in steps]
-            info["max_audio_gap_ms"] = round(max(gaps, default=0) * 1000, 1)
-            if gaps and max(gaps) > 0.05:
-                rep.fail(f"epoch {epoch}: audio gap of {max(gaps) * 1000:.0f} ms")
+            gap = max_gap(probe_packets(joined, "a:0"))
+            info["max_audio_gap_ms"] = round(gap * 1000, 1)
+            if gap > 0.05:
+                rep.fail(f"epoch {epoch}: audio gap of {gap * 1000:.0f} ms")
         info["seconds_declared"] = round(info["seconds_declared"], 3)
     return rep
 

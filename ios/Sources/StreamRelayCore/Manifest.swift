@@ -101,13 +101,24 @@ public final class Manifest: @unchecked Sendable {
     // MARK: Writing (capture side)
 
     /// Stores an init segment: file first (fsynced), then the row.
+    /// An identical repeat is a no-op; different bytes for a stored id throw and leave the file alone.
     public func addInit(id: Int, data: Data) throws {
         let name = "init-\(id).mp4"
-        try Self.writeDurably(data, to: folder.appendingPathComponent(name))
+        let sha = SHA256.hex(data)
         try locked {
-            _ = try db.run("INSERT OR IGNORE INTO inits (init_id, file, sha256, bytes) VALUES (?, ?, ?, ?)",
-                           [.int(Int64(id)), .text(name), .text(SHA256.hex(data)), .int(Int64(data.count))])
+            if let have = try db.query("SELECT sha256 FROM inits WHERE init_id = ?", [.int(Int64(id))]).first {
+                if have[0].text == sha { return }
+                throw Conflict(what: "init \(id)")
+            }
+            try Self.writeDurably(data, to: folder.appendingPathComponent(name))
+            _ = try db.run("INSERT INTO inits (init_id, file, sha256, bytes) VALUES (?, ?, ?, ?)",
+                           [.int(Int64(id)), .text(name), .text(sha), .int(Int64(data.count))])
         }
+    }
+
+    /// Different bytes offered for an init id or segment key the manifest already holds.
+    public struct Conflict: Error, Equatable {
+        public var what: String
     }
 
     /// Opens an epoch (idempotent).
@@ -118,13 +129,19 @@ public final class Manifest: @unchecked Sendable {
     /// Stores a media segment: file first (fsynced), then the row.
     public func addSegment(_ key: SegmentKey, initID: Int, startMicros: Int64, durationMicros: Int64, data: Data) throws {
         let name = "seg-\(key.epoch)-\(key.sequence).m4s"
-        try Self.writeDurably(data, to: folder.appendingPathComponent(name))
+        let sha = SHA256.hex(data)
         try locked {
+            if let have = try db.query("SELECT sha256 FROM segments WHERE epoch = ? AND sequence = ?",
+                                       [.int(Int64(key.epoch)), .int(Int64(key.sequence))]).first {
+                if have[0].text == sha { return }
+                throw Conflict(what: "segment \(key)")
+            }
+            try Self.writeDurably(data, to: folder.appendingPathComponent(name))
             _ = try db.run("""
                 INSERT INTO segments (epoch, sequence, init_id, start_us, duration_us, bytes, sha256, file)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """, [.int(Int64(key.epoch)), .int(Int64(key.sequence)), .int(Int64(initID)), .int(startMicros),
-                      .int(durationMicros), .int(Int64(data.count)), .text(SHA256.hex(data)), .text(name)])
+                      .int(durationMicros), .int(Int64(data.count)), .text(sha), .text(name)])
         }
     }
 
@@ -133,10 +150,12 @@ public final class Manifest: @unchecked Sendable {
         try locked {
             try db.transaction {
                 try db.run("INSERT OR IGNORE INTO epochs (epoch) VALUES (?)", [.int(Int64(epoch))])
-                try db.run("UPDATE epochs SET last_sequence = ?, end_reason = ? WHERE epoch = ? AND last_sequence IS NULL",
-                           [.int(Int64(lastSequence)), .text(reason.rawValue), .int(Int64(epoch))])
-                try db.run("UPDATE segments SET final = 1 WHERE epoch = ? AND sequence = ?",
-                           [.int(Int64(epoch)), .int(Int64(lastSequence))])
+                let first = try db.run("UPDATE epochs SET last_sequence = ?, end_reason = ? WHERE epoch = ? AND last_sequence IS NULL",
+                                       [.int(Int64(lastSequence)), .text(reason.rawValue), .int(Int64(epoch))])
+                if first == 1 {                 // only the first close decides the final segment
+                    try db.run("UPDATE segments SET final = 1 WHERE epoch = ? AND sequence = ?",
+                               [.int(Int64(epoch)), .int(Int64(lastSequence))])
+                }
             }
         }
     }
@@ -177,6 +196,11 @@ public final class Manifest: @unchecked Sendable {
             try? FileManager.default.removeItem(at: folder.appendingPathComponent(name))
         }
         try locked {
+            for row in try db.query("SELECT init_id, file FROM inits WHERE uploaded = -1") {
+                guard let f = row[1].text, FileManager.default.fileExists(atPath: folder.appendingPathComponent(f).path) else { continue }
+                try db.run("UPDATE inits SET uploaded = 0 WHERE init_id = ?", [row[0]])
+                try db.run("UPDATE segments SET state = 'pending' WHERE init_id = ? AND state = 'blocked'", [row[0]])
+            }
             for row in try db.query("SELECT epoch, sequence, file FROM segments WHERE state = 'pending'") {
                 guard let f = row[2].text, !FileManager.default.fileExists(atPath: folder.appendingPathComponent(f).path) else { continue }
                 try db.run("UPDATE segments SET state = 'damaged' WHERE epoch = ? AND sequence = ?", [row[0], row[1]])
@@ -203,16 +227,37 @@ public final class Manifest: @unchecked Sendable {
     }
 
     public func newestPending() throws -> SegmentRecord? {
+        try newestPending(limit: 1).first
+    }
+
+    /// The newest pending segments, newest first.
+    public func newestPending(limit: Int) throws -> [SegmentRecord] {
         try locked {
-            try db.query(Self.segmentColumns + " WHERE state = 'pending' ORDER BY epoch DESC, sequence DESC LIMIT 1")
-                .first.map(Self.record)
+            try db.query(Self.segmentColumns + " WHERE state = 'pending' ORDER BY epoch DESC, sequence DESC LIMIT ?",
+                         [.int(Int64(limit))]).map(Self.record)
         }
     }
 
-    public func inits() throws -> [(id: Int, file: String, sha256: String, uploaded: Bool)] {
+    /// `lost`: the file vanished from the phone; its segments were marked damaged.
+    public func inits() throws -> [(id: Int, file: String, sha256: String, uploaded: Bool, lost: Bool)] {
         try locked {
             try db.query("SELECT init_id, file, sha256, uploaded FROM inits ORDER BY init_id").map {
-                (Int($0[0].int ?? 0), $0[1].text ?? "", $0[2].text ?? "", $0[3].int == 1)
+                (Int($0[0].int ?? 0), $0[1].text ?? "", $0[2].text ?? "", $0[3].int == 1, $0[3].int == -1)
+            }
+        }
+    }
+
+    /// The init's file is gone: mark it lost and hold back its pending segments (`blocked`). Returns them.
+    /// If the file comes back, `recoverAfterRelaunch` makes it uploadable again.
+    @discardableResult
+    public func markInitLost(_ id: Int) throws -> [SegmentKey] {
+        try locked {
+            try db.transaction {
+                let keys = try db.query("SELECT epoch, sequence FROM segments WHERE init_id = ? AND state = 'pending'",
+                                        [.int(Int64(id))]).map { SegmentKey(epoch: Int($0[0].int ?? 0), sequence: Int($0[1].int ?? 0)) }
+                try db.run("UPDATE inits SET uploaded = -1 WHERE init_id = ?", [.int(Int64(id))])
+                try db.run("UPDATE segments SET state = 'blocked' WHERE init_id = ? AND state = 'pending'", [.int(Int64(id))])
+                return keys
             }
         }
     }
@@ -223,6 +268,11 @@ public final class Manifest: @unchecked Sendable {
 
     public func markAcknowledged(_ key: SegmentKey) throws {
         try setState(key, .acknowledged)
+    }
+
+    /// Back to pending (tests: an acknowledgement lost in a crash).
+    func markPending(_ key: SegmentKey) throws {
+        try setState(key, .pending)
     }
 
     public func markDamaged(_ key: SegmentKey) throws {
@@ -260,13 +310,20 @@ public final class Manifest: @unchecked Sendable {
         public var segments: Int
         public var bytes: Int64
         public var seconds: Double
-        public var damaged: Int
+        public var damaged: Int          // rejected by the server, or blocked by a missing init
+
+        public init(segments: Int = 0, bytes: Int64 = 0, seconds: Double = 0, damaged: Int = 0) {
+            self.segments = segments
+            self.bytes = bytes
+            self.seconds = seconds
+            self.damaged = damaged
+        }
     }
 
     public func backlog() throws -> Backlog {
         try locked {
             let r = try db.query("SELECT count(*), coalesce(sum(bytes), 0), coalesce(sum(duration_us), 0) FROM segments WHERE state = 'pending'")
-            let d = try db.query("SELECT count(*) FROM segments WHERE state = 'damaged'")
+            let d = try db.query("SELECT count(*) FROM segments WHERE state IN ('damaged', 'blocked')")
             return Backlog(segments: Int(r[0][0].int ?? 0), bytes: r[0][1].int ?? 0,
                            seconds: Double(r[0][2].int ?? 0) / 1e6, damaged: Int(d[0][0].int ?? 0))
         }
@@ -306,6 +363,17 @@ public final class Manifest: @unchecked Sendable {
                         try db.run("UPDATE epochs SET end_sent = 1 WHERE epoch = ?", [.int(Int64(e.epoch))])
                     }
                 }
+                // an end the server no longer has (restored from a backup): send it again
+                let ended = Set(status.epochs.filter(\.ended).map(\.epoch))
+                for row in try db.query("SELECT epoch FROM epochs WHERE end_sent = 1") {
+                    let ep = Int(row[0].int ?? 0)
+                    if !ended.contains(ep) {
+                        try db.run("UPDATE epochs SET end_sent = 0 WHERE epoch = ?", [.int(Int64(ep))])
+                    }
+                }
+                if try db.query("SELECT 1 FROM epochs WHERE end_sent = 0").first != nil {
+                    try db.run("UPDATE recording SET finish_sent = 0 WHERE id = 1")
+                }
                 for id in status.inits {
                     try db.run("UPDATE inits SET uploaded = 1 WHERE init_id = ?", [.int(Int64(id))])
                 }
@@ -329,11 +397,11 @@ public final class Manifest: @unchecked Sendable {
             try FileManager.default.removeItem(at: url)
         }
         try FileManager.default.moveItem(at: tmp, to: url)
+        // the directory entry must be durable before the caller commits a row that points at it
         let dir = open(url.deletingLastPathComponent().path, O_RDONLY)
-        if dir >= 0 {
-            fsync(dir)
-            close(dir)
-        }
+        guard dir >= 0 else { throw CocoaError(.fileWriteUnknown) }
+        defer { close(dir) }
+        guard fsync(dir) == 0 else { throw CocoaError(.fileWriteUnknown) }
     }
 
     private static let segmentColumns =

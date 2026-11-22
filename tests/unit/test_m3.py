@@ -180,6 +180,35 @@ def test_wrong_codec_init_rejected(vclient: TestClient, media: Path):
     assert r.status_code == 422 and "H.264" in r.json()["error"]
     junk = os.urandom(5000)
     assert vclient.put(f"/v1/broadcasts/{bid}/inits/0", content=junk, headers={"X-SR-SHA256": sha(junk)}).status_code == 422
+    noaudio = (media.parent / "noaudio" / "init.mp4").read_bytes()     # the playout decoder needs the audio track
+    r = vclient.put(f"/v1/broadcasts/{bid}/inits/0", content=noaudio, headers={"X-SR-SHA256": sha(noaudio)})
+    assert r.status_code == 422 and "AAC" in r.json()["error"]
+
+
+@needs_ffmpeg
+def test_wrong_container_rejected(vclient: TestClient, media: Path):
+    """Clean H.264/AAC in MPEG-TS probes fine with format detection, but the playout reads MP4 only."""
+    bid = create(vclient, {"Authorization": vclient.headers["Authorization"]})
+    ts = (media.parent / "clip.ts").read_bytes()
+    head, tail = ts[:1880], ts[1880:]
+    r = vclient.put(f"/v1/broadcasts/{bid}/inits/0", content=head, headers={"X-SR-SHA256": sha(head)})
+    assert r.status_code == 422, r.text
+    init = (media / "init.mp4").read_bytes()
+    assert vclient.put(f"/v1/broadcasts/{bid}/inits/0", content=init, headers={"X-SR-SHA256": sha(init)}).status_code == 201
+    r = vclient.put(f"/v1/broadcasts/{bid}/segments/0/0", content=tail, headers=seg_headers(tail, 0))
+    assert r.status_code == 422, r.text
+
+
+@needs_ffmpeg
+def test_final_segment_duration_is_checked_too(vclient: TestClient, media: Path):
+    bid = create(vclient, {"Authorization": vclient.headers["Authorization"]})
+    init = (media / "init.mp4").read_bytes()
+    vclient.put(f"/v1/broadcasts/{bid}/inits/0", content=init, headers={"X-SR-SHA256": sha(init)})
+    good = (media / "00000.m4s").read_bytes()
+    h = seg_headers(good, 0, dur=3_000_000) | {"X-SR-Flags": "final"}
+    assert vclient.put(f"/v1/broadcasts/{bid}/segments/0/0", content=good, headers=h).status_code == 422
+    h = seg_headers(good, 0) | {"X-SR-Flags": "final"}
+    assert vclient.put(f"/v1/broadcasts/{bid}/segments/0/0", content=good, headers=h).status_code == 201
 
 
 # ---- limits -------------------------------------------------------------------------------------
@@ -200,6 +229,48 @@ def test_storage_cap_507_then_resumes(settings: Settings):
     s2 = dataclasses.replace(settings, storage_max_bytes=1_000_000)
     with TestClient(create_app(s2), headers={"Authorization": f"Bearer {s.static_token}"}) as c:
         assert c.put(f"/v1/broadcasts/{bid}/segments/0/2", content=body, headers=seg_headers(body, 2)).status_code == 201
+
+
+def test_identical_init_replay_is_200_even_when_storage_is_full(settings: Settings):
+    s = dataclasses.replace(settings, storage_max_bytes=1500)
+    with TestClient(create_app(s), headers={"Authorization": f"Bearer {s.static_token}"}) as c:
+        bid = create(c, {"Authorization": c.headers["Authorization"]})
+        init = b"i" * 1000
+        assert c.put(f"/v1/broadcasts/{bid}/inits/0", content=init, headers={"X-SR-SHA256": sha(init)}).status_code == 201
+        assert c.put(f"/v1/broadcasts/{bid}/inits/1", content=init, headers={"X-SR-SHA256": sha(init)}).status_code == 507
+        assert c.put(f"/v1/broadcasts/{bid}/inits/0", content=init, headers={"X-SR-SHA256": sha(init)}).status_code == 200
+
+
+def test_concurrent_uploads_cannot_both_pass_the_cap(tmp_path: Path):
+    """Admission reserves the bytes, so the second of two simultaneous uploads is refused."""
+    import asyncio
+
+    from streamrelay.limits import StorageGuard
+    from streamrelay.store import Rejected
+
+    g = StorageGuard(str(tmp_path), max_bytes=100, free_min_bytes=0)
+    g.used, g.read_at = 90, 10**12          # fresh: no database read
+
+    async def run() -> None:
+        held = await g.admit(None, 6)  # type: ignore[arg-type]
+        with pytest.raises(Rejected) as e:
+            await g.admit(None, 6)  # type: ignore[arg-type]
+        assert e.value.status == 507
+        g.release(held)
+        g.release(await g.admit(None, 6))  # type: ignore[arg-type]
+    asyncio.run(run())
+
+
+def test_control_bodies_are_capped_before_parsing(client: TestClient):
+    big = b'{"code": "' + b"A" * 100_000 + b'", "name": "x", "platform": "test"}'
+    r = client.post("/v1/devices/pair", content=big, headers={"Content-Type": "application/json"})
+    assert r.status_code == 413
+
+    def chunks():                                   # no Content-Length: counted as it arrives
+        for _ in range(20):
+            yield b" " * 10_000
+    r = client.post("/v1/devices/pair", content=chunks(), headers={"Content-Type": "application/json"})
+    assert r.status_code == 413
 
 
 def test_free_space_floor_507(settings: Settings):

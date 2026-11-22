@@ -29,7 +29,7 @@ Without a local Swift 6 toolchain, the official image works (add `libsqlite3-dev
 docker run --rm -v "$PWD":/src -w /src swift:6.0-noble bash -c 'apt-get update -qq && apt-get install -yqq libsqlite3-dev && swift test'
 ```
 
-Against the real server through the bad-network proxy, with an API `kill -9` halfway:
+From the checkout root: the core against the real server through the bad-network proxy, with an API `kill -9` halfway:
 
 ```bash
 tests/ios/core_vs_server.sh data/ios-core-run 20     # minutes of segments, real time
