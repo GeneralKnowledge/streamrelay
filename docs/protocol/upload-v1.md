@@ -90,7 +90,9 @@ POST /v1/broadcasts/{id}/finish               { "last_epoch": 2 }
 
 `finish` means "no more capture" and is sent after the last epoch's end call. The server rejects `finish` with `409` if any epoch up to `last_epoch` has no end call.
 
-**When a backlog counts as complete:** every epoch `0..last_epoch` has an end call, and every sequence `0..last_sequence` of each epoch is stored (nothing, for an empty epoch with `last_sequence: -1`). In `catch_up` mode the playout drains in `finishing` until the backlog is complete and played. If it is still incomplete after the **drain wait** (default 15 minutes, per broadcast), the playout marks the missing segments `skipped`, shows the end card and closes the outputs. In `skip_to_live` mode it ends once the last epoch's final segment has played. Uploads after that are accepted for the archive only.
+**When a backlog counts as complete:** every epoch `0..last_epoch` has an end call, and every sequence `0..last_sequence` of each epoch is stored (nothing, for an empty epoch with `last_sequence: -1`). An empty epoch (`last_sequence: -1`) is complete as soon as its end call arrives; a broadcast whose epochs are all empty finishes as soon as `finish` is accepted.
+
+In `finishing`, the playout plays what its mode plays (`catch_up`: everything in order; `skip_to_live`: from its current position onwards) until the backlog is complete and that footage has played. Both modes have the same bound: if the backlog is still incomplete when the **drain wait** (default 15 minutes, per broadcast) expires, the missing segments are marked `skipped`, the playout keeps draining the footage it already has, then shows the end card and closes the outputs. Uploads after that are accepted for the archive only.
 
 ### Status (reconciliation)
 ```
@@ -134,7 +136,7 @@ Two different promises, tested separately:
 ## Server rules
 
 - Validate: size ≤ `max_segment_bytes`; checksum; `ffprobe` check of container and codecs in a time- and memory-limited process ([untrusted media](../architecture/storage-and-security.md#security)); `start_us` monotonic within the epoch (±50 ms jitter allowed); duration 0.5–4 s, except a segment flagged `final`, which may be any length above 0.
-- Write to a temp file, fsync it, rename it into place, fsync the directory, then insert the row and **commit** the transaction (Postgres `synchronous_commit` on, the default), and only then respond. No acknowledgement is sent before the commit succeeds.
-- A crash after the rename but before the insert leaves a file with no row. The startup scan **deletes** such files: the client never got an acknowledgement, so it still holds the segment and its metadata and will upload it again.
+- Writes are **serialised per segment key**: the handler takes a Postgres transaction-scoped advisory lock on `(broadcast_id, epoch, sequence)` before touching storage. Under the lock: if a row exists with the same checksum, respond `200` without writing; if a row exists with a different checksum, respond `409` without touching the stored file; otherwise write the body to a temp file, fsync it, rename it into place, fsync the directory, insert the row and **commit** (Postgres `synchronous_commit` on, the default), which releases the lock. Only then respond. No acknowledgement is sent before the commit succeeds, and a stored file is never replaced.
+- A crash after the rename but before the commit leaves a file with no row (the lock dies with the transaction). The startup scan **deletes** such files: the client never got an acknowledgement, so it still holds the segment and its metadata and will upload it again. A file with a committed row is never deleted by the scan.
 - The playout never plays a segment twice in normal running. After a playout crash it resumes from its last checkpoint, so up to about one second can repeat ([playout crash recovery](../architecture/playout.md#crash-recovery)).
 - Rate limit per device (default 20 segment PUTs/s, far above the 0.5/s a live client needs plus catch-up).

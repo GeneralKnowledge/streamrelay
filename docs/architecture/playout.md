@@ -23,7 +23,7 @@ The spec's state machine, made concrete for the playout (the phone has its own s
 | `live` | Footage at 1×, `playout_delay` behind capture | Buffer healthy | Next segment not on disk at its deadline → `holding` |
 | `holding` | Holding screen with "Reconnecting… back shortly" and elapsed time | Underrun | Enough contiguous footage after the play point (`resume_threshold`, default 10 s) → `catching_up` (or `live` in skip-to-live) |
 | `catching_up` | Backlog at `speed` (1.25× default, 1.5× max) | Resumed with backlog > `buffer_target` | Behind-live ≤ `buffer_target` → `live`; underrun → `holding` |
-| `finishing` | Remaining footage (at the catch-up speed if behind), then an end card for 10 s | Client called `finish`, from any state; start and resume thresholds no longer apply | `catch_up`: backlog complete (protocol: [finish](../protocol/upload-v1.md#end-an-epoch-or-the-broadcast)) and played, or the drain wait expired. `skip_to_live`: the last epoch's final segment has played. Then end card shown; outputs closed → `finished` |
+| `finishing` | Remaining footage (at the catch-up speed if behind), then an end card for 10 s | Client called `finish`, from any state; start and resume thresholds no longer apply | All stored footage the mode plays has played and the backlog is complete (protocol: [finish](../protocol/upload-v1.md#end-an-epoch-or-the-broadcast)); empty epochs need only their end call, so a broadcast with no footage ends at once. If the **drain wait** expires first (both modes), missing segments are marked `skipped` and the stored footage still drains. Then end card; outputs closed → `finished` |
 
 Hysteresis (a resume threshold larger than one segment) stops flapping between holding and footage on a connection that delivers in bursts.
 
