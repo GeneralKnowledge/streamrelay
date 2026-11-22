@@ -4,7 +4,7 @@ Ordered by how badly each would damage the architecture if wrong. Each names the
 
 | # | Assumption or risk | If wrong | Settled by |
 |---|---|---|---|
-| R1 | **One playout process holds one RTMP session through source switches, on one clock, in real time** | The core promise fails; engine choice changes | Spike S1, then M1 |
+| R1 | **One playout process holds one RTMP session through source switches, on one clock, in real time** | The core promise fails; engine choice changes | Spike S1 passed 2026-11-22 on a 4-vCPU cloud machine (PyAV, ≤30% of a core); M1 confirms with restarts and epoch changes |
 | R2 | **AVAssetWriter segments are IDR-aligned, ~2 s, with continuous audio, and join cleanly** | Need our own segmenter from `CMSampleBuffer`s with VideoToolbox (more work, same design) | M2 segment validity and reconstruction tests |
 | R3 | **iPhone stops the camera when locked or backgrounded** (documented) | Known limit: recording only while the app is on screen. The product must say so plainly; pocket mode keeps the screen on but dimmed | M2 condition matrix records the real behaviour, including calls, Low Power Mode, thermal and storage |
 | R4 | **Upload headroom, not playback speed, often limits catch-up** | At 4 Mbps recording on a 4.5 Mbps uplink, 5 minutes of backlog takes 40 minutes to upload | M4 arithmetic shown to the user; M3/M4 netem caps; lower cellular default bitrate |

@@ -1,0 +1,9 @@
+2026/11/22 14:26:54 INF MediaMTX v1.9.3
+2026/11/22 14:26:54 INF configuration loaded from /home/user/streamrelay/spikes/s1_playout/mediamtx.yml
+2026/11/22 14:26:54 INF [RTMP] listener opened on :1935
+2026/11/22 14:26:57 INF [RTMP] [conn 127.0.0.1:46560] opened
+2026/11/22 14:26:57 INF [RTMP] [conn 127.0.0.1:46560] is publishing to path 's1', 2 tracks (H264, MPEG-4 Audio)
+2026/11/22 14:26:57 INF [RTMP] [conn 127.0.0.1:46568] opened
+2026/11/22 14:26:58 INF [RTMP] [conn 127.0.0.1:46568] is reading from path 's1', 2 tracks (H264, MPEG-4 Audio)
+2026/11/22 14:40:27 INF [RTMP] [conn 127.0.0.1:46560] closed: EOF
+2026/11/22 14:40:27 INF [RTMP] [conn 127.0.0.1:46568] closed: terminated

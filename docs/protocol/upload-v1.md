@@ -130,7 +130,7 @@ Every 5 s while connected. Lets the server tell "phone offline" from "phone onli
 
 Two different promises, tested separately:
 
-- **Live completeness.** In `catch_up` mode, every segment acknowledged before the playout reaches it is broadcast once, in order (≤ about 1 s repeated after a playout crash). A segment that arrives after the playout has moved past it (skip-to-live, drain wait expired, or broadcast already finished) is marked `skipped` for live.
+- **Live completeness.** In `catch_up` mode, every segment acknowledged before the playout reaches it is broadcast once, in order, except one that fails to decode, which is marked `damaged` and skipped (≤ about 1 s repeated after a playout crash). A segment that arrives after the playout has moved past it (skip-to-live, drain wait expired, or broadcast already finished) is marked `skipped` for live.
 - **Archive completeness.** Every acknowledged segment is kept for the archive, whenever it arrives, including after `finish` and after live playout has ended, until the retention period ([limits](../architecture/storage-and-security.md#storage)) or the user deletes the broadcast. The archive download reassembles all epochs in order.
 
 ## Server rules
