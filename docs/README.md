@@ -20,9 +20,9 @@ The rule everything else follows: **recording and broadcasting are independent.*
 2. [Upload protocol v1](protocol/upload-v1.md): the phone/server contract.
 3. [Playout engine](architecture/playout.md): how one RTMP session survives holding screens and catch-up. The hardest part.
 4. [Database schema](architecture/database-schema.md) and [schema.sql](architecture/schema.sql).
-5. [Milestones M1–M8](plan/milestones.md), each with an acceptance test.
+5. [Milestones M1–M8](plan/milestones.md), each with an acceptance test. M1 is the whole chain, roughly: iPhone to Twitch on an unstable connection.
 6. [Risks](plan/risks.md): what could sink it, and which milestone finds out.
-7. [GitHub issues](plan/issues.md): milestone issues ready to create once the repo exists.
+7. [GitHub issues](plan/issues.md): milestone issues ready to create once the plan is approved.
 
 ## What changed from the original spec
 
@@ -32,4 +32,5 @@ The rule everything else follows: **recording and broadcasting are independent.*
 - **One PUT per segment instead of POST + PUT.** Fewer round trips on a bad connection; idempotent by checksum (protocol doc).
 - **"Catch up or skip to live" is a broadcaster setting, not a viewer one.** Twitch and YouTube viewers all see the same stream; a per-viewer choice needs our own player (later).
 - **Redis is dropped from v1.** Postgres covers job coordination for one server.
+- **M1 is end to end.** The first milestone goes from the iPhone to Twitch on a flaky connection, with a Linux bench step first so the phone sitting only tests the phone. Later milestones harden each layer.
 - **Filesystem storage first, S3-compatible second.** Same interface, so self-hosters need nothing extra.

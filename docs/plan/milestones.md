@@ -1,81 +1,95 @@
 # Milestones
 
-Each milestone ends with a demonstration and an acceptance test that a script or a person can run. The order proves the hard media problem before any polish. **Device** marks the milestones that need the iPhone; M1 needs none.
+Each milestone ends with a demonstration and an acceptance test that a script or a person can run. **Device** marks milestones with an iPhone sitting.
 
 | | Milestone | Needs | Proves |
 |---|---|---|---|
-| M1 | Server media pipeline prototype | Linux only | One unbroken output through upload, outage, holding screen and catch-up |
-| M2 | iPhone recording engine | **iPhone** | Phone produces correct segments and never loses them |
-| M3 | Reliable upload | Linux, then **iPhone** | No segment lost or played twice through repeated disconnects |
-| M4 | Hybrid recovery, end to end | **iPhone** | M1's result with a real phone and real outages |
-| M5 | Multi-destination | Linux + Twitch/YouTube test accounts | Destinations fail independently; platforms tolerate our stream |
+| M1 | **First run: iPhone to Twitch on unstable internet** | Linux bench, then **iPhone**, a reachable server, a Twitch account | The whole idea works end to end, roughly |
+| M2 | Recording engine hardening | **iPhone** | The phone never loses footage: restarts, interruptions, storage |
+| M3 | Upload hardening | Linux, then **iPhone** | No segment lost or played twice through hours of chaos; pairing and security |
+| M4 | Recovery hardening | Linux, then **iPhone** | Skip-to-live, playout restarts, long outages, cellular uplink limits |
+| M5 | Multi-destination | Linux + Twitch/YouTube | Destinations fail independently; YouTube as well as Twitch |
 | M6 | Product-quality iPhone app | **iPhone** | An ordinary person can broadcast without understanding it |
 | M7 | Web dashboard | Browser | A whole broadcast managed from the dashboard |
 | M8 | Self-hostable release | Fresh Linux VPS | A third party deploys it unaided |
+
+M1 is a thin slice through every layer (Reuben, 2026-11-22: "the first run … end to end … livestream from the phone on unstable internet and streaming on Twitch"). Later milestones harden each layer; none of them adds a new layer before M7.
 
 Later (not scheduled): Android client, adaptive bitrate, separate archive/broadcast quality, audio-only capture through interruptions, own viewer page with per-viewer catch-up choice, OAuth destination connections, several broadcasters per server.
 
 ---
 
-## M1: Server media pipeline prototype
+## M1: First run, iPhone to Twitch on unstable internet
 
-**Goal.** Answer the question the whole product depends on: can independently uploaded segments, with a 5-minute hole, become one continuous stream that never drops, with a holding screen and a catch-up that sounds right?
+**Goal.** Livestream from the iPhone through a connection that drops, and watch it on Twitch without the stream ending: footage, a holding screen while the phone is offline, then the missed footage at 1.25× until it is live again. Rough edges are fine; lost or repeated footage is not.
 
-**Built.**
-- `tools/fake-phone`: turns a test clip into fMP4 init + 2 s segments exactly as AVAssetWriter will (FFmpeg's HLS muxer in fMP4 mode), then uploads them in real time with protocol v1. Can pause, reorder, duplicate and corrupt uploads on command.
-- `tools/testclip`: generates the source: a frame counter and broadcast time burned into each frame as a machine-readable block, plus a 1 kHz tone with a beep every second.
-- Minimal API: create broadcast, PUT init, PUT segment, status (protocol v1, no auth beyond a static token yet), filesystem store, Postgres.
-- Playout (ADR 0005) with states `starting`, `live`, `holding`, `catching_up`, `finishing`.
-- MediaMTX in Docker; one forwarder to a **second** MediaMTX standing in for Twitch.
-- `tools/verify`: records the "platform" side and checks it automatically.
-- Network faults with `tc netem` in a network namespace (outage, 300 ms latency, 5% loss, uplink capped to 3 and 6 Mbps).
+**Built, in three steps.** Step A is done on Linux first so the phone sitting only tests the phone.
 
-**Acceptance test** (`tests/media-continuity/m1_outage.sh`, one command, ≈40 min):
-1. 30-minute test clip at 720p30, 4 Mbps. Fake phone uploads in real time.
-2. At minute 5 the network namespace drops all traffic for 5 minutes, then restores it (uplink 6 Mbps).
-3. Pass when all of these hold on the recording taken from the stand-in platform:
-   - Exactly **one** publish session at the stand-in for the whole run (MediaMTX log).
-   - Output timestamps strictly monotonic; no gap between frames over 1.5 frame durations; no audio gap over 25 ms.
-   - Holding screen visible within `buffer_target` + 2 s of the outage starting.
-   - Every source second from 0 to 30:00 appears, in order, none twice (frame-counter blocks; dropped frames inside a second are allowed during catch-up).
-   - During catch-up the tone is still 1 kHz ±2% (pitch preserved) and beeps arrive every 1/1.25 s.
-   - Back in `live` within 25 minutes of reconnection (5 min backlog at 1.25× = 20 min, plus upload time).
-4. Also passes: the same run with segments uploaded out of order, with 10% duplicate uploads, and with one corrupted upload (rejected by checksum, re-sent).
-5. Kill the playout process at minute 12: the stand-in still shows one session or a single reconnect under 5 s, and no footage is lost or repeated. (Records how forwarders bridge a playout restart; input for risk R3.)
+*A. Server and Linux bench (no phone).*
+- Repository skeleton, Docker Compose (API, Postgres, MediaMTX, playout).
+- API subset of protocol v1: create broadcast, PUT init, PUT segment, status. One static device token from the server's config file (pairing comes in M3).
+- Filesystem segment store, fsync before acknowledging.
+- Playout (ADR 0005) with `starting`, `live`, `holding`, `catching_up`, `finishing`: PyAV decode, frame-drop + `atempo` at 1.25×, one x264 encoder, holding screen with a moving clock and quiet audio.
+- One forwarder to Twitch (stream key in the server's config file, never in the repo), plus a local stand-in MediaMTX for tests.
+- `tools/testclip`, `tools/fake-phone` (fMP4 segments as AVAssetWriter makes them, real-time upload, pause/reorder/duplicate/corrupt), `tools/verify`, netem helpers.
 
-**Decision gate.** CPU use at real time on a 4-vCPU machine (≤ 70% of one core for the encoder), and a listening test of 1.25× and 1.5× speech. If either fails, switch engine (ADR 0005) before M2.
+*B. iPhone app, minimum.*
+- Forge app: SwiftUI preview, Start/Stop, status line (Recording · Uploading · N segments waiting · state from the server).
+- `AVCaptureSession` → `AVAssetWriter` fMP4 2 s segments → files; Rust core keeps the queue (SQLite manifest, epochs, sequences) and uploads oldest first with retry, backoff and a status reconcile on launch. Foreground only; screen kept awake.
+- Server address and token typed into a settings screen.
 
-## M2: iPhone recording engine (Device)
-
-**Goal.** The phone records 2 s segments to disk, whatever the network does, and recovers its queue after a restart.
-
-**Built.** Forge app (SwiftUI + Rust core). `AVCaptureSession` → `AVAssetWriter` (fMP4, 2 s) → files; Rust core manifest (SQLite) with epochs and sequence numbers; storage estimate and low-space warning; interruption handling (background, call, thermal) that closes the epoch cleanly; minimal UI: preview, record/stop, timer, queue size. No uploading yet. The segments can be pulled off the phone with `forge device` tooling for inspection.
+*C. A server the phone can reach over mobile data.* Choice for Reuben before step C (see "Needs from Reuben").
 
 **Acceptance test.**
-- Airplane mode on, record 30 minutes: 900 segments, each starting with an IDR frame, each 2.0 s ± 1 frame; joining them with the init plays without a visible or audible seam (checked on Linux with `tools/verify` in file mode).
-- Force-quit the app during recording, reopen: the queue lists every completed segment; the partial one is either complete or cleanly discarded; a new epoch starts.
-- Lock the screen for 30 s during recording: the epoch ends with reason `interrupted`, a new one starts on unlock, and the timeline gap is 30 s.
+1. *Bench (step A, scripted):* `tests/media-continuity/m1_outage.sh` (30-minute test clip, 5-minute total outage at minute 5, uplink capped at 6 Mbps) passes against the stand-in: one publish session throughout; strictly monotonic timestamps with no video gap over 1.5 frames or audio gap over 25 ms; holding screen within `buffer_target` + 2 s; every source second appears once and in order; tone stays 1 kHz ±2% during catch-up; back to `live` within 25 minutes. Variants pass with out-of-order, duplicated and corrupted uploads. Then the same run once to Twitch using Twitch's bandwidth-test mode (`?bandwidthtest=true` on the key), which reaches the ingest without going public.
+2. *Phone run (the M1 result, ≈30 minutes, iPhone):* start a broadcast to Twitch; a second device watches the Twitch page and never refreshes. At about minute 5, turn on airplane mode (or walk out of coverage) for 3–5 minutes, then reconnect. Pass when:
+   - the Twitch player shows footage, then the holding screen, then footage again without the stream ending or the page needing a refresh;
+   - after reconnecting, the missed minutes play at 1.25× with understandable audio, then the "behind live" figure returns to about 8 s;
+   - the Twitch VOD (or the server's archive, if the VOD is split) contains every minute recorded on the phone, none twice;
+   - the server's event log shows one Twitch session for the whole broadcast.
+   Results are written down per check; a check that wasn't seen is recorded as not run.
 
-**Phone note.** Needs a slot decision first (risk R11).
+**Not in M1** (comes later): pairing and per-device tokens, background uploads, interruptions beyond "end the epoch", skip-to-live, playout crash recovery, YouTube, more than one destination, dashboard, polished UI.
 
-## M3: Reliable upload
+**Decision gate after step A.** Real-time CPU headroom on the target server and a listening test at 1.25× and 1.5×. If either fails, switch the playout engine (ADR 0005) before the phone run.
 
-**Goal.** Protocol v1 complete on both sides: auth, pairing, idempotency, status reconciliation, background upload.
+**Needs from Reuben.**
+- A Twitch account to test on and its stream key (into the server config file on the server, not into chat or the repo).
+- Where the server runs for the phone run: the existing Hetzner box (reachable over mobile data, already has Caddy for TLS), or the laptop over Tailscale (phone needs Tailscale on; the laptop must stay awake). Recommended: Hetzner, because the test is about mobile networks and the laptop sleeps.
+- An iPhone slot (risk R11): a StreamRelay screen inside Device Lab, or swapping out the VPN or WebDriverAgent slot for the sitting.
+- One phone sitting of about 30 minutes, on mobile data.
 
-**Built.** Server: device pairing and tokens, ownership checks, rate limits, all response codes, crash repair at startup. Rust core: upload manager (ordering, concurrency, backoff, network-change retry, reconcile on launch); Swift: foreground and background `URLSession`.
+## M2: Recording engine hardening (Device)
+
+**Goal.** The phone never loses footage it has recorded.
+
+**Built.** Interruption handling (lock, background, phone call, Siri, other camera apps, thermal) that closes the epoch cleanly with a reason; crash and force-quit recovery of the queue; partial-segment cleanup; storage estimate before start and low-space warning; thermal-aware presets; `tools/verify` file mode for segments pulled off the phone.
 
 **Acceptance test.**
-- Linux chaos test (fake phone): 2 hours of random 5–120 s outages, 0–10% loss, server restarts every 20 minutes. At the end every segment is stored once with the right checksum, and the server log shows no 409.
-- iPhone: record 20 minutes while toggling airplane mode every 1–3 minutes; background the app for the last 5 minutes after stopping. Status shows every segment received; none missing, none duplicated.
-- Security: a second account's device token gets 404 on the first account's broadcast for every endpoint (automated).
+- Airplane mode on, record 30 minutes: 900 segments, each starting with an IDR frame, each 2.0 s ± 1 frame; joined with the init they play without a visible or audible seam (checked on Linux).
+- Force-quit during recording, reopen: every completed segment is in the queue; the partial one is complete or cleanly discarded; a new epoch starts.
+- Lock the screen for 30 s: the epoch ends with reason `interrupted`, a new one starts on unlock, and the timeline gap is 30 s.
 
-## M4: Hybrid recovery, end to end (Device)
+## M3: Upload hardening
 
-**Goal.** M1's playout driven by a real phone.
+**Goal.** Protocol v1 complete and secure on both sides.
 
-**Built.** Playout supervisor started by broadcast creation; heartbeats; recovery status shown on the phone (Live / Holding / Catching up, minutes behind); catch-up mode setting; finishing and end card.
+**Built.** Server: pairing codes, device tokens, revocation, ownership checks (404 for other people's broadcasts), rate limits, every response code, startup repair scan. Phone: background `URLSession` hand-off after the app leaves the foreground and reconciliation on relaunch; concurrency and network-change retry. OpenAPI/JSON Schema generated into `packages/protocol/` and checked in CI.
 
-**Acceptance test.** Walk out of coverage (or airplane mode) for 5 minutes during a 30-minute broadcast; viewer on OBS/ffplay watching the stand-in sees: footage, holding screen, footage again at 1.25×, then live; one session throughout; `tools/verify` passes the M1 checks on the recording. Repeat in skip-to-live mode: footage jumps to near-live within 15 s of reconnection; the archive still holds all footage.
+**Acceptance test.**
+- Linux chaos test (fake phone): 2 hours of random 5–120 s outages, 0–10% loss, server restarts every 20 minutes. Every segment stored once with the right checksum; no 409 in the log.
+- iPhone: record 20 minutes while toggling airplane mode every 1–3 minutes, then stop and background the app with a backlog: status shows every segment received, none missing or duplicated.
+- A second account's device gets 404 on the first account's broadcast for every endpoint (automated).
+
+## M4: Recovery hardening
+
+**Goal.** Recovery that holds up beyond the M1 happy path.
+
+**Built.** Skip-to-live mode; playout checkpoint and restart; epoch gaps shown as a short "Camera interrupted" card; speed ramps; 1.5× option; heartbeats and offline detection; phone shows Live / Holding / Catching up and minutes behind; lower default bitrate on cellular.
+
+**Acceptance test.**
+- Bench: kill the playout at minute 12 of the M1 bench run; the stand-in sees one session or one reconnect under 5 s, and no footage is lost or repeated. 20-minute outage with a 4 Mbps uplink cap: catches up, or the report says how long it would take.
+- Phone: repeat the M1 phone run in skip-to-live mode: footage jumps to near-live within 15 s of reconnecting; the archive still holds every minute.
 
 ## M5: Multi-destination
 
@@ -83,7 +97,7 @@ Later (not scheduled): Android client, adaptive bitrate, separate archive/broadc
 
 **Acceptance test.**
 - Two stand-in destinations; block one with `iptables` for 2 minutes: the other's session never drops; the blocked one reconnects by itself.
-- Real Twitch and YouTube test channels, one 45-minute broadcast with a 5-minute outage: both stay live without a viewer refresh; record what each platform shows (stream health warnings, VOD continuity). This is where risk R3 is settled.
+- Real Twitch and YouTube test channels, one 45-minute broadcast with a 5-minute outage: both stay live without a viewer refresh; record what each platform shows (stream health warnings, VOD continuity). M1 settles risk R3 for Twitch; this settles it for YouTube.
 
 ## M6: Product-quality iPhone app (Device)
 

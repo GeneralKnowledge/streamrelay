@@ -18,4 +18,4 @@
 fMP4 from AVAssetWriter is the same format the server stores, so the iPhone needs no remuxing. The Android client later needs its own fMP4 writer (Media3's `FragmentedMp4Muxer` or MediaCodec + MediaMuxer); the original CameraX `Recorder` cannot produce seamless 2 s segments.
 
 ## Revisit if
-M2 shows `AVAssetWriter` segments drift from 2 s or split audio badly at boundaries; then segment ourselves from `CMSampleBuffer`s with VideoToolbox.
+M1 or M2 shows `AVAssetWriter` segments drift from 2 s or split audio badly at boundaries; then segment ourselves from `CMSampleBuffer`s with VideoToolbox.

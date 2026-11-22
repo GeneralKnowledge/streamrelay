@@ -1,6 +1,6 @@
 # Playout engine
 
-The part that decides what viewers see, and the hardest part of StreamRelay. M1 exists to prove it.
+The part that decides what viewers see, and the hardest part of StreamRelay. M1 step A proves it on Linux before the phone run.
 
 ## Shape
 
@@ -55,4 +55,4 @@ The playout checkpoints `(state, epoch, sequence, frame offset)` to Postgres eve
 
 ## Implementation plan
 
-M1 builds this in Python with PyAV. Decision gate at the end of M1: if a 720p30 decode + speed + encode can't hold real time with 30% headroom on a 4-vCPU VPS-class machine, switch the engine to GStreamer (`input-selector`, `scaletempo`) and keep the scheduler in Python.
+M1 builds this in Python with PyAV. Decision gate after M1 step A: if a 720p30 decode + speed + encode can't hold real time with 30% headroom on a 4-vCPU VPS-class machine, switch the engine to GStreamer (`input-selector`, `scaletempo`) and keep the scheduler in Python.
