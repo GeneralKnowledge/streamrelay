@@ -85,11 +85,11 @@ Why one PUT instead of the spec's POST-then-PUT: on a bad connection every round
 POST /v1/broadcasts/{id}/epochs/{epoch}/end   { "last_sequence": 899, "reason": "interrupted|app_restart|camera_lost|stopped" }
 POST /v1/broadcasts/{id}/finish               { "last_epoch": 2 }
 ```
-**Every epoch gets an end call.** The client sends `epochs/{n}/end` when it closes an epoch (Stop, interruption, restart). After a crash, the relaunched app sends it for the crashed epoch from its manifest, using the last complete segment, before opening the next epoch. End calls go through the same queue as segments and are retried the same way.
+**Every epoch gets an end call.** The client sends `epochs/{n}/end` when it closes an epoch (Stop, interruption, restart). After a crash, the relaunched app sends it for the crashed epoch from its manifest, using the last complete segment, before opening the next epoch. An epoch that closed before its first segment completed is ended with `"last_sequence": -1` (empty); it counts as ended and complete with no segments. End calls go through the same queue as segments and are retried the same way.
 
 `finish` means "no more capture" and is sent after the last epoch's end call. The server rejects `finish` with `409` if any epoch up to `last_epoch` has no end call.
 
-**When a backlog counts as complete:** every epoch `0..last_epoch` has an end call, and every sequence `0..last_sequence` of each epoch is stored. In `catch_up` mode the playout drains in `finishing` until the backlog is complete and played. If it is still incomplete after the **drain wait** (default 15 minutes, per broadcast), the playout marks the missing segments `skipped`, shows the end card and closes the outputs. In `skip_to_live` mode it ends once the last epoch's final segment has played. Uploads after that are accepted for the archive only.
+**When a backlog counts as complete:** every epoch `0..last_epoch` has an end call, and every sequence `0..last_sequence` of each epoch is stored (nothing, for an empty epoch with `last_sequence: -1`). In `catch_up` mode the playout drains in `finishing` until the backlog is complete and played. If it is still incomplete after the **drain wait** (default 15 minutes, per broadcast), the playout marks the missing segments `skipped`, shows the end card and closes the outputs. In `skip_to_live` mode it ends once the last epoch's final segment has played. Uploads after that are accepted for the archive only.
 
 ### Status (reconciliation)
 ```
@@ -126,7 +126,7 @@ Every 5 s while connected. Lets the server tell "phone offline" from "phone onli
 ## Server rules
 
 - Validate: size ≤ `max_segment_bytes`; checksum; `start_us` monotonic within the epoch (±50 ms jitter allowed); duration 0.5–4 s, except a segment flagged `final`, which may be any length above 0.
-- Write to a temp file, fsync it, rename it into place, fsync the directory, then insert the row, then respond.
+- Write to a temp file, fsync it, rename it into place, fsync the directory, then insert the row and **commit** the transaction (Postgres `synchronous_commit` on, the default), and only then respond. No acknowledgement is sent before the commit succeeds.
 - A crash after the rename but before the insert leaves a file with no row. The startup scan **deletes** such files: the client never got an acknowledgement, so it still holds the segment and its metadata and will upload it again.
 - The playout never plays a segment twice in normal running. After a playout crash it resumes from its last checkpoint, so up to about one second can repeat ([playout crash recovery](../architecture/playout.md#crash-recovery)).
 - Rate limit per device (default 20 segment PUTs/s, far above the 0.5/s a live client needs plus catch-up).
