@@ -92,3 +92,9 @@ def test_gaps_lost_rows_and_escaping_paths_are_reported_not_crashed(media, tmp_p
     assert "epoch 2: closed at 0 but has no segment rows" in out
     assert "7/0: segment row with no epoch row" in out
     assert "../outside.m4s: path leaves the recording folder" in out
+
+
+def test_audio_that_stops_early_is_reported(media, tmp_path):
+    r = run(recording(tmp_path / "rec", media.parent / "shortaudio"))
+    assert r.returncode != 0
+    assert "audio covers" in r.stdout or "no audio packets" in r.stdout, r.stdout

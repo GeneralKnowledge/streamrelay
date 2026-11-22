@@ -196,9 +196,10 @@ public final class Manifest: @unchecked Sendable {
             try? FileManager.default.removeItem(at: folder.appendingPathComponent(name))
         }
         try locked {
-            for row in try db.query("SELECT init_id, file FROM inits WHERE uploaded = -1") {
+            // an init whose file is back: its segments can go again, whatever its upload state says
+            for row in try db.query("SELECT init_id, file, uploaded FROM inits") {
                 guard let f = row[1].text, FileManager.default.fileExists(atPath: folder.appendingPathComponent(f).path) else { continue }
-                try db.run("UPDATE inits SET uploaded = 0 WHERE init_id = ?", [row[0]])
+                if row[2].int == -1 { try db.run("UPDATE inits SET uploaded = 0 WHERE init_id = ?", [row[0]]) }
                 try db.run("UPDATE segments SET state = 'pending' WHERE init_id = ? AND state = 'blocked'", [row[0]])
             }
             for row in try db.query("SELECT epoch, sequence, file FROM segments WHERE state = 'pending'") {
@@ -371,11 +372,17 @@ public final class Manifest: @unchecked Sendable {
                         try db.run("UPDATE epochs SET end_sent = 0 WHERE epoch = ?", [.int(Int64(ep))])
                     }
                 }
-                if try db.query("SELECT 1 FROM epochs WHERE end_sent = 0").first != nil {
+                // finish is recorded apart from the epoch ends: a server without it hasn't heard Stop
+                let finishHeard = ["finishing", "finished", "failed"].contains(status.state)
+                let endUnsent = try db.query("SELECT 1 FROM epochs WHERE end_sent = 0").first != nil
+                if !finishHeard || endUnsent {
                     try db.run("UPDATE recording SET finish_sent = 0 WHERE id = 1")
                 }
                 for id in status.inits {
+                    // the server holds this init, so segments blocked on its lost file can go
                     try db.run("UPDATE inits SET uploaded = 1 WHERE init_id = ?", [.int(Int64(id))])
+                    try db.run("UPDATE segments SET state = 'pending' WHERE init_id = ? AND state = 'blocked'",
+                               [.int(Int64(id))])
                 }
             }
         }

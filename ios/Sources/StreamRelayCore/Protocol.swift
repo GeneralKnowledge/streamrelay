@@ -95,6 +95,10 @@ public final class URLSessionTransport: HTTPTransport, @unchecked Sendable {
             (data, response) = try await session.data(for: req)
         }
         guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
+        // an answer from wherever a redirect led is not the paired server's answer: treat it as none
+        guard let answered = http.url, ServerURL.origin(answered) == ServerURL.origin(base) else {
+            throw URLError(.badServerResponse)
+        }
         var headers: [String: String] = [:]
         for (k, v) in http.allHeaderFields {
             if let k = k as? String, let v = v as? String { headers[k.lowercased()] = v }

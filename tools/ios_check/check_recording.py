@@ -10,7 +10,7 @@ For every epoch in manifest.sqlite:
   timing     start_us of each segment = previous start + duration (within one frame)
   decode     init + all segments of the epoch decode with no errors
   total      decoded length within 0.1 % of the sum of declared durations
-  a/v        no audio gap over 50 ms inside an epoch
+  a/v        audio in every epoch, no gap over 50 ms inside it, and ends within 0.25 s of video's
 and across epochs: start_us never goes backwards, each closed epoch's final flag
 sits on its last sequence, and the recording's state (pending/acknowledged/damaged).
 
@@ -31,6 +31,7 @@ import tempfile
 from dataclasses import dataclass, field
 
 FRAME_TOL = 1.0 / 30 + 0.001
+EDGE_TOL = 0.25            # audio may start or end this much inside the video (AAC priming, capture start)
 
 
 @dataclass
@@ -69,6 +70,12 @@ def span(packets: list[tuple[float, float, bool]]) -> float:
         return 0.0
     step = frame_step(packets)
     return max(p[0] + (p[1] or step) for p in packets) - min(p[0] for p in packets)
+
+
+def edges(packets: list[tuple[float, float, bool]]) -> tuple[float, float]:
+    """Earliest start and latest end."""
+    step = frame_step(packets)
+    return min(p[0] for p in packets), max(p[0] + (p[1] or step) for p in packets)
 
 
 def max_gap(packets: list[tuple[float, float, bool]]) -> float:
@@ -201,10 +208,19 @@ def check(folder: str) -> Report:
                 want = info["seconds_declared"]
                 if want and abs(total - want) / want > 0.001 and abs(total - want) > FRAME_TOL:
                     rep.fail(f"epoch {epoch}: decodes to {total:.3f} s, declared {want:.3f} s")
-            gap = max_gap(probe_packets(joined, "a:0"))
-            info["max_audio_gap_ms"] = round(gap * 1000, 1)
-            if gap > 0.05:
-                rep.fail(f"epoch {epoch}: audio gap of {gap * 1000:.0f} ms")
+            audio = probe_packets(joined, "a:0")
+            if not audio:
+                rep.fail(f"epoch {epoch}: no audio packets")
+            else:
+                gap = max_gap(audio)
+                info["max_audio_gap_ms"] = round(gap * 1000, 1)
+                if gap > 0.05:
+                    rep.fail(f"epoch {epoch}: audio gap of {gap * 1000:.0f} ms")
+                if video:
+                    # inner gaps can't see audio that stops early or starts late: compare the ends with video's
+                    (a0, a1), (v0, v1) = edges(audio), edges(video)
+                    if a0 - v0 > EDGE_TOL or v1 - a1 > EDGE_TOL:
+                        rep.fail(f"epoch {epoch}: audio covers {a0:.3f}-{a1:.3f} s, video {v0:.3f}-{v1:.3f} s")
         info["seconds_declared"] = round(info["seconds_declared"], 3)
     return rep
 

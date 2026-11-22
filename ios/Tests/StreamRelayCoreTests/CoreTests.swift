@@ -169,11 +169,14 @@ final class UploadQueueTests: XCTestCase {
         let server = FakeServer(), clock = VirtualClock()
         let counter = Locked(0)
         let q = queue(m, server, clock, concurrency: 1, events: { e in
-            if case .stored = e { counter.with { $0 += 1 } }
+            guard case .stored = e else { return }
+            // the tenth stored segment takes the network down at once, so work is surely left when Stop comes
+            if counter.with({ $0 += 1; return $0 }) == 10 { server.locked { server.faults.putsOffline = true } }
         })
         let task = Task { await q.run() }
         await eventually("10 segments stored") { counter.with { $0 } >= 10 }
         await q.stop()
+        server.locked { server.faults.putsOffline = false }
         let first = await task.value
         XCTAssertEqual(first, .stopped)
         XCTAssertGreaterThan(try m.backlog().segments, 0, "the first run stopped with work left")
@@ -369,6 +372,27 @@ final class ManifestSafetyTests: XCTestCase {
         ], inits: [0]))
         XCTAssertEqual(try m.epochs().first?.endSent, false)
         XCTAssertEqual(try m.recording().finishSent, false, "finish goes again after the end")
+    }
+
+    func testReconcileResendsAFinishTheServerLost() throws {
+        let m = try makeRecording(count: 2)            // closed, finish requested
+        try m.markEpochEndSent(0)
+        try m.markFinishSent()
+        let ended = [BroadcastStatus.Epoch(epoch: 0, receivedThrough: 1, ended: true)]
+        try m.reconcile(with: BroadcastStatus(state: "finishing", epochs: ended, inits: [0]))
+        XCTAssertEqual(try m.recording().finishSent, true, "the server has it: nothing to resend")
+        try m.reconcile(with: BroadcastStatus(state: "live", epochs: ended, inits: [0]))
+        XCTAssertEqual(try m.recording().finishSent, false, "every end is there but not the finish: send it again")
+    }
+
+    func testSegmentsBlockedOnALostInitGoOnceTheServerHasIt() throws {
+        let m = try makeRecording(count: 2)
+        try FileManager.default.removeItem(at: m.url(of: "init-0.mp4"))
+        _ = try m.markInitLost(0)
+        XCTAssertEqual(try m.segment(SegmentKey(epoch: 0, sequence: 0))?.state, .blocked)
+        // its upload had gone through after all (the answer was lost): the server lists it
+        try m.reconcile(with: BroadcastStatus(state: "live", epochs: [], inits: [0]))
+        XCTAssertEqual(try m.segment(SegmentKey(epoch: 0, sequence: 0))?.state, .pending)
     }
 
     func testOnlyHTTPSOrTailnetCarriesCredentials() {

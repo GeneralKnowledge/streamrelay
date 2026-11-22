@@ -66,6 +66,11 @@ def media(tmp_path_factory) -> Path:
     subprocess.run(["ffmpeg", "-v", "error", "-i", str(d / "clip.mp4"), "-an", "-c:v", "copy", "-f", "hls", "-hls_time", "2",
                     "-hls_segment_type", "fmp4", "-hls_fmp4_init_filename", "init.mp4",
                     "-hls_segment_filename", str(d / "noaudio/%05d.m4s"), str(d / "noaudio/index.m3u8")], check=True)
+    (d / "shortaudio").mkdir()   # audio only in the first 2 s of the 6 s clip, with no gap inside it
+    subprocess.run(["ffmpeg", "-v", "error", "-i", str(d / "clip.mp4"), "-c:v", "copy", "-af", "atrim=end=2",
+                    "-c:a", "aac", "-f", "hls", "-hls_time", "2", "-hls_segment_type", "fmp4",
+                    "-hls_fmp4_init_filename", "init.mp4", "-hls_segment_filename", str(d / "shortaudio/%05d.m4s"),
+                    str(d / "shortaudio/index.m3u8")], check=True)
     subprocess.run(["ffmpeg", "-v", "error", "-i", str(d / "clip.mp4"), "-t", "2", "-c", "copy", "-f", "mpegts",
                     str(d / "clip.ts")], check=True)     # clean H.264/AAC in the wrong container
     return d / "segs"

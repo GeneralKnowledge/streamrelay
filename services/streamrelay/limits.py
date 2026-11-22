@@ -44,14 +44,24 @@ class StorageGuard:
         self.used: int | None = None
         self.reserved = 0
         self.read_at = 0.0
+        self.landed_during_read: int | None = None   # writes stored while a refresh awaits the database
 
     async def refresh(self, conn: psycopg.AsyncConnection) -> None:
+        if self.landed_during_read is not None and self.used is not None:
+            return                                   # another request is reading; the current total stands
         if self.used is None or time.monotonic() - self.read_at > 1.0:
-            cur = await conn.execute(
-                "SELECT coalesce((SELECT sum(size_bytes) FROM segments), 0) + coalesce((SELECT sum(size_bytes) FROM inits), 0)")
-            row = await cur.fetchone()
-            self.used = int(row[0]) if row else 0
-            self.read_at = time.monotonic()
+            self.landed_during_read = 0
+            try:
+                cur = await conn.execute(
+                    "SELECT coalesce((SELECT sum(size_bytes) FROM segments), 0)"
+                    " + coalesce((SELECT sum(size_bytes) FROM inits), 0)")
+                row = await cur.fetchone()
+                # a write that landed during the read may or may not be in its snapshot: count it anyway,
+                # since a total briefly too high only delays an upload, and one too low could pass the cap
+                self.used = (int(row[0]) if row else 0) + self.landed_during_read
+                self.read_at = time.monotonic()
+            finally:
+                self.landed_during_read = None
 
     def free_bytes(self) -> int:
         st = os.statvfs(self.root)
@@ -73,3 +83,5 @@ class StorageGuard:
     def stored(self, n: int) -> None:
         if self.used is not None:
             self.used += n
+        if self.landed_during_read is not None:
+            self.landed_during_read += n

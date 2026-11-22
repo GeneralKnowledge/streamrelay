@@ -81,7 +81,7 @@ final class FakeServer: HTTPTransport, @unchecked Sendable {
                 let missing = (max(through + 1, 0)...max(top, through + 1)).filter { $0 <= top && !seqs.contains($0) }
                 return ["epoch": e, "received_through": through, "missing": missing, "ended": epochEnds[e] != nil]
             }
-            return json(200, ["state": "live", "epochs": list, "inits": inits.keys.sorted()])
+            return json(200, ["state": finished == nil ? "live" : "finishing", "epochs": list, "inits": inits.keys.sorted()])
         case ("PUT", 5) where parts[3] == "inits":
             let id = Int(parts[4])!
             let sha = SHA256.hex(r.body ?? Data())

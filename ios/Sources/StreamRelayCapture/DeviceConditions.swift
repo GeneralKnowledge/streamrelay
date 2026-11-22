@@ -44,10 +44,8 @@ public final class DeviceConditions: @unchecked Sendable {
                                      queue: .main) { [weak self] _ in
             guard let self else { return }
             let recorder = self.recorder
-            recorder.endEpoch(.cameraLost) {
-                // resume() checks, when it runs, that recording wasn't stopped in the meantime
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { recorder.resume() }
-            }
+            // recoverCamera() restarts the session and checks that recording wasn't stopped meanwhile
+            recorder.endEpoch(.cameraLost) { recorder.recoverCamera() }
         })
         tokens.append(nc.addObserver(forName: ProcessInfo.thermalStateDidChangeNotification, object: nil,
                                      queue: .main) { [weak self] _ in self?.applyPower() })

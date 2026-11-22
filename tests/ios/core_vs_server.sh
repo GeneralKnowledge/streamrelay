@@ -34,13 +34,13 @@ export SR_STORE_DIR="$work/store" SR_PORT=${SR_PORT:-8082} SR_STORAGE_FREE_MIN_B
 proxy_port=${PROXY_PORT:-8092}
 start_api() { local deadline=$(( $(date +%s) + 10 ))
               # a server left over from another run would answer the health check in this one's place
-              while curl -s -o /dev/null "http://127.0.0.1:$SR_PORT/v1/health"; do
+              while curl -s --max-time 2 -o /dev/null "http://127.0.0.1:$SR_PORT/v1/health"; do
                 (( $(date +%s) > deadline )) && { echo "port $SR_PORT is already in use"; exit 1; }
                 sleep 0.2
               done
               streamrelay-api >> "$work/api.log" 2>&1 & api=$!
               deadline=$(( $(date +%s) + 60 ))
-              until curl -sf "http://127.0.0.1:$SR_PORT/v1/health" > /dev/null; do
+              until curl -sf --max-time 2 "http://127.0.0.1:$SR_PORT/v1/health" > /dev/null; do
                 if ! kill -0 "$api" 2>/dev/null || (( $(date +%s) > deadline )); then
                   echo "API did not start:"; tail -20 "$work/api.log"; exit 1
                 fi

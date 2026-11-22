@@ -15,6 +15,22 @@ enum Pairing {
         Keychain.token(for: ServerURL.origin(server))
     }
 
+    /// The origin a recording belongs to: the server paired when it was recorded. Its files go there or nowhere.
+    static func owner(of m: Manifest) -> String? {
+        (try? String(contentsOf: m.folder.appendingPathComponent("server-origin"), encoding: .utf8))
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+    }
+
+    static func setOwner(_ m: Manifest, _ server: URL) throws {
+        try Data(ServerURL.origin(server).utf8).write(to: m.folder.appendingPathComponent("server-origin"), options: .atomic)
+    }
+
+    /// Whether the recording may go to this server (a recording from before owners were kept is adopted).
+    static func belongs(_ m: Manifest, to server: URL) -> Bool {
+        guard let o = owner(of: m) else { return (try? setOwner(m, server)) != nil }
+        return o == ServerURL.origin(server)
+    }
+
     static var recordingsFolder: URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let f = docs.appendingPathComponent("Recordings", isDirectory: true)
@@ -30,7 +46,10 @@ enum Pairing {
         guard let server, ServerURL.isAllowed(server) else { return nil }
         let folder = recordingsFolder
         let h = BackgroundHandOff(base: server, token: { Pairing.token(for: server) }) { name in
-            try? Manifest(folder: folder.appendingPathComponent(name))
+            // a finished task is only acknowledged in a recording that belongs to this server
+            guard let m = try? Manifest(folder: folder.appendingPathComponent(name)),
+                  Pairing.owner(of: m) == ServerURL.origin(server) else { return nil }
+            return m
         }
         h.resume()
         return h
@@ -79,6 +98,8 @@ final class AppModel {
     private var queueTask: Task<Void, Never>?
     private var ticker: Task<Void, Never>?
     private var foreground = true
+    private var transition = 0                  // bumped on each background/foreground change
+    private var launched = false
     private var current: Manifest?
     private let path = NWPathMonitor()
 
@@ -87,6 +108,8 @@ final class AppModel {
     /// After a crash or force-quit: close open epochs, tidy files, queue every recording that hasn't
     /// finished uploading (oldest first), and offer the newest unfinished one for resuming.
     func launch() {
+        guard !launched else { return }           // a second scene must not recover a recording in progress
+        launched = true
         let folders = (try? FileManager.default.contentsOfDirectory(
             at: Pairing.recordingsFolder, includingPropertiesForKeys: [.creationDateKey])) ?? []
         func created(_ u: URL) -> Date { (try? u.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? .distantPast }
@@ -122,6 +145,7 @@ final class AppModel {
             try Keychain.save(token, for: ServerURL.origin(base))
             await retireUploadsForOldServer(base)
             UserDefaults.standard.set(base.absoluteString, forKey: "pairedServer")
+            Pairing.handOff?.invalidate()
             Pairing.handOff = Pairing.makeHandOff()
             paired = true
             pumpUploads()
@@ -137,8 +161,12 @@ final class AppModel {
     func unpair() {
         Task {
             await retireUploadsForOldServer(nil)
-            if let s = Pairing.server { Keychain.delete(for: ServerURL.origin(s)) }
+            if let s = Pairing.server, !Keychain.delete(for: ServerURL.origin(s)) {
+                problem = "Couldn't remove the pairing from this iPhone's Keychain. Try again."
+                return
+            }
             UserDefaults.standard.removeObject(forKey: "pairedServer")
+            Pairing.handOff?.invalidate()
             Pairing.handOff = nil
             paired = false
         }
@@ -170,6 +198,7 @@ final class AppModel {
                                         holdMaxDelaySeconds: mode == .hold ? holdMaxDelayMinutes * 60 : nil)
                 uploads.append(m)
             }
+            if let server = Pairing.server { try Pairing.setOwner(m, server) }
             current = m
             resumable = m
             let origin = ((try? m.folder.resourceValues(forKeys: [.creationDateKey]))?.creationDate) ?? Date()
@@ -188,7 +217,12 @@ final class AppModel {
             cond.start()
             r.begin()
             phase = .recording
-            pumpUploads()
+            if queueTask != nil, queueManifest !== m {
+                // another recording holds the upload slot: it gives way, and the pump picks this one next
+                Task { await queue?.stop() }
+            } else {
+                pumpUploads()
+            }
         } catch {
             problem = "Couldn't start the camera: \(error)"
         }
@@ -199,17 +233,23 @@ final class AppModel {
         phase = .stopping
         conditions?.stop()
         r.finish { [weak self] in
-            // the epoch's close is in the manifest: now the broadcast may finish
-            try? m.requestFinish()
             r.stopSession()
-            Task { @MainActor in
-                guard let self else { return }
-                if self.resumable === m { self.resumable = nil }
-                self.phase = .idle
-                await self.queue?.nudge()
-                self.pumpUploads()
-            }
+            Task { @MainActor in await self?.saveFinish(m) }
         }
+    }
+
+    /// The epoch's close is in the manifest: now the broadcast may finish. Stop is done only once the
+    /// finish request is saved, or a relaunch would offer to resume a recording the user stopped.
+    private func saveFinish(_ m: Manifest) async {
+        while (try? m.requestFinish()) == nil {
+            problem = "Couldn't save Stop on this iPhone. Retrying…"
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+        }
+        problem = nil
+        if resumable === m { resumable = nil }
+        phase = .idle
+        await queue?.nudge()
+        pumpUploads()
     }
 
     private func recorderEvent(_ e: SegmentRecorder.Event) {
@@ -221,6 +261,9 @@ final class AppModel {
             Task { await queue?.nudge() }
         case .epochClosed: break
         case .failed(let why): problem = why
+        case .gaveUp(let why):
+            problem = why
+            stop()
         }
     }
 
@@ -231,7 +274,9 @@ final class AppModel {
     /// request that arrives while an old queue is still winding down is picked up when it exits.
     private func pumpUploads() {
         guard foreground, queueTask == nil, paired, let server = Pairing.server, ServerURL.isAllowed(server) else { return }
-        guard let m = (current.flatMap { c in uploads.first { $0 === c } }) ?? uploads.first else { return }
+        // only recordings of this server: another server's stay queued until it is paired again
+        let mine = uploads.filter { Pairing.belongs($0, to: server) }
+        guard let m = (current.flatMap { c in mine.first { $0 === c } }) ?? mine.first else { return }
         let c = ProtocolClient(transport: URLSessionTransport(base: server, token: { Pairing.token(for: server) }))
         let q = UploadQueue(manifest: m, client: c, onEvent: { [weak self] e in
             Task { @MainActor in self?.queueEvent(e) }
@@ -273,15 +318,20 @@ final class AppModel {
     /// Leaving the foreground: the camera stops (iOS), the queue goes to the background session.
     func enteredBackground() {
         foreground = false
-        let pending = uploads
+        transition += 1
+        let mine = transition
+        let pending = uploads.filter { m in Pairing.server.map { Pairing.belongs(m, to: $0) } ?? false }
         Task {
             await queue?.stop()
-            for m in pending { Pairing.handOff?.handOff(m) }
+            // back in the foreground while the queue wound down: its own queue carries on instead
+            guard transition == mine, !foreground else { return }
+            for m in pending { Pairing.handOff?.handOff(m) }   // a later cancelAll() voids any still being scheduled
         }
     }
 
     func enteredForeground() {
         foreground = true
+        transition += 1
         Pairing.handOff?.cancelAll()
         pumpUploads()
     }
@@ -302,7 +352,8 @@ final class AppModel {
         guard let m = current else { return }
         if let b = try? m.backlog() { backlog = b }
         hoursLeft = conditions?.hoursRemaining()
-        guard let server = Pairing.server, ServerURL.isAllowed(server), let bid = try? m.recording().broadcastID else { return }
+        guard let server = Pairing.server, ServerURL.isAllowed(server), Pairing.belongs(m, to: server),
+              let bid = try? m.recording().broadcastID else { return }
         let c = ProtocolClient(transport: URLSessionTransport(base: server, token: { Pairing.token(for: server) }))
         let body = HeartbeatBody(epoch: epoch, capturedThrough: (try? m.lastStoredSequence(epoch: epoch ?? 0)),
                                  queueDepth: backlog.segments, queueBytes: backlog.bytes,

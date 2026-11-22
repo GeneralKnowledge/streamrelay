@@ -39,8 +39,11 @@ enum Keychain {
         guard status == errSecSuccess else { throw Failure(status: status) }
     }
 
-    static func delete(for origin: String) {
-        SecItemDelete(query(origin) as CFDictionary)
+    /// Removes the token; false if the Keychain kept it.
+    @discardableResult
+    static func delete(for origin: String) -> Bool {
+        let status = SecItemDelete(query(origin) as CFDictionary)
+        return status == errSecSuccess || status == errSecItemNotFound
     }
 }
 #endif

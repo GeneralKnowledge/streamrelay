@@ -23,6 +23,8 @@ public final class BackgroundHandOff: NSObject, URLSessionDataDelegate, @uncheck
         return URLSession(configuration: c, delegate: self, delegateQueue: nil)
     }()
     public var finishedEvents: (() -> Void)?
+    private let lock = NSLock()
+    private var round = 0                 // bumped by cancelAll(): hand-offs still being scheduled are void
 
     public init(base: URL, token: @escaping @Sendable () -> String?, manifestFor: @escaping @Sendable (String) -> Manifest?) {
         self.base = base
@@ -42,9 +44,10 @@ public final class BackgroundHandOff: NSObject, URLSessionDataDelegate, @uncheck
     public func handOff(_ manifest: Manifest, limit: Int = 300) {
         guard ServerURL.isAllowed(base), let rec = try? manifest.recording(), let bid = rec.broadcastID,
               let t = token() else { return }
-        // epochs before segments: a segment read after its epoch closed already carries its final flag
-        guard let open = try? Set(manifest.epochs().filter { $0.lastSequence == nil }.map(\.epoch)) else { return }
-        func ready(_ s: SegmentRecord) -> Bool { !(open.contains(s.key.epoch) && s.durationMicros < 1_750_000) }
+        // epochs before segments, and only an epoch seen closed counts as closed: a segment of an epoch that
+        // opened or closed after this read is treated as open, so a short one waits for its final flag
+        guard let closed = try? Set(manifest.epochs().filter { $0.lastSequence != nil }.map(\.epoch)) else { return }
+        func ready(_ s: SegmentRecord) -> Bool { closed.contains(s.key.epoch) || s.durationMicros >= 1_750_000 }
         let segments: [SegmentRecord]
         if rec.mode == .skipToLive {
             segments = ((try? manifest.newestPending(limit: 3)) ?? []).filter(ready).prefix(1).map { $0 }
@@ -52,7 +55,10 @@ public final class BackgroundHandOff: NSObject, URLSessionDataDelegate, @uncheck
             segments = ((try? manifest.pending(limit: limit)) ?? []).filter(ready)
         }
         let folder = manifest.folder.lastPathComponent
+        lock.lock(); let mine = round; lock.unlock()
         session.getAllTasks { [self] running in
+            lock.lock(); defer { lock.unlock() }
+            guard round == mine else { return }       // the app came back meanwhile: its own queue has it
             let already = Set(running.compactMap(\.taskDescription))
             for i in (try? manifest.inits()) ?? [] where !i.uploaded {
                 let desc = "\(folder)|init|\(i.id)"
@@ -83,7 +89,14 @@ public final class BackgroundHandOff: NSObject, URLSessionDataDelegate, @uncheck
 
     /// Cancels the hand-off when the app is back in the foreground and its own queue takes over.
     public func cancelAll() {
+        lock.lock(); round += 1; lock.unlock()
         session.getAllTasks { $0.forEach { $0.cancel() } }
+    }
+
+    /// Before another hand-off replaces this one (pairing changed): two sessions must not share the identifier.
+    public func invalidate() {
+        lock.lock(); round += 1; lock.unlock()
+        session.invalidateAndCancel()
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
@@ -99,7 +112,10 @@ public final class BackgroundHandOff: NSObject, URLSessionDataDelegate, @uncheck
         }
     }
 
-    /// Refuse redirects: an upload goes to the paired server or not at all.
+    /// Refuse redirects. iOS calls this only for default and ephemeral sessions: tasks in a background
+    /// session follow redirects by themselves, so it is a second line here. What holds in the background
+    /// is that only an answer from the paired origin acknowledges a segment (see above); the body itself
+    /// can still follow a redirect, which is why plain http is allowed only to loopback and Tailscale.
     public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
                            newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         completionHandler(nil)

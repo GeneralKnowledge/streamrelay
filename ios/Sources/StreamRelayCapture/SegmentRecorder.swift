@@ -35,9 +35,15 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
         case segmentStored(SegmentKey, bytes: Int)
         case epochClosed(Int, lastSequence: Int, reason: EpochEndReason)
         case failed(String)
+        /// Recording can't go on (the writer or camera kept failing): the app should stop it.
+        case gaveUp(String)
     }
 
     public let session = AVCaptureSession()
+    /// One serial queue for every recorder's startRunning/stopRunning, so a new recording's session
+    /// starts only after the previous one has let go of the camera.
+    private static let sessionQueue = DispatchQueue(label: "streamrelay.capture-session", qos: .userInitiated)
+    private var wantedQuality: Quality?      // the latest change(to:), applied when its close completes
     public let manifest: Manifest
     public var onEvent: (@Sendable (Event) -> Void)?
 
@@ -167,7 +173,7 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
             startEpochOnQueue()
         }
         if !session.isRunning {
-            DispatchQueue.global(qos: .userInitiated).async { self.session.startRunning() }
+            Self.sessionQueue.async { self.session.startRunning() }
         }
     }
 
@@ -176,6 +182,18 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
         queue.async { [self] in
             guard active else { return }
             startEpochOnQueue()
+        }
+    }
+
+    /// The camera reported a runtime error and its epoch is closed: restart the capture session, then a
+    /// new epoch, sharing the writer's retry budget so a camera that keeps failing ends the recording.
+    public func recoverCamera() {
+        queue.async { [self] in
+            guard active else { return }
+            if !session.isRunning {
+                Self.sessionQueue.async { self.session.startRunning() }
+            }
+            retryAfterWriterFailure()
         }
     }
 
@@ -197,15 +215,18 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
     /// Ends the epoch and restarts with another quality (thermal step-down, Low Power Mode).
     public func change(to q: Quality) {
         queue.async { [self] in
-            guard q != quality else { return }
+            guard q != (wantedQuality ?? quality) else { return }
+            wantedQuality = q
             guard case .recording = state else {          // not recording: the next epoch uses it
                 setQuality(q)
+                wantedQuality = nil
                 return
             }
             let gen = generation
             closeOnQueue(.interrupted) { [self] in
                 queue.async { [self] in
-                    setQuality(q)
+                    // the latest request wins, even if another arrived while this close was under way
+                    if let w = wantedQuality { setQuality(w); wantedQuality = nil }
                     // Stop pressed meanwhile: this recording is over, don't start another epoch
                     if generation == gen && active { startEpochOnQueue() }
                 }
@@ -214,7 +235,7 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
     }
 
     public func stopSession() {
-        DispatchQueue.global(qos: .userInitiated).async { self.session.stopRunning() }
+        Self.sessionQueue.async { self.session.stopRunning() }
     }
 
     private func setQuality(_ q: Quality) {
@@ -264,9 +285,10 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
             state = .closing(run, reason: r, waiting: waiting)
         case .recording(let run):
             state = .closing(run, reason: reason, waiting: completion.map { [$0] } ?? [])
-            run.video.markAsFinished()
-            run.audio.markAsFinished()
             if run.writer.status == .writing {
+                // only a started writer's inputs may be finished: one stopped before its first frame skips this
+                run.video.markAsFinished()
+                run.audio.markAsFinished()
                 run.writer.finishWriting { [self] in
                     queue.async { [self] in
                         if run.writer.status == .failed {
@@ -320,7 +342,7 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
     private func retryAfterWriterFailure() {
         writerFailures += 1
         guard active, writerFailures <= 5 else {
-            if active { onEvent?(.failed("recording stopped: the camera writer keeps failing")) }
+            if active { onEvent?(.gaveUp("Recording stopped: the camera keeps failing. Press Start to try again.")) }
             return
         }
         let gen = generation
@@ -433,6 +455,7 @@ extension SegmentRecorder: AVAssetWriterDelegate {
                 run.lastSegmentEnd = CMTimeAdd(start, duration)
                 run.sequence += 1
                 onEvent?(.segmentStored(key, bytes: segmentData.count))
+                queue.async { [self] in writerFailures = 0 }     // recovered: earlier failures don't count
             @unknown default:
                 break
             }
