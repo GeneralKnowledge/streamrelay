@@ -86,6 +86,25 @@ class Phone:
         with open(os.path.join(self.a.segments, f"{i:05d}.m4s"), "rb") as f:
             return f.read()
 
+    def call(self, method: str, url: str, **kw: object) -> httpx.Response:
+        """A control request, retried with backoff until the server answers (outages, restarts)."""
+        backoff = 1.0
+        while True:
+            try:
+                r = self.http.request(method, url, **kw)  # type: ignore[arg-type]
+                if r.status_code < 500 and r.status_code != 429:
+                    return r
+            except httpx.HTTPError as e:
+                self.log("call_error", url=url, error=str(e)[:200])
+            time.sleep(self.rng.uniform(0, backoff))
+            backoff = min(30.0, backoff * 2)
+
+    def pair(self, code: str) -> None:
+        r = self.call("POST", "/v1/devices/pair", json={"code": code, "name": "fake phone", "platform": "test"})
+        r.raise_for_status()
+        self.http.headers["Authorization"] = f"Bearer {r.json()['token']}"
+        self.log("paired", device_id=r.json()["device_id"])
+
     def put_init(self) -> None:
         data = open(os.path.join(self.a.segments, "init.mp4"), "rb").read()
         while True:
@@ -121,9 +140,11 @@ class Phone:
                 status = r.status_code
             except httpx.HTTPError as e:
                 status = 0
-                self.log("put", seq=i, kind=kind, status=0, error=str(e)[:200])
+                self.log("put", seq=i, kind=kind, status=0, error=str(e)[:200],
+                         **({"corrupt": True} if send is not data else {}))
             if status:
                 self.log("put", seq=i, kind=kind, status=status, ms=round((time.time() - t) * 1000), bytes=len(send),
+                         **({"corrupt": True} if send is not data else {}),
                          **({"error": r.text[:200]} if status >= 400 else {}))
             if status in (200, 201):
                 return status
@@ -148,8 +169,10 @@ class Phone:
     def run(self) -> None:
         a = self.a
         ref = a.ref or str(uuid.uuid4())
-        r = self.http.post("/v1/broadcasts", json={"title": a.title, "client_broadcast_ref": ref,
-                                                   "catch_up": {"mode": a.mode}})
+        if a.pair:
+            self.pair(a.pair)
+        r = self.call("POST", "/v1/broadcasts", json={"title": a.title, "client_broadcast_ref": ref,
+                                                      "catch_up": {"mode": a.mode}})
         r.raise_for_status()
         self.bid = r.json()["broadcast_id"]
         t0 = time.time()
@@ -220,11 +243,11 @@ class Phone:
             time.sleep(0.02)
         pool.shutdown(wait=True)
         last = n - 1
-        r = self.http.post(f"/v1/broadcasts/{self.bid}/epochs/0/end", json={"last_sequence": last, "reason": "stopped"})
+        r = self.call("POST", f"/v1/broadcasts/{self.bid}/epochs/0/end", json={"last_sequence": last, "reason": "stopped"})
         self.log("epoch_end", status=r.status_code)
-        r = self.http.post(f"/v1/broadcasts/{self.bid}/finish", json={"last_epoch": 0})
+        r = self.call("POST", f"/v1/broadcasts/{self.bid}/finish", json={"last_epoch": 0})
         self.log("finish", status=r.status_code, acked=len(self.acked), damaged=sorted(self.damaged))
-        st = self.http.get(f"/v1/broadcasts/{self.bid}/status").json()
+        st = self.call("GET", f"/v1/broadcasts/{self.bid}/status").json()
         self.log("status", **st)
 
 
@@ -236,6 +259,7 @@ def main() -> None:
     ap.add_argument("--mode", default="skip_to_live", choices=["catch_up", "hold", "skip_to_live"])
     ap.add_argument("--title", default="fake phone")
     ap.add_argument("--ref")
+    ap.add_argument("--pair", help="pairing code: pair first and use the issued token")
     ap.add_argument("--offline", default="")
     ap.add_argument("--reorder", type=float, default=0.0)
     ap.add_argument("--duplicate", type=float, default=0.0)
