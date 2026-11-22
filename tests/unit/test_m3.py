@@ -261,6 +261,33 @@ def test_concurrent_uploads_cannot_both_pass_the_cap(tmp_path: Path):
     asyncio.run(run())
 
 
+def test_concurrent_first_refreshes_share_one_read(tmp_path: Path):
+    """Two uploads at start-up both need the first total: the second waits for it instead of failing."""
+    import asyncio
+
+    from streamrelay.limits import StorageGuard
+
+    g = StorageGuard(str(tmp_path), max_bytes=1000, free_min_bytes=0)
+    reads = 0
+
+    class Conn:
+        async def execute(self, _sql: str) -> Conn:
+            nonlocal reads
+            reads += 1
+            await asyncio.sleep(0.05)          # the other request arrives while this read is out
+            return self
+
+        async def fetchone(self) -> tuple[int]:
+            return (40,)
+
+    async def run() -> None:
+        a, b = await asyncio.gather(g.admit(Conn(), 5), g.admit(Conn(), 5))  # type: ignore[arg-type]
+        assert g.used == 40 and reads == 1
+        g.release(a)
+        g.release(b)
+    asyncio.run(run())
+
+
 def test_control_bodies_are_capped_before_parsing(client: TestClient):
     big = b'{"code": "' + b"A" * 100_000 + b'", "name": "x", "platform": "test"}'
     r = client.post("/v1/devices/pair", content=big, headers={"Content-Type": "application/json"})

@@ -312,21 +312,25 @@ public final class Manifest: @unchecked Sendable {
         public var bytes: Int64
         public var seconds: Double
         public var damaged: Int          // rejected by the server, or blocked by a missing init
+        public var blocked: Int          // of those, the ones blocked by a missing init (they may still go)
 
-        public init(segments: Int = 0, bytes: Int64 = 0, seconds: Double = 0, damaged: Int = 0) {
+        public init(segments: Int = 0, bytes: Int64 = 0, seconds: Double = 0, damaged: Int = 0, blocked: Int = 0) {
             self.segments = segments
             self.bytes = bytes
             self.seconds = seconds
             self.damaged = damaged
+            self.blocked = blocked
         }
     }
 
     public func backlog() throws -> Backlog {
         try locked {
             let r = try db.query("SELECT count(*), coalesce(sum(bytes), 0), coalesce(sum(duration_us), 0) FROM segments WHERE state = 'pending'")
-            let d = try db.query("SELECT count(*) FROM segments WHERE state IN ('damaged', 'blocked')")
+            let d = try db.query("SELECT count(*), coalesce(sum(state = 'blocked'), 0) FROM segments"
+                                 + " WHERE state IN ('damaged', 'blocked')")
             return Backlog(segments: Int(r[0][0].int ?? 0), bytes: r[0][1].int ?? 0,
-                           seconds: Double(r[0][2].int ?? 0) / 1e6, damaged: Int(d[0][0].int ?? 0))
+                           seconds: Double(r[0][2].int ?? 0) / 1e6, damaged: Int(d[0][0].int ?? 0),
+                           blocked: Int(d[0][1].int ?? 0))
         }
     }
 

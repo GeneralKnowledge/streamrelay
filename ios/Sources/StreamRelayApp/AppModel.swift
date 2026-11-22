@@ -126,7 +126,9 @@ final class AppModel {
             guard let m = try? Manifest(folder: f) else { continue }
             try? m.recoverAfterRelaunch()
             guard let r = try? m.recording() else { continue }
-            let done = r.finishSent && ((try? m.backlog().segments) ?? 0) == 0
+            // blocked segments may still go once a reconcile finds their init on the server: not done yet
+            let b = try? m.backlog()
+            let done = r.finishSent && b != nil && b!.segments == 0 && b!.blocked == 0
             if !done { uploads.append(m) }
             if !r.finishRequested { resumable = m }           // the newest such wins (sorted oldest first)
         }
@@ -338,7 +340,11 @@ final class AppModel {
             await queue?.stop()
             // back in the foreground while the queue wound down: its own queue carries on instead
             guard transition == mine, !foreground else { return }
-            for m in pending { Pairing.handOff?.handOff(m) }   // a later cancelAll() voids any still being scheduled
+            // pairing may have changed during the await: check ownership again against the server now paired
+            guard let server = Pairing.server else { return }
+            for m in pending where Pairing.belongs(m, to: server) {
+                Pairing.handOff?.handOff(m)                   // a later cancelAll() voids any still being scheduled
+            }
         }
     }
 

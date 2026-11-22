@@ -1,6 +1,7 @@
 """Server limits: per-device rate limit and storage caps (storage-and-security.md)."""
 from __future__ import annotations
 
+import asyncio
 import os
 import time
 import uuid
@@ -45,11 +46,14 @@ class StorageGuard:
         self.reserved = 0
         self.read_at = 0.0
         self.landed_during_read: int | None = None   # writes stored while a refresh awaits the database
+        self.reading = asyncio.Lock()                # one database read at a time
 
     async def refresh(self, conn: psycopg.AsyncConnection) -> None:
         if self.landed_during_read is not None and self.used is not None:
             return                                   # another request is reading; the current total stands
-        if self.used is None or time.monotonic() - self.read_at > 1.0:
+        async with self.reading:                     # the first read: later callers wait for its total
+            if self.used is not None and time.monotonic() - self.read_at <= 1.0:
+                return
             self.landed_during_read = 0
             try:
                 cur = await conn.execute(
