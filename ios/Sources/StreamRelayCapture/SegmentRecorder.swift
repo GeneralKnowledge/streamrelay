@@ -43,6 +43,7 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
     /// One serial queue for every recorder's startRunning/stopRunning, so a new recording's session
     /// starts only after the previous one has let go of the camera.
     private static let sessionQueue = DispatchQueue(label: "streamrelay.capture-session", qos: .userInitiated)
+    private var recovery = 0                 // bumped by each camera recovery: older pending retries are void
     private var wantedQuality: Quality?      // the latest change(to:), applied when its close completes
     public let manifest: Manifest
     public var onEvent: (@Sendable (Event) -> Void)?
@@ -190,12 +191,13 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
     public func recoverCamera() {
         queue.async { [self] in
             guard active else { return }
-            let gen = generation
+            recovery += 1
+            let gen = generation, mine = recovery
             Self.sessionQueue.async { [self] in
                 if !session.isRunning { session.startRunning() }    // returns once started, or failed
                 let running = session.isRunning
                 queue.async { [self] in
-                    guard generation == gen, active else { return }  // Stop pressed meanwhile
+                    guard generation == gen, recovery == mine, active else { return }  // stopped, or a newer error
                     if running {
                         retryAfterWriterFailure()                    // a new epoch after a short wait
                         return
@@ -360,9 +362,11 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
             if active { onEvent?(.gaveUp("Recording stopped: the camera keeps failing. Press Start to try again.")) }
             return
         }
-        let gen = generation
+        let gen = generation, mine = recovery
         queue.asyncAfter(deadline: .now() + Double(writerFailures)) { [self] in
-            if generation == gen && active { startEpochOnQueue() }
+            // a newer camera error took over meanwhile, or the session stopped again: no epoch without a camera
+            guard generation == gen, recovery == mine, active else { return }
+            if session.isRunning { startEpochOnQueue() } else { recoverCamera() }
         }
     }
 
