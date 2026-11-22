@@ -1,4 +1,4 @@
--- StreamRelay schema v1 (PostgreSQL 16). Managed by Alembic; this file is the reference.
+-- StreamRelay schema v1 (PostgreSQL 16). Applied as services/streamrelay/migrations/0001_initial.sql (identical copy, checked by tests).
 
 CREATE TABLE users (
     id            uuid PRIMARY KEY,
@@ -114,6 +114,8 @@ CREATE TABLE playout_checkpoints (
     frame_offset   integer NOT NULL DEFAULT 0,
     speed          numeric(3,2) NOT NULL DEFAULT 1.0,
     output_frames  bigint NOT NULL DEFAULT 0,    -- output clock
+    position_us    bigint,                       -- source position on the broadcast timeline
+    behind_live_ms integer,                      -- newest stored footage minus position
     updated_at     timestamptz NOT NULL DEFAULT now()
 );
 
