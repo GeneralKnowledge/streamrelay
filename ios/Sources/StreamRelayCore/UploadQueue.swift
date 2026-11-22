@@ -334,7 +334,8 @@ public actor UploadQueue {
 
     private func idle() async throws {
         let until = max(now() + options.idleWait, pausedUntil)
-        while !nudged && !stopRequested && now() < until {
+        // a nudge ends an ordinary idle, but not a backoff: new segments mustn't spin the loop while paused
+        while !stopRequested && now() < until && (!nudged || now() < pausedUntil) {
             try await sleep(min(options.idleWait, until - now()))
         }
         nudged = false
