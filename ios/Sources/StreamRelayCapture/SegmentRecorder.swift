@@ -182,7 +182,7 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
     public func resume() {
         queue.async { [self] in
             guard active else { return }
-            startEpochOnQueue()
+            if session.isRunning { startEpochOnQueue() } else { recoverCamera() }   // never an epoch without a camera
         }
     }
 
@@ -216,7 +216,13 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
 
     /// Ends the current epoch (interruption, camera lost). Recording stays active, so `resume` restarts it.
     public func endEpoch(_ reason: EpochEndReason, completion: (@Sendable () -> Void)? = nil) {
-        queue.async { [self] in closeOnQueue(reason, completion: completion) }
+        queue.async { [self] in
+            if reason == .cameraLost {
+                resumeAfterClose = false     // no epoch waits on this close: camera recovery starts the next one
+                recovery += 1                // and delayed retries from before the error are void
+            }
+            closeOnQueue(reason, completion: completion)
+        }
     }
 
     /// Stop pressed: ends the epoch `stopped`. `completion` runs once the epoch's close is in the manifest.
@@ -342,7 +348,8 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
         waiting.forEach { $0() }
         if resumeAfterClose && active {
             resumeAfterClose = false
-            startEpochOnQueue()
+            // a resume that came in while closing: only with the camera running, else recover it first
+            if session.isRunning { startEpochOnQueue() } else { recoverCamera() }
         }
     }
 
