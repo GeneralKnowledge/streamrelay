@@ -15,6 +15,17 @@ jobs:
       - run: ruff check services tests tools
       - run: mypy
 
+  ios-core:
+    # The iPhone app's Foundation-only core (manifest, protocol client, upload
+    # queue) on Linux. The capture and app targets need the iOS SDK (laptop, xtool).
+    runs-on: ubuntu-24.04
+    container: swift:6.0-noble
+    steps:
+      - uses: actions/checkout@v4
+      - run: apt-get update -qq && apt-get install -yqq libsqlite3-dev
+      - run: swift test
+        working-directory: ios
+
   test:
     runs-on: ubuntu-24.04
     services:
