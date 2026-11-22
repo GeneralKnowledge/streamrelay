@@ -1,0 +1,3 @@
+[console_scripts]
+streamrelay-api = streamrelay.api.main:run
+streamrelay-playout = streamrelay.playout.supervisor:main

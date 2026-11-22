@@ -1,0 +1,4 @@
+{"wall": 1795356372.018931, "event": "start", "t0": 1795356373.9891925, "gap_start": 120.0, "gap_len": 180.0}
+{"wall": 1795356493.9897466, "event": "outage_start", "source_time": 120.0}
+{"wall": 1795356673.9942582, "event": "backlog_delivered", "last_segment": 149}
+{"wall": 1795357573.9896228, "event": "end"}

@@ -1,0 +1,91 @@
+{
+ "broadcast_id": "01a2044b-7668-713a-a812-fc988965c390",
+ "offline_windows_rel_s": [],
+ "viewer_warning_lines": [],
+ "recording_seconds": 28.8,
+ "source_seconds_shown": 24,
+ "source_seconds_range": [
+  0,
+  23
+ ],
+ "source_frame_largest_step": 1,
+ "clock_mapping": {
+  "offset_frames": 60,
+  "recorded_switches": 1,
+  "max_mismatch_frames": 0
+ },
+ "cpu_mean_core": 0.251,
+ "cpu_by_showing": {
+  "starting": 0.271,
+  "footage": 0.257,
+  "ended": 0.201
+ },
+ "cpu_max_1s": 0.64,
+ "late_ticks": 4,
+ "late_max_s": 0.124,
+ "phone_puts": {
+  "201": 30
+ },
+ "phone_acknowledged": 30,
+ "phone_segments": 30,
+ "store_play_results": {
+  "played": "30"
+ },
+ "checks": [
+  {
+   "name": "publish sessions at the receiver",
+   "passed": false,
+   "value": 2,
+   "gate": "1"
+  },
+  {
+   "name": "viewer sessions (no reconnect)",
+   "passed": true,
+   "value": 1,
+   "gate": "1"
+  },
+  {
+   "name": "viewer disconnected only after the broadcast ended",
+   "passed": false,
+   "value": false,
+   "gate": "True"
+  },
+  {
+   "name": "viewer warnings",
+   "passed": true,
+   "value": 0,
+   "gate": "0"
+  },
+  {
+   "name": "video PTS strictly increasing",
+   "passed": true,
+   "value": "0 non-increasing of 864",
+   "gate": "0"
+  },
+  {
+   "name": "video gaps over 1.5 frames",
+   "passed": true,
+   "value": "0 (max 34.0 ms)",
+   "gate": "0"
+  },
+  {
+   "name": "audio gaps over 25 ms",
+   "passed": true,
+   "value": "0 (max 1.0 ms)",
+   "gate": "0"
+  },
+  {
+   "name": "footage frames in source order, none twice",
+   "passed": true,
+   "value": "713 frames, 0 repeated, 0 out of order",
+   "gate": "0 repeated, 0 out of order"
+  },
+  {
+   "name": "recorded switches match the playout log",
+   "passed": true,
+   "value": "1 switches, max 0 frame off",
+   "gate": "<= 1 frame"
+  }
+ ],
+ "verdict": "fail"
+}

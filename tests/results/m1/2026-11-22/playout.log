@@ -1,0 +1,12 @@
+2026-11-22 17:05:27,131 INFO streamrelay.playout.supervisor 01a20438-4470-71b4-94de-eb3c990342f4: starting playout
+2026-11-22 17:05:34,382 INFO streamrelay.playout 01a20438-4470-71b4-94de-eb3c990342f4: starting -> live {'jumped_to': (0, 0)}
+2026-11-22 17:07:32,382 INFO streamrelay.playout 01a20438-4470-71b4-94de-eb3c990342f4: live -> holding {}
+2026-11-22 17:07:38,482 INFO streamrelay.playout 01a20438-4470-71b4-94de-eb3c990342f4: holding -> live {'jumped_to': (0, 62)}
+2026-11-22 17:10:32,482 INFO streamrelay.playout 01a20438-4470-71b4-94de-eb3c990342f4: live -> holding {}
+2026-11-22 17:11:32,416 INFO streamrelay.playout 01a20438-4470-71b4-94de-eb3c990342f4: holding -> live {'jumped_to': (0, 179)}
+2026-11-22 17:15:32,416 INFO streamrelay.playout 01a20438-4470-71b4-94de-eb3c990342f4: live -> holding {}
+2026-11-22 17:20:32,382 INFO streamrelay.playout 01a20438-4470-71b4-94de-eb3c990342f4: holding -> live {'jumped_to': (0, 449)}
+2026-11-22 17:25:26,349 INFO streamrelay.playout 01a20438-4470-71b4-94de-eb3c990342f4: live -> finishing {}
+2026-11-22 17:25:34,382 INFO streamrelay.playout 01a20438-4470-71b4-94de-eb3c990342f4: finishing -> ended {}
+2026-11-22 17:25:44,416 INFO streamrelay.playout 01a20438-4470-71b4-94de-eb3c990342f4: ended -> finished {}
+2026-11-22 17:25:45,473 INFO streamrelay.playout.supervisor 01a20438-4470-71b4-94de-eb3c990342f4: playout finished
