@@ -17,6 +17,7 @@ import os
 import uuid
 from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 import psycopg
 
@@ -26,9 +27,9 @@ TMP = ".tmp"
 class Rejected(Exception):
     """A request the protocol answers with a 4xx status."""
 
-    def __init__(self, status: int, reason: str):
+    def __init__(self, status: int, reason: str, retry_after: int | None = None):
         super().__init__(reason)
-        self.status, self.reason = status, reason
+        self.status, self.reason, self.retry_after = status, reason, retry_after
 
 
 @dataclass
@@ -107,16 +108,43 @@ class Store:
         except FileNotFoundError:
             pass
 
+    def safe_dir(self, key: str) -> str:
+        """Create the key's directory under the root, refusing symlinks and anything outside it.
+
+        Keys are built only from server-side UUIDs and integers, so this is a
+        second line of defence against a tampered store directory.
+        """
+        final = os.path.normpath(os.path.join(self.root, key))
+        if os.path.commonpath([final, self.root]) != self.root:
+            raise Rejected(422, "storage key outside the store")
+        d = self.root
+        for part in os.path.relpath(os.path.dirname(final), self.root).split(os.sep):
+            d = os.path.join(d, part)
+            try:
+                os.mkdir(d, 0o750)
+            except FileExistsError:
+                pass
+            if os.path.islink(d) or not os.path.isdir(d):
+                raise Rejected(422, "storage path is not a plain directory")
+        if os.path.lexists(final):
+            # a file with no committed row here means the startup scan has not run or something else wrote it
+            raise Rejected(409, "storage path already exists")
+        return d
+
+    def open_read(self, key: str) -> int:
+        """Open a stored file for reading without following a symlink at its last component."""
+        return os.open(self.path(key), os.O_RDONLY | os.O_NOFOLLOW)
+
     async def _place(self, rec: Received, key: str) -> str:
         final = self.path(key)
-        d = os.path.dirname(final)
-        os.makedirs(d, exist_ok=True)
+        d = self.safe_dir(key)
         os.rename(rec.path, final)
         await asyncio.to_thread(_fsync_dir, d)
         return final
 
     # ---- durable writes ----------------------------------------------------
-    async def put_init(self, conn: psycopg.AsyncConnection, bid: uuid.UUID, init_id: int, rec: Received) -> int:
+    async def put_init(self, conn: psycopg.AsyncConnection, bid: uuid.UUID, init_id: int, rec: Received,
+                       codec: str = "unprobed", width: int | None = None, height: int | None = None) -> int:
         key = self.init_key(bid, init_id)
         final = None
         try:
@@ -134,8 +162,8 @@ class Store:
                 if self.after_rename:
                     await self.after_rename()
                 await conn.execute(
-                    "INSERT INTO inits (broadcast_id, init_id, sha256, size_bytes, storage_key, codec)"
-                    " VALUES (%s, %s, %s, %s, %s, 'unprobed')", (bid, init_id, rec.sha256, rec.size, key))
+                    "INSERT INTO inits (broadcast_id, init_id, sha256, size_bytes, storage_key, codec, width, height)"
+                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (bid, init_id, rec.sha256, rec.size, key, codec, width, height))
             return 201
         except Exception:
             # An ordinary failure after the rename: the row was not committed, so the
@@ -145,7 +173,9 @@ class Store:
             self.discard(rec)
             raise
 
-    async def put_segment(self, conn: psycopg.AsyncConnection, m: SegmentMeta, rec: Received) -> int:
+    async def put_segment(self, conn: psycopg.AsyncConnection, m: SegmentMeta, rec: Received,
+                          late_for_live: bool = False) -> int:
+        """Store a segment. late_for_live marks it `skipped` at once (broadcast already finished)."""
         key = self.segment_key(m.broadcast_id, m.epoch, m.sequence)
         final = None
         try:
@@ -167,9 +197,10 @@ class Store:
                     await self.after_rename()
                 await conn.execute(
                     "INSERT INTO segments (broadcast_id, epoch, sequence, init_id, start_us, duration_us,"
-                    " size_bytes, sha256, storage_key) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                    (m.broadcast_id, m.epoch, m.sequence, m.init_id, m.start_us, m.duration_us,
-                     rec.size, rec.sha256, key))
+                    " size_bytes, sha256, storage_key, played_at, play_result)"
+                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (m.broadcast_id, m.epoch, m.sequence, m.init_id, m.start_us, m.duration_us, rec.size, rec.sha256,
+                     key, datetime.now(UTC) if late_for_live else None, "skipped" if late_for_live else None))
             return 201
         except Exception:
             if final:

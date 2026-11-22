@@ -1,3 +1,4 @@
 [console_scripts]
+streamrelay-admin = streamrelay.admin:main
 streamrelay-api = streamrelay.api.main:run
 streamrelay-playout = streamrelay.playout.supervisor:main

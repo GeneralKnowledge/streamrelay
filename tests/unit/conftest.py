@@ -36,7 +36,8 @@ def database_url() -> Iterator[str]:
 
 @pytest.fixture
 def settings(database_url: str, tmp_path) -> Settings:
-    return Settings(database_url=database_url, store_dir=str(tmp_path / "store"), static_token=TOKEN)
+    return Settings(database_url=database_url, store_dir=str(tmp_path / "store"), static_token=TOKEN,
+                    validate_media=False, max_active_broadcasts=100, storage_free_min_bytes=0)
 
 
 @pytest.fixture

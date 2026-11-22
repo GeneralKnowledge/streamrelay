@@ -1,12 +1,15 @@
-"""Upload API, protocol v1 subset for M1.
+"""Upload API, protocol v1.
 
-Endpoints: create broadcast, PUT init, PUT segment, epoch end, finish, status.
-Auth: a bearer device token looked up by hash in `devices` (M1 provisions one
-from SR_STATIC_TOKEN; pairing arrives in M3). Every broadcast-scoped request
-checks ownership; another account's broadcast is a 404, a deleted one a 410.
+Endpoints: pair, create broadcast, PUT init, PUT segment, epoch end, finish,
+status, heartbeat. Auth: a bearer device token looked up by hash in `devices`
+(issued by pairing; SR_STATIC_TOKEN can still provision one test device).
+Every broadcast-scoped request checks ownership; another account's broadcast
+is a 404, a deleted one a 410. Media is probed before it is accepted, uploads
+are rate-limited per device and refused with 507 when storage is full.
 """
 
 import logging
+import os
 import uuid
 from contextlib import asynccontextmanager
 from typing import Annotated, Any, Literal
@@ -18,9 +21,10 @@ from psycopg.types.json import Jsonb
 from psycopg_pool import AsyncConnectionPool
 from pydantic import BaseModel, Field
 
-from .. import db
+from .. import db, pairing, validate
 from ..config import Settings
 from ..ids import uuid7
+from ..limits import RateLimiter, StorageGuard
 from ..store import Rejected, SegmentMeta, Store
 
 log = logging.getLogger("streamrelay.api")
@@ -49,8 +53,29 @@ class Finish(BaseModel):
     last_epoch: int = Field(ge=0)
 
 
+class Pair(BaseModel):
+    code: str = Field(min_length=4, max_length=32)
+    name: str = Field(min_length=1, max_length=100)
+    platform: Literal["ios", "android", "test"]
+
+
+class Heartbeat(BaseModel):
+    epoch: int | None = None
+    captured_through: int | None = None
+    queue_depth: int | None = None
+    queue_bytes: int | None = None
+    battery: float | None = None
+    thermal: str | None = Field(None, max_length=20)
+    free_bytes: int | None = None
+    network: str | None = Field(None, max_length=20)
+
+
 def create_app(settings: Settings) -> FastAPI:
     store = Store(settings.store_dir)
+    rate = RateLimiter(settings.segment_puts_per_second)
+    pair_rate = RateLimiter(settings.pairing_attempts_per_minute / 60, burst=settings.pairing_attempts_per_minute)
+    PAIR_KEY = uuid.UUID(int=0)
+    storage = StorageGuard(store.root, settings.storage_max_bytes, settings.storage_free_min_bytes)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -73,7 +98,8 @@ def create_app(settings: Settings) -> FastAPI:
 
     @app.exception_handler(Rejected)
     async def rejected(_: Request, exc: Rejected) -> JSONResponse:
-        return JSONResponse({"error": exc.reason}, status_code=exc.status)
+        headers = {"Retry-After": str(exc.retry_after)} if exc.retry_after else None
+        return JSONResponse({"error": exc.reason}, status_code=exc.status, headers=headers)
 
     async def conn_dep(request: Request):
         async with request.app.state.pool.connection() as conn:
@@ -106,12 +132,40 @@ def create_app(settings: Settings) -> FastAPI:
     async def health() -> dict[str, str]:
         return {"status": "ok"}
 
+    @app.post("/v1/devices/pair", status_code=201)
+    async def pair(body: Pair, conn: Conn) -> dict[str, Any]:
+        pair_rate.take(PAIR_KEY)
+        token = pairing.new_token()
+        dev_id = uuid.uuid4()
+        async with conn.transaction():
+            cur = await conn.execute(
+                "UPDATE pairing_codes SET used_at = now() WHERE code_hash = %s AND used_at IS NULL AND expires_at > now()"
+                " RETURNING owner_id", (pairing.code_hash(body.code),))
+            row = await cur.fetchone()
+            if row is None:
+                raise Rejected(403, "pairing code unknown, used or expired")
+            await conn.execute("INSERT INTO devices (id, owner_id, name, platform, token_hash) VALUES (%s, %s, %s, %s, %s)",
+                               (dev_id, row[0], body.name, body.platform, db.token_hash(token)))
+        log.info("device %s paired", dev_id)
+        return {"device_id": str(dev_id), "token": token}
+
     @app.post("/v1/broadcasts", status_code=201)
     async def create(body: CreateBroadcast, conn: Conn, dev: Device, response: Response) -> dict[str, Any]:
         if body.destination_ids:
             raise Rejected(422, "destinations arrive in M5; send an empty destination_ids list")
         bid = uuid7()
         async with conn.transaction():
+            await conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (f"create:{dev[1]}",))
+            cur = await conn.execute("SELECT 1 FROM broadcasts WHERE device_id = %s AND client_ref = %s",
+                                     (dev[0], body.client_broadcast_ref))
+            if await cur.fetchone() is None:
+                cur = await conn.execute(
+                    "SELECT count(*) FROM broadcasts WHERE owner_id = %s AND deleted_at IS NULL"
+                    " AND state NOT IN ('finished', 'failed')", (dev[1],))
+                active = (await cur.fetchone() or [0])[0]
+                if active >= settings.max_active_broadcasts:
+                    raise Rejected(429, f"{active} broadcasts already active (limit {settings.max_active_broadcasts})",
+                                   retry_after=60)
             cur = await conn.execute(
                 "INSERT INTO broadcasts (id, owner_id, device_id, client_ref, title, catch_up_mode,"
                 " hold_max_delay_s, catch_up_max_speed, buffer_target_ms)"
@@ -157,11 +211,23 @@ def create_app(settings: Settings) -> FastAPI:
         if init_id < 0:
             raise Rejected(422, "init_id must be >= 0")
         want = sha_header(x_sr_sha256)
-        rec = await store.receive(request.stream(), settings.max_segment_bytes, content_length(request))
+        n = content_length(request)
+        await storage.check(conn, n or 0)
+        rec = await store.receive(request.stream(), settings.max_segment_bytes, n)
         if rec.sha256 != want:
             store.discard(rec)
             raise Rejected(422, "checksum mismatch")
-        status = await store.put_init(conn, bid, init_id, rec)
+        codec, width, height = "unprobed", None, None
+        if settings.validate_media:
+            try:
+                p = await validate.check_init(rec.path, settings.ffprobe)
+            except Rejected:
+                store.discard(rec)
+                raise
+            codec, width, height = p.codec, p.width, p.height
+        status = await store.put_init(conn, bid, init_id, rec, codec, width, height)
+        if status == 201:
+            storage.stored(rec.size)
         return Response(status_code=status)
 
     @app.put("/v1/broadcasts/{bid}/segments/{epoch}/{sequence}")
@@ -184,12 +250,38 @@ def create_app(settings: Settings) -> FastAPI:
         if final and x_sr_duration_us <= 0 or not final and not 500_000 <= x_sr_duration_us <= 4_000_000:
             raise Rejected(422, "duration_us out of range (0.5-4 s, or > 0 for the final segment)")
         want = sha_header(x_sr_sha256)
-        rec = await store.receive(request.stream(), settings.max_segment_bytes, content_length(request))
+        rate.take(dev[0])
+        # a replay of a stored segment is answered without reading the body or probing it
+        cur = await conn.execute("SELECT sha256 FROM segments WHERE broadcast_id = %s AND epoch = %s AND sequence = %s",
+                                 (bid, epoch, sequence))
+        row = await cur.fetchone()
+        if row is not None and bytes(row[0]) == want:
+            return Response(status_code=200)
+        n = content_length(request)
+        await storage.check(conn, n or 0)
+        rec = await store.receive(request.stream(), settings.max_segment_bytes, n)
         if rec.sha256 != want:
             store.discard(rec)
             raise Rejected(422, "checksum mismatch")
+        if settings.validate_media and row is None:
+            cur = await conn.execute("SELECT storage_key FROM inits WHERE broadcast_id = %s AND init_id = %s",
+                                     (bid, x_sr_init))
+            init = await cur.fetchone()
+            if init is None:
+                store.discard(rec)
+                raise Rejected(412, f"init segment {x_sr_init} not uploaded yet")
+            try:
+                await validate.check_segment(store.path(init[0]), rec.path, x_sr_duration_us, final,
+                                             os.path.dirname(rec.path), settings.ffprobe)
+            except Rejected:
+                store.discard(rec)
+                raise
+        cur = await conn.execute("SELECT state = 'finished' FROM broadcasts WHERE id = %s", (bid,))
+        late = bool((await cur.fetchone() or [False])[0])
         meta = SegmentMeta(bid, epoch, sequence, x_sr_init, x_sr_start_us, x_sr_duration_us, final)
-        status = await store.put_segment(conn, meta, rec)
+        status = await store.put_segment(conn, meta, rec, late_for_live=late)
+        if status == 201:
+            storage.stored(rec.size)
         return Response(status_code=status)
 
     @app.post("/v1/broadcasts/{bid}/epochs/{epoch}/end")
@@ -240,6 +332,16 @@ def create_app(settings: Settings) -> FastAPI:
                 await conn.execute("INSERT INTO events (broadcast_id, kind, detail) VALUES (%s, 'finish', %s)",
                                    (bid, Jsonb(body.model_dump())))
         return {"state": "finishing"}
+
+    @app.post("/v1/broadcasts/{bid}/heartbeat", status_code=204)
+    async def heartbeat(bid: uuid.UUID, body: Heartbeat, conn: Conn, dev: Device) -> Response:
+        await owned(conn, dev, bid)
+        await conn.execute(
+            "INSERT INTO device_heartbeats (broadcast_id, at, body) VALUES (%s, now(), %s)"
+            " ON CONFLICT (broadcast_id) DO UPDATE SET at = now(), body = EXCLUDED.body",
+            (bid, Jsonb(body.model_dump(exclude_none=True))))
+        await conn.execute("UPDATE devices SET last_seen_at = now() WHERE id = %s", (dev[0],))
+        return Response(status_code=204)
 
     @app.get("/v1/broadcasts/{bid}/status")
     async def status(bid: uuid.UUID, conn: Conn, dev: Device) -> dict[str, Any]:
