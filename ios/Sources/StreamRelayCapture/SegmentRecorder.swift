@@ -251,13 +251,15 @@ public final class SegmentRecorder: NSObject, @unchecked Sendable {
                 wantedQuality = nil
                 return
             }
-            let gen = generation
+            let gen = generation, mine = recovery
             closeOnQueue(.interrupted) { [self] in
                 queue.async { [self] in
                     // the latest request wins, even if another arrived while this close was under way
                     if let w = wantedQuality { setQuality(w); wantedQuality = nil }
-                    // Stop pressed meanwhile: this recording is over, don't start another epoch
-                    if generation == gen && active { startEpochOnQueue() }
+                    // Stop pressed meanwhile: this recording is over; a camera error meanwhile: its recovery
+                    // starts the next epoch once the camera is back
+                    guard generation == gen, recovery == mine, active else { return }
+                    if session.isRunning { startEpochOnQueue() } else { recoverCamera() }
                 }
             }
         }
