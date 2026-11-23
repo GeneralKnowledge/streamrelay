@@ -69,6 +69,8 @@ Later, not scheduled: Android client (same protocol, no server change), adaptive
 
 **Slot:** StreamRelay installs as its own app; Reuben frees a slot for the sitting (decided 2026-11-22).
 
+**Status (2026-11-22):** code written in `ios/` (recorder, manifest, conditions); not compiled for iOS yet; no phone run. The checker for pulled folders is `tools/ios_check/check_recording.py`. Sitting plan: [phone-sitting-m2-m3.md](phone-sitting-m2-m3.md).
+
 ## M3: Reliable upload
 
 **Goal.** Protocol v1 complete and trustworthy: a `201`/`200` means durably stored, and nothing is lost or duplicated across disconnects and restarts on either side.
@@ -84,9 +86,13 @@ Later, not scheduled: Android client (same protocol, no server change), adaptive
 
 **Evidence kept:** chaos report (per-segment ledger), server logs, iPhone run results file.
 
+**Status (2026-11-22):** server side, chaos run and the iPhone upload core (on Linux, against the real server) done: [results](../../tests/results/m3/2026-11-22/RESULTS.md). The iPhone run waits for the phone sitting.
+
 ## M4: Hybrid recovery and end-to-end proof
 
 **Goal.** Catch-up playback and the full scenario from the iPhone.
+
+**Transport (decided 2026-11-23).** M2/M3 phone sittings use plain `http://` to the laptop over Tailscale, which the app allows only for loopback and 100.64.0.0/10. From M4 on, the phone talks to the Hetzner server over `https://` only; before the M4 sitting, either remove the http exception or limit it to debug builds.
 
 **Built.** `catching_up` state with frame-drop video and `atempo` audio at a configurable speed (default 1.25×, tested up to 1.5×), speed ramps, `catch_up` / `hold` (optional `max_delay_s`) / `skip_to_live` setting, `finishing` with drain wait, playout checkpoints and restart, heartbeats; phone shows Live / Holding / Catching up and minutes behind live.
 

@@ -6,8 +6,10 @@ postgresql://postgres@127.0.0.1:5499/postgres. CI uses a service container.
 from __future__ import annotations
 
 import os
+import subprocess
 import uuid
 from collections.abc import Iterator
+from pathlib import Path
 
 import psycopg
 import pytest
@@ -17,6 +19,7 @@ from streamrelay.api.main import create_app
 from streamrelay.config import Settings
 
 ADMIN_URL = os.environ.get("SR_TEST_DATABASE_URL", "postgresql://postgres@127.0.0.1:5499/postgres")
+ROOT_DIR = Path(__file__).resolve().parents[2]
 TOKEN = "test-token-" + "a" * 32
 
 
@@ -36,10 +39,38 @@ def database_url() -> Iterator[str]:
 
 @pytest.fixture
 def settings(database_url: str, tmp_path) -> Settings:
-    return Settings(database_url=database_url, store_dir=str(tmp_path / "store"), static_token=TOKEN)
+    return Settings(database_url=database_url, store_dir=str(tmp_path / "store"), static_token=TOKEN,
+                    validate_media=False, max_active_broadcasts=100, storage_free_min_bytes=0)
 
 
 @pytest.fixture
 def client(settings: Settings) -> Iterator[TestClient]:
     with TestClient(create_app(settings), headers={"Authorization": f"Bearer {TOKEN}"}) as c:
         yield c
+
+
+@pytest.fixture(scope="session")
+def media(tmp_path_factory) -> Path:
+    """6 s of the test clip cut into init + three 2 s segments, plus a wrong-codec init, a video-only
+    fMP4 and an MPEG-TS copy."""
+    d = tmp_path_factory.mktemp("media")
+    subprocess.run(["python3", str(ROOT_DIR / "tools/testclip/make_clip.py"), str(d / "clip.mp4"), "--seconds", "6"], check=True)
+    subprocess.run([str(ROOT_DIR / "tools/testclip/segment.sh"), str(d / "clip.mp4"), str(d / "segs")], check=True,
+                   capture_output=True)
+    (d / "mp4v").mkdir()
+    subprocess.run(["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "testsrc=size=320x240:rate=30:duration=2",
+                    "-c:v", "mpeg4", "-f", "hls", "-hls_time", "2", "-hls_segment_type", "fmp4",
+                    "-hls_fmp4_init_filename", "init.mp4", "-hls_segment_filename", str(d / "mp4v/%05d.m4s"),
+                    str(d / "mp4v/index.m3u8")], check=True)
+    (d / "noaudio").mkdir()      # H.264 with no audio track
+    subprocess.run(["ffmpeg", "-v", "error", "-i", str(d / "clip.mp4"), "-an", "-c:v", "copy", "-f", "hls", "-hls_time", "2",
+                    "-hls_segment_type", "fmp4", "-hls_fmp4_init_filename", "init.mp4",
+                    "-hls_segment_filename", str(d / "noaudio/%05d.m4s"), str(d / "noaudio/index.m3u8")], check=True)
+    (d / "shortaudio").mkdir()   # audio only in the first 2 s of the 6 s clip, with no gap inside it
+    subprocess.run(["ffmpeg", "-v", "error", "-i", str(d / "clip.mp4"), "-c:v", "copy", "-af", "atrim=end=2",
+                    "-c:a", "aac", "-f", "hls", "-hls_time", "2", "-hls_segment_type", "fmp4",
+                    "-hls_fmp4_init_filename", "init.mp4", "-hls_segment_filename", str(d / "shortaudio/%05d.m4s"),
+                    str(d / "shortaudio/index.m3u8")], check=True)
+    subprocess.run(["ffmpeg", "-v", "error", "-i", str(d / "clip.mp4"), "-t", "2", "-c", "copy", "-f", "mpegts",
+                    str(d / "clip.ts")], check=True)     # clean H.264/AAC in the wrong container
+    return d / "segs"

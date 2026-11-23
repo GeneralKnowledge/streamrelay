@@ -1,0 +1,8 @@
+{
+ "broadcast_id": "01a204f7-27c0-78ad-b8c7-c1ee35e9eea4",
+ "segments": 600,
+ "epochs": 10,
+ "state": "finishing",
+ "finish_requested": true,
+ "problems": []
+}

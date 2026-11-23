@@ -1,0 +1,5 @@
+# StreamRelay installs as its own app (decided 2026-11-22): one bundle id, always reused.
+version: 1
+bundleID: org.forgemobile.streamrelay
+product: StreamRelay
+infoPath: Info.plist
