@@ -92,6 +92,8 @@ Later, not scheduled: Android client (same protocol, no server change), adaptive
 
 **Goal.** Catch-up playback and the full scenario from the iPhone.
 
+**Transport (decided 2026-11-23).** M2/M3 phone sittings use plain `http://` to the laptop over Tailscale, which the app allows only for loopback and 100.64.0.0/10. From M4 on, the phone talks to the Hetzner server over `https://` only; before the M4 sitting, either remove the http exception or limit it to debug builds.
+
 **Built.** `catching_up` state with frame-drop video and `atempo` audio at a configurable speed (default 1.25×, tested up to 1.5×), speed ramps, `catch_up` / `hold` (optional `max_delay_s`) / `skip_to_live` setting, `finishing` with drain wait, playout checkpoints and restart, heartbeats; phone shows Live / Holding / Catching up and minutes behind live.
 
 **Backlog arithmetic** (shown in the phone and dashboard, and checked in tests). With outage length B, catch-up speed s, recording bitrate r and uplink u:
